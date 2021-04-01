@@ -1,6 +1,6 @@
 import Head from 'next/head'
 
-const Home = () => {
+const LandingPage = () => {
   return (
     <div>
 
@@ -8,9 +8,9 @@ const Home = () => {
         <title>GameHighlights</title>
       </Head>
       
-      <h1>Welcome To Next</h1>
+      <h1>LandingPage</h1>
     </div>
   )
 }
 
-export default Home;
+export default LandingPage;

@@ -1,0 +1,152 @@
+$BorderColor:rgb(248, 0, 0);
+$BackgroudColor: rgb(20, 20, 20);
+
+.HeaderBar{
+
+    display: flex;
+    height: 10vh;
+    margin: auto ;
+    align-items: center;
+    background-color:$BackgroudColor;
+    border:  2px solid $BorderColor;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.userText{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 2.9vh;
+    text-decoration: none;
+    font-size: 2.7vh;
+    border: 0.2vh none ;
+    margin-right: 3vh;
+}
+
+.uploadText{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 2.9vh;
+    text-decoration: none;
+    font-size: 2.7vh;
+    
+    border: 0.2vh none ;
+    margin-right: 3vh;
+}
+
+.NavBarBorder{
+    border: 2px  solid $BorderColor;
+    background-color:$BackgroudColor;
+    width: 15vh;
+    height: 40vh;
+    flex: 1;
+    flex-direction: column;
+}
+
+
+
+.HomeButton
+{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 2.9vh;
+    text-decoration: none;
+    font-size: 2.7vh;
+    border: 0.2vh none ;
+}
+
+.menu-bars{
+    margin-left: 2vh;
+    font-size: 1vh;
+    background: none;
+}
+
+
+
+.NavBarBorder{
+
+    border: 2px  solid $BorderColor;
+    width: 15vh;
+    height: 80vh;
+    float: left;
+}
+
+.XButton{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 3vh;
+    text-align: center;
+    text-decoration: none;
+    font-size: 2vh;
+    border: 0.2vh none $BorderColor;
+    margin-top: 2vh;
+}
+
+.ToHomeButton{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 8vh;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.4vh;
+    border: 0.2vh solid $BorderColor;
+    margin-left: 1vh;
+    margin-top: 2vh;
+}
+
+.ToMyChanel{
+    background-color: transparent;
+    color: $BorderColor;
+    padding: 1.5vh 7vh;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.4vh;
+    border: 0.2vh solid $BorderColor;
+    margin-left: 1vh;
+    margin-top: 2vh;
+}
+
+.nav-menu{
+    border: 2px  solid $BorderColor;
+    background-color:$BackgroudColor;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 25vh;
+    height: 95vh;
+    position: fixed;
+    animation-name: tranlate-right;
+    animation-duration: 850ms;
+    animation-fill-mode: forwards;
+    z-index : 1;
+
+    top: 0%;
+}
+
+.nav-menu.active{
+
+    animation-name: tranlate-left;
+    animation-duration: 850ms;
+    animation-fill-mode: forwards;
+    z-index : 1;
+}
+
+@keyframes tranlate-left {
+
+    from{
+        transform: translateX(-300px);
+    }
+
+    to {
+        transform: translateX(0px);
+    }
+}
+
+@keyframes tranlate-right {
+
+    to {
+        transform: translateX(-300px);
+
+    }
+}
