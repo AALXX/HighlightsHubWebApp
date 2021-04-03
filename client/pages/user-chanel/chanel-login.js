@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from "react"
 import axios from 'axios';
 
-import { APIBACKEND } from "../EnviormentalVariables"
+import { APIBACKEND } from "../../EnviormentalVariables"
 
 const ChanelLogin = () => {
 
@@ -19,7 +19,7 @@ const ChanelLogin = () => {
         axios.post(`${APIBACKEND}/login-chanel`, data).then((res) => {
             if (res.data.ChanelToken !== null && res.data.ChanelToken !== "") {
                 localStorage.setItem("ChanelToken", res.data.ChanelToken)
-                router.push('/chanel')
+                router.push('/user-chanel')
             }
         })
     }

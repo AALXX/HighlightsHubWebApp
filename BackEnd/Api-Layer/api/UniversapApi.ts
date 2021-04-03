@@ -154,7 +154,7 @@ UniversalServerApi.get(
 );
 
 UniversalServerApi.get(
-  "/api/get-creatro-chanel-avatar/:publicchaneltoken",
+  "/api/get-creator-chanel-avatar/:publicchaneltoken",
   (req: Request, res: Response) => {
     GetCreatorChanelPubliucAvatar(req, res);
   }

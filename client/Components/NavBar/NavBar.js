@@ -12,7 +12,7 @@ const NavBar = () => {
                     G H
                 </button>
                 <div>
-                    <button className={styles.uploadText} onClick={() => router.push('/upload')} >
+                    <button className={styles.uploadText} onClick={() => router.push('/user-chanel/upload')} >
                         Upload
                     </button>
 
@@ -32,7 +32,7 @@ const NavBar = () => {
                         HOME
                     </button>
 
-                    <button className={styles.ToMyChanel} onClick={() => router.push("/chanel")}>
+                    <button className={styles.ToMyChanel} onClick={() => router.push("/user-chanel")}>
                         MY CHANEL
                     </button>
                 </nav>

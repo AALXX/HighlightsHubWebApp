@@ -3,9 +3,9 @@ import axios from "axios";
 import { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
 
-import styles from "../styles/Account.module.css"
+import styles from "../../styles/Account.module.css"
 
-import { APIBACKEND } from "../EnviormentalVariables"
+import { APIBACKEND } from "../../EnviormentalVariables"
 
 const AccountPage = () => {
 
@@ -15,7 +15,7 @@ const AccountPage = () => {
   useEffect(() => {
 
     if (localStorage.getItem("UserToken") === null) {
-      router.push('/login')
+      router.push('/account/login')
     }
 
     const url = `${APIBACKEND}/get-user/${localStorage.getItem("UserToken")}`;
@@ -23,7 +23,7 @@ const AccountPage = () => {
     axios.get(url).then((res) => {
       if (res.data[0] != null) {
         if (!res.data[0].IsLoggedIn) {
-          router.push('/login')
+          router.push('/account/login')
         }
         setuserName(res.data[0].AcountName)
       }

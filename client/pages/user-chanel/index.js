@@ -3,8 +3,8 @@ import axios from "axios";
 import { useRouter } from 'next/router'
 
 import { useState, useEffect } from "react"
-import { APIBACKEND } from "../EnviormentalVariables"
-import VideoTamplate from "../Components/VideoTemplate/VideoTamplate"
+import { APIBACKEND } from "../../EnviormentalVariables"
+import VideoTamplate from "../../Components/VideoTemplate/VideoTamplate"
 
 const UserChanelPage = () => {
     const router = useRouter();
@@ -35,7 +35,7 @@ const UserChanelPage = () => {
                 if (!res.data[0].IsLoggedIn) {
                     return (
                         localStorage.removeItem("ChanelToken"),
-                        router.push('/create-chanel')
+                        router.push('/user-chanel/create-chanel')
                     );
                 }
                 localStorage.setItem("ChanelToken", res.data[0].ChanelToken)

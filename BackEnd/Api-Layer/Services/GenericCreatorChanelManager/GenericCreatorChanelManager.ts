@@ -62,7 +62,7 @@ const GetChanelInfos = (PublicToken: any, res:any, callback: any,) => {
     if (err) {
       console.log(err);
     }
-
+    
     const PrivateCreatorChanelInfos = rows.map((row: any) => {
       return {
         PrivateChanelToken: row.ChanelToken,
@@ -90,6 +90,7 @@ const GetChanelInfos = (PublicToken: any, res:any, callback: any,) => {
   });
 };
 
+//Get Chanel Public Data
 export const GetCreatorChanelPubliucData = (req: any, res: any) => {
   GetChanelInfos(req.params.publicchaneltoken, res, (err: boolean, ChanelInfos: any) => {
     if (err) {
@@ -98,7 +99,7 @@ export const GetCreatorChanelPubliucData = (req: any, res: any) => {
     res.json(ChanelInfos.PublicCreatorChanelInfos);
   });
 };
-
+//Get Creator Chanel Avatar
 export const GetCreatorChanelPubliucAvatar = (req: any, res: any) => {
   GetChanelInfos(req.params.publicchaneltoken, res, (err: boolean, ChanelInfos: any) => {
     if (err) {
@@ -109,6 +110,9 @@ export const GetCreatorChanelPubliucAvatar = (req: any, res: any) => {
       const imgStream = fs.createReadStream(
         ChanelInfos.PrivateCreatorChanelInfos[0].ChanelAvatarPath
       );
+
+      // ADD image.pipe percentej and after it's done res.end()
+      
       imgStream.pipe(res);
       setTimeout(() => {
         res.end();

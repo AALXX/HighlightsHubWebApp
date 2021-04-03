@@ -5,7 +5,7 @@ const CreateChanel = () => {
 
     return (
         <div>
-            <button onClick={()=>router.push("/chanel-login")}>AleadyHave a chanel</button>
+            <button onClick={()=>router.push("/user-chanel/chanel-login")}>AleadyHave a chanel</button>
         </div>
     )
 }
