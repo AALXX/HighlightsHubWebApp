@@ -31,7 +31,12 @@ const LoginForm = () => {
 
             axios.post(`${APIBACKEND}/login-user`, data)
                 .then((res) => {
-                    localStorage.setItem("UserToken", res.data);
+
+                    if (res.data[0].WrongCredentials === true) {
+                        return window.alert("Wrong credentials")
+                    }
+
+                    localStorage.setItem("UserToken", res.data[0].UserToken);
                     router.push('/account')
                     
                 })

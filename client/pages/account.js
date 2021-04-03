@@ -3,10 +3,13 @@ import axios from "axios";
 import { useState, useEffect } from "react"
 import { useRouter } from 'next/router'
 
+import styles from "../styles/Account.module.css"
+
 import { APIBACKEND } from "../EnviormentalVariables"
 
 const AccountPage = () => {
 
+  const [userName, setuserName] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -15,31 +18,38 @@ const AccountPage = () => {
       router.push('/login')
     }
 
-    const url = `${APIBACKEND}/login/${localStorage.getItem("UserToken")}`;
+    const url = `${APIBACKEND}/get-user/${localStorage.getItem("UserToken")}`;
 
     axios.get(url).then((res) => {
       if (res.data[0] != null) {
-        if(!res.data[0].IsLoggedIn){
+        if (!res.data[0].IsLoggedIn) {
           router.push('/login')
         }
+        setuserName(res.data[0].AcountName)
       }
     });
-  
+
   }, []);
 
+  const Delete = () => {
+    localStorage.clear();
+  };
 
-const Delete = () => {
-  localStorage.clear();
-};
+  return (
+    <div>
+      <Head>
+        <title>GameHighlights</title>
+      </Head>
+      <form>
+        <button onClick={Delete}>Log out</button>
+      </form>
+      <div className={styles.UserAcountLogo}>
+        <div className={styles.UserAcountLogoDot}></div>
+        <h4 className={styles.WlcomeText}>Hello, {userName} </h4>
+      </div>
 
-return (
-  <div>
-    <Head>
-      <title>GameHighlights</title>
-    </Head>
-    <button onClick={Delete}>Clear</button>
-  </div>
-)
+    </div>
+  )
 }
 
 export default AccountPage;

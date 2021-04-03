@@ -9,6 +9,7 @@ import {
   GetChanelVideos,
   InsertChanelIntoDb,
   VerifyifUserHasChanel,
+  LoginToChanel
 } from "../Services/ChanelManager/ChanelManager";
 import {
   SendVideos,
@@ -50,7 +51,7 @@ UniversalServerApi.post("/api/login-user", (req: Request, res: Response) => {
   LoginUser(req, res);
 })
 
-UniversalServerApi.get("/api/login/:name", (req: Request, res: Response) => {
+UniversalServerApi.get("/api/get-user/:name", (req: Request, res: Response) => {
   GetusserAcount(req, res);
 });
 
@@ -158,6 +159,13 @@ UniversalServerApi.get(
     GetCreatorChanelPubliucAvatar(req, res);
   }
 );
+
+UniversalServerApi.post(
+  "/api/login-chanel/",
+  (req: Request, res: Response) => {
+    LoginToChanel(req, res)
+  }
+)
 
 http.listen(7000, function () {
   console.log("Server listening on port 7000");

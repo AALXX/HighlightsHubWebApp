@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 
 const saltRounds = 10;
 
+// Get User Public Data
 export const GetusserAcount = (req: any, res: any) => {
   const queryString = `SELECT * FROM users WHERE Token="${req.params.name}";`;
 
@@ -21,26 +22,37 @@ export const GetusserAcount = (req: any, res: any) => {
       };
     });
 
+    if (users == "" || users == null) {
+      return (
+        res.json([
+          {
+            IsLoggedIn: 0,
+          },
+        ])
+      )
+      }
+
     res.json(users);
+
   });
 }
 
 export const RegisterUser = (req: any, res: any) => {
   const RegisterqueryString = `INSERT INTO users(uidUsers,Token ,emailUsers,pwdUsers) VALUES (?,?,?,?)`;
   let UserToken = hat();
-  
+
   bcrypt.hash(req.body.PassWord, saltRounds, (err, hash) => {
     if (err) {
       console.log(err)
     }
-    connection.query(RegisterqueryString, [req.body.Username, UserToken, req.body.Mailuid, hash] , (err: any, rows: any) => {
+    connection.query(RegisterqueryString, [req.body.Username, UserToken, req.body.Mailuid, hash], (err: any, rows: any) => {
       if (err) {
         console.log(err);
         return;
       }
     });
   });
-    
+
 }
 export const LoginUser = (req: any, res: any) => {
   const loginQuerryString = `SELECT * FROM users WHERE emailUsers=?`
@@ -49,15 +61,35 @@ export const LoginUser = (req: any, res: any) => {
     if (err) {
       console.log(err)
     }
-
-    const User = rows.map((row:any) => {
+    
+    // Get User Data from Db
+    const User = rows.map((row: any) => {
       return {
-        HashedPassword: row.pwdUsers,
-        UserToken: row.Token
+        UserToken: row.Token,
+        WrongCredentials: false
+        
       }
     })
 
-    bcrypt.compare(req.body.Password, User[0].HashedPassword, function (err, isMatch) {
+    //If Credentals are wrong Send wrong credentials status
+    if (User == "" || User == null) {
+      return (
+        res.json([
+          {
+            WrongCredentials: true,
+          },
+        ])
+      )
+    }
+
+    //Compare hasedPassword with one from the usser
+    const UserPasswordFromDb = rows.map((row: any) => {
+    return {
+          HashedPassword: row.pwdUsers
+      }
+    })
+
+    bcrypt.compare(req.body.Password, UserPasswordFromDb[0].HashedPassword, function (err, isMatch) {
       if (err) {
         throw err
       } else if (!isMatch) {
@@ -67,17 +99,19 @@ export const LoginUser = (req: any, res: any) => {
         const IsAuthentificatedSqlQuerry = `UPDATE users SET IsLogedIn="1"  WHERE Token="${User[0].UserToken}";`
         connection.query(IsAuthentificatedSqlQuerry, (err: any) => {
           if (err) {
-          console.log(err)
+            console.log(err)
           }
-          res.json(User[0].UserToken)
+
+          res.json(User)
         })
       }
     })
-    
+
   })
 }
 
-export const GetUserPrivateAndPublicInformationsByToken = (Token:any, callback:any) => {
+// Get User Private And Public Informations By Token
+export const GetUserPrivateAndPublicInformationsByToken = (Token: any, callback: any) => {
   const GetAccountPublicAndPrivateInfo = `SELECT * FROM users WHERE Token="${Token}"`;
   connection.query(GetAccountPublicAndPrivateInfo, (err: any, rows: string[]) => {
     if (err) {
@@ -106,5 +140,4 @@ export const GetUserPrivateAndPublicInformationsByToken = (Token:any, callback:a
   })
 }
 
-export default { GetusserAcount, RegisterUser, LoginUser , GetUserPrivateAndPublicInformationsByToken};
-    
+export default { GetusserAcount, RegisterUser, LoginUser, GetUserPrivateAndPublicInformationsByToken };

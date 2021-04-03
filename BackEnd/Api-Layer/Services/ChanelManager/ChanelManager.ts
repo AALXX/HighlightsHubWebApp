@@ -21,8 +21,9 @@ let upload = multer({
   storage: storage,
 }).single("file");
 
+// CrateChanel
+
 export async function InsertChanelIntoDb(req: any, res: any) {
-  //console.log(req.body);
 
   upload(req, res, (err: any) => {
     if (err) {
@@ -66,30 +67,82 @@ export async function InsertChanelIntoDb(req: any, res: any) {
   });
 }
 
-export function VerifyifUserHasChanel(req: any, res: any) {
-  const sqlQuerry = `SELECT * FROM chanels WHERE ChanelOwnderToken="${req.params.name}"`;
+// Login Into Chanel
+export const LoginToChanel = (req: any, res: any) => {
 
+  const ChanelLoginQuerryString = `SELECT * FROM chanels WHERE ChanelEmail=?`;
+  connection.query(ChanelLoginQuerryString, [req.body.ChanelMail], (err: any, rows: any) => {
+    if (err) {
+      console.log(err)
+    }
+
+    // GetChanel Data by e-mail
+    const Chanel = rows.map((row: any) => {
+      return {
+        HashedPassword: row.ChanelPassword,
+        ChanelToken: row.ChanelToken
+      }
+    })
+
+    //Compare hasedPassword with one from the usser
+    bcrypt.compare(req.body.ChanelPassword, Chanel[0].HashedPassword, function (err, isMatch) {
+      if (err) {
+        throw err
+      } else if (!isMatch) {
+        console.log("Password doesn't match!")
+        res.end()
+      } else {
+        const IsAuthentificatedSqlQuerry = `UPDATE chanels SET IsLoggedIn="1"  WHERE ChanelToken="${Chanel[0].ChanelToken}";`
+        connection.query(IsAuthentificatedSqlQuerry, (err: any) => {
+          if (err) {
+            console.log(err)
+          }
+          res.json(Chanel[0].ChanelToken)
+        })
+      }
+    })
+
+  })
+
+}
+
+//VerifyIfThe User has a Chanel
+export const VerifyifUserHasChanel = (req: any, res: any) => {
+  const sqlQuerry = `SELECT * FROM chanels WHERE ChanelOwnderToken="${req.params.name}"`;
+  //TODO Add a ele statemant to not send
   connection.query(sqlQuerry, (err: any, rows: any) => {
     if (err) {
       console.log(err);
       return;
     }
 
-    const chanels = rows.map((row: any) => {
+    const chanel = rows.map((row: any) => {
       return {
         IsLoggedIn: row.IsLoggedIn,
         ChanelToken: row.ChanelToken,
       };
     });
 
-    res.json(chanels);
+    if (chanel == "" || chanel == null) {
+      return (
+        res.json([
+          {
+            IsLoggedIn: 0,
+          },
+        ])
+      )
+    }
+    res.json(chanel);
   });
 }
 
-export function GetChanelVideos(req: any, res: any) {
+//Get Chanel Videos
+export const GetChanelVideos = (req: any, res: any) => {
   GetChanelVids(req.params.name, (err: boolean, Videos: any) => {
     res.json(Videos)
   });
 }
+
+
 
 export default { InsertChanelIntoDb, VerifyifUserHasChanel, GetChanelVideos };
