@@ -1,7 +1,8 @@
 import Head from 'next/head'
 import { useState } from "react"
 import axios from 'axios';
-import { useRouter } from 'next/router'
+import Router from 'next/router'
+import Cookie from "js-cookie";
 
 
 import { APIBACKEND } from "../../EnviormentalVariables"
@@ -15,9 +16,6 @@ const LoginForm = () => {
     const [PassWord, setPassWord] = useState("");
     const [RepeatePassWord, setRepeatePassWord] = useState("");
 
-      const router = useRouter();
-
-    
     const LogInAcount = (e) => {
 
         e.preventDefault();
@@ -35,10 +33,13 @@ const LoginForm = () => {
                     if (res.data[0].WrongCredentials === true) {
                         return window.alert("Wrong credentials")
                     }
+                    Cookie.set("UserToken", res.data[0].UserToken,{
+                        expires: 360*86400,
+                        sameSite: "strict",
+                        path: "/"
+                    })
+                    Router.push('/account')
 
-                    localStorage.setItem("UserToken", res.data[0].UserToken);
-                    router.push('/account')
-                    
                 })
                 .catch(err => console.log(err));
         } else {
@@ -57,13 +58,13 @@ const LoginForm = () => {
         };
 
         if (data.PassWord != null && data.Mailuid != null && data.PassWord != null && data.RepeatePassWord != null) {
-        axios.post(
-            `${APIBACKEND}/register`,
-            data
+            axios.post(
+                `${APIBACKEND}/register`,
+                data
             )
-            .then((res) => (localStorage.setItem("UserToken", res.data)))
-            .catch((err) => console.log(err));
-        }else(
+                .then((res) => (cookieCutter.set('UserToken', res.data)))
+                .catch((err) => console.log(err));
+        } else (
             console.log("U didn't filled all forms")
         )
     };
@@ -71,6 +72,11 @@ const LoginForm = () => {
 
     return (
         <div>
+
+            <Head>
+                <title>GameHighlights</title>
+            </Head>
+
             <div>
                 <form onSubmit={LogInAcount}>
                     <input type="text" placeholder="E-mail..." onChange={(e) => { setmailuid(e.target.value) }} required />

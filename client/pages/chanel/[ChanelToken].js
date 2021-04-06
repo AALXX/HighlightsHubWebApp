@@ -1,46 +1,10 @@
-import { useRouter } from 'next/router'
-import { useState, useEffect } from "react";
 import axios from "axios";
 import VideoTamplate from "../../Components/VideoTemplate/VideoTamplate";
 import styles from "../../styles/GenericChanel.module.css"
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
-const GenericChanelPage = ({PublicChanelToken}) => {
-
-    const [ChanelName, setChanelName] = useState("")
-    const [ChanelFolowers, setChanelFolowers] = useState("")
-    const [VideoList, setVideoList] = useState([])
-
-    useEffect(() => {
-        const GetCreatorChanelData = (PublicToken) => {
-            axios
-                .get(
-                    `${APIBACKEND}/get-creator-chanel-data/${PublicToken}`
-                )
-                .then((res) => {
-                    setChanelName(res.data[0].ChanelName);
-                    setChanelFolowers(res.data[0].ChanelFolowers);
-                    GetCreatorChanelVideos(PublicChanelToken);
-                });
-        };
-        const GetCreatorChanelVideos = (PublicToken) => {
-            axios
-                .get(
-                    `${APIBACKEND}/get-creator-chanel-videos/${PublicToken}`
-                ).then((res) => {
-                    let tmpVideoList = [];
-                    for (let index = 0; index < res.data.length; index++) {
-                        tmpVideoList.push(res.data[index])
-                    }
-                    setVideoList(tmpVideoList)
-                })
-        }
-        
-        GetCreatorChanelData(PublicChanelToken);
-        // console.log(PublicChanelToken)
-    }, []);
-
+const GenericChanelPage = ({ PublicChanelToken, ChanelName, ChanelFolowers, VideoList }) => {
     return (
         <div className={styles.GeneralCreatorChanelContentPage}>
 
@@ -63,11 +27,23 @@ const GenericChanelPage = ({PublicChanelToken}) => {
     )
 }
 
+//Make get requests
+GenericChanelPage.getInitialProps = async (ctx) => {
+    const { query } = ctx;
+    const ChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-data/${query.ChanelToken}`);
+    const ChanelVideos = await axios.get(`${APIBACKEND}/get-creator-chanel-videos/${query.ChanelToken}`);
 
-//Move all Use Effect TO get Initial props
-GenericChanelPage.getInitialProps = async (ctx) =>{
-    const {query} = ctx;
-    return {PublicChanelToken: query.ChanelToken}
+    let tmpVideoList = [];
+    for (let index = 0; index < ChanelVideos.data.length; index++) {
+        tmpVideoList.push(ChanelVideos.data[index])
+    }
+    
+    return {
+        ChanelName: ChanelData.data[0].ChanelName,
+        ChanelFolowers: ChanelData.data[0].ChanelFolowers,
+        VideoList:tmpVideoList,
+        PublicChanelToken: query.ChanelToken
+    }
 }
 
 export default GenericChanelPage;

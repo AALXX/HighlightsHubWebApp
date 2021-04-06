@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import styles from "./style/VideoPlayerStyle.module.css";
 import { useRouter } from 'next/router'
+import Cookie from "js-cookie";
+
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
@@ -11,7 +13,7 @@ const VideoPlayer = ({
     VideoLikes,
     VideoTitle,
     HasUserLikedTheVideo,
-    ChanelPublicToken
+    ChanelPublicToken,
 }) => {
     const videoRef = useRef();
     const previousUrl = useRef(VideoPublicToken);
@@ -32,12 +34,12 @@ const VideoPlayer = ({
 
     const LikeVideoFunc = () => {
         const VideoData = {
-            UserToken: localStorage.getItem("UserToken"),
+            UserToken: Cookie.get("UserToken"),
             VideoToken: VideoPublicToken,
         };
 
         axios.post(
-            `${APIBACKEND}/video-player-manager/like-a-video`,
+            `${APIBACKEND}/like-a-video`,
             VideoData
         );
 

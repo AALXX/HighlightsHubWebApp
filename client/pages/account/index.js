@@ -1,38 +1,16 @@
 import Head from 'next/head'
+import Router from 'next/router'
 import axios from "axios";
-import { useState, useEffect } from "react"
-import { useRouter } from 'next/router'
+import Cookies from 'cookies'
+const cookieCutter = require('cookie-cutter')
 
 import styles from "../../styles/Account.module.css"
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
-const AccountPage = () => {
-
-  const [userName, setuserName] = useState("");
-  const router = useRouter();
-
-  useEffect(() => {
-
-    if (localStorage.getItem("UserToken") === null) {
-      router.push('/account/login')
-    }
-
-    const url = `${APIBACKEND}/get-user/${localStorage.getItem("UserToken")}`;
-
-    axios.get(url).then((res) => {
-      if (res.data[0] != null) {
-        if (!res.data[0].IsLoggedIn) {
-          router.push('/account/login')
-        }
-        setuserName(res.data[0].AcountName)
-      }
-    });
-
-  }, []);
-
+const AccountPage = (props) => {
   const Delete = () => {
-    localStorage.clear();
+    cookieCutter.set('UserToken', '', { expires: new Date(0) })
   };
 
   return (
@@ -40,16 +18,51 @@ const AccountPage = () => {
       <Head>
         <title>GameHighlights</title>
       </Head>
+
       <form>
         <button onClick={Delete}>Log out</button>
       </form>
       <div className={styles.UserAcountLogo}>
         <div className={styles.UserAcountLogoDot}></div>
-        <h4 className={styles.WlcomeText}>Hello, {userName} </h4>
+        <h4 className={styles.WlcomeText}>Hello, {props.UserName} </h4>
       </div>
 
     </div>
   )
+}
+
+AccountPage.getInitialProps = async ({ req, res }) => {
+  if (req) {
+
+    let HasTokenCookie = true;
+
+    // Create a cookies instance
+    const ServerSideCookies = new Cookies(req, res)
+    if (ServerSideCookies.get("UserToken") === null || ServerSideCookies.get("UserToken") === undefined) {
+      HasTokenCookie = false
+      //TODO ADD REDIRECT TO LOGIn
+    }
+
+    const UserData = await axios.get(`${APIBACKEND}/get-user/${ServerSideCookies.get("UserToken")}`);
+
+    return {
+      HasTokenCookie: HasTokenCookie,
+      UserName: UserData.data[0].AcountName
+    }
+  } else {
+
+    let HasTokenCookie = true;
+    if (cookieCutter.get("UserToken") === null || cookieCutter.get("UserToken") === undefined) {
+      Router.push("/account/login")
+    }
+
+    const UserData = await axios.get(`${APIBACKEND}/get-user/${cookieCutter.get("UserToken")}`);
+
+    return {
+      HasTokenCookie: HasTokenCookie,
+      UserName: UserData.data[0].AcountName
+    }
+  }
 }
 
 export default AccountPage;

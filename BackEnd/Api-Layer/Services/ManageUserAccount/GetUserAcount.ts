@@ -2,6 +2,7 @@
 import connection from '../DatabaseConnection/GetDatabaseConnection';
 import hat from "hat";
 import bcrypt from "bcrypt";
+import cookie from "cookie"
 
 const saltRounds = 10;
 

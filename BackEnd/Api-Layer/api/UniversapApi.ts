@@ -15,7 +15,7 @@ import {
   SendVideos,
   GetVideo,
 } from "../Services/LandingPageManager/LandingPageManager";
-import { LikeTheVideoFunc, GetVideoData} from "../Services/Video-PlayerManager/VideoPlayerManager";
+import { LikeTheVideoFunc, GetVideoData, HasUserLikedTheVideo} from "../Services/Video-PlayerManager/VideoPlayerManager";
 
 //User Packages
 import { GetusserAcount, RegisterUser, LoginUser } from "../Services/ManageUserAccount/GetUserAcount";
@@ -65,11 +65,18 @@ UniversalServerApi.get("/api/login/", (req: Request, res: Response) => {
 
 //Video Sharing
 UniversalServerApi.post(
-  "/api/video-player-manager/:name",
+  "/api/like-a-video/",
   (req: Request, res: Response) => {
     LikeTheVideoFunc(req, res);
   }
 );
+
+UniversalServerApi.post(
+  "/api/has-user-liked-video/",
+  (req: Request, res: Response) => {
+    HasUserLikedTheVideo(req, res);
+  }
+)
 
 UniversalServerApi.get(
   "/api/get-video-data/:videotoken",
