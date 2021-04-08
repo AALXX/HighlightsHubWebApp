@@ -4,6 +4,7 @@ import Cookies from 'cookies'
 import Cookie from "js-cookie";
 
 import VideoPlayer from "../Components/VideoPlayer/VideoPlayer"
+import CommentSection from "../Components/CommentSystem/CommentSection"
 
 import styles from "../styles/Home.module.css"
 import { APIBACKEND } from "../EnviormentalVariables"
@@ -25,9 +26,9 @@ const LandingPage = (props) => {
         VideoTitle={props.VideoTitle}
       />
 
-      {/* <CommentSection
-        VideoPublicToken={landingPageVideoToken}
-      /> */}
+      <CommentSection
+        VideoPublicToken={props.VideoToken}
+      />
     </div>
   )
 }

@@ -1,0 +1,15 @@
+.CommentSection {
+    border: 2px solid #f80000;
+    height: 80vh;
+    width: 15%;
+}
+
+.WathVideoPageContent{
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    height: 79vh;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+}

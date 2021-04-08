@@ -1,16 +1,21 @@
+import Head from 'next/head'
 import axios from "axios";
 import Cookies from 'cookies'
 import Cookie from "js-cookie";
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 import VideoPlayer from "../../Components/VideoPlayer/VideoPlayer.js";
+import CommentSection from "../../Components/CommentSystem/CommentSection"
+import styles from "../../styles/WatchVideo.module.css"
 
 
 const WatchVideoPage = (props) => {
 
 
     return (
-        <div>
+        <div className={styles.WathVideoPageContent}>
+            <Head><title>Watching: {props.VideoTitle}</title></Head>
+
             <VideoPlayer
                 VideoPublicToken={props.VideoToken}
                 ChanelName={props.VideoChanelName}
@@ -18,6 +23,10 @@ const WatchVideoPage = (props) => {
                 HasUserLikedTheVideo={props.HasUserLikedTheVideo}
                 ChanelPublicToken={props.ChanelPublicToken}
                 VideoTitle={props.VideoTitle}
+            />
+
+            <CommentSection
+                VideoPublicToken={props.VideoToken}
             />
         </div>
     )
