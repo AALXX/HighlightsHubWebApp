@@ -37,6 +37,7 @@ const UserChanelPage = (props) => {
                 <div key={index}>
                     <VideoTamplate
                         VideoName={Video.VideoName}
+                        VideoToken={Video.VideoToken}
                     />
                 </div>
             ))} 

@@ -41,15 +41,15 @@ const VideoPlayer = ({
         axios.post(
             `${APIBACKEND}/like-a-video`,
             VideoData
-        );
-
-        if (HasUserLiked === true) {
-            setVidLikes(VidLikes - 1);
-            setHasUserLiked(false);
-        } else {
-            setVidLikes(VidLikes + 1);
-            setHasUserLiked(true);
-        }
+        ).then(() => {      
+            if (HasUserLiked === true) {
+                setVidLikes(VidLikes - 1);
+                setHasUserLiked(false);
+            } else {
+                setVidLikes(VidLikes + 1);
+                setHasUserLiked(true);
+            }
+        })
     };
 
     return (

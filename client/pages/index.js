@@ -63,6 +63,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
   
   if (req) {
 
+    //*Create instance
     const ServerSideCookies = new Cookies(req, res)
     const VideoPlayerDatas = await GetVideoData(ServerSideCookies.get("UserToken"));
 

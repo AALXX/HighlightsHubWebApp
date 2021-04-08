@@ -22,6 +22,16 @@ export function SendVideos(req: any, res: any) {
       };
     });
 
+    if (Videos === "" || Videos === null) {
+      return (
+        res.json([
+          {
+            VideoDoesentExist: true,
+          },
+        ])
+      )
+    }
+
     const videoPath = Videos[0].VideoPath;
     const videoSize = fs.statSync(videoPath).size;
 
