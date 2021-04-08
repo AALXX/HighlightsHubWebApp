@@ -1,4 +1,3 @@
-//TODO:SEND VIDEOS/VIDEOSDATATO CLIENT 
 import connection from "../../DatabaseConnection/GetDatabaseConnection"
 
 

@@ -36,7 +36,7 @@ AccountPage.getInitialProps = async ({ req, res }) => {
 
     let HasTokenCookie = true;
 
-    // Create a cookies instance
+    //* Create a cookies instance
     const ServerSideCookies = new Cookies(req, res)
     if (ServerSideCookies.get("UserToken") === null || ServerSideCookies.get("UserToken") === undefined) {
       HasTokenCookie = false

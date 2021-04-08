@@ -27,7 +27,7 @@ const GenericChanelPage = ({ PublicChanelToken, ChanelName, ChanelFolowers, Vide
     )
 }
 
-//Make get requests
+//* Make get requests
 GenericChanelPage.getInitialProps = async (ctx) => {
     const { query } = ctx;
     const ChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-data/${query.ChanelToken}`);

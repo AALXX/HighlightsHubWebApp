@@ -33,6 +33,7 @@ const LandingPage = (props) => {
 }
 
 const GetVideoData = async (UserToken) => {
+  //*Get a video from backend
   const RandomVideo = await axios.get(`${APIBACKEND}/getrandomvideos/`);
 
   const VideoData = {
@@ -40,10 +41,12 @@ const GetVideoData = async (UserToken) => {
     VideoToken: RandomVideo.data.VideoToken,
   };
 
-
+  //*Chech if user liked It
   const HasUserLikedTheVideo = await axios.post(`${APIBACKEND}/has-user-liked-video`, VideoData);
+  //* GetChanelData
   const CreatorChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-by-video/${RandomVideo.data.VideoToken}`)
 
+  //* Return Data
   return {
     ChanelName: RandomVideo.data.ChanelName,
     VideoToken: RandomVideo.data.VideoToken,
@@ -55,6 +58,9 @@ const GetVideoData = async (UserToken) => {
 }
 
 LandingPage.getInitialProps = async ({ req, res }) => {
+
+  //* Check if is rendered client-side / server-side
+  
   if (req) {
 
     const ServerSideCookies = new Cookies(req, res)

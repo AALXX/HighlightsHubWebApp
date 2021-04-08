@@ -63,7 +63,7 @@ export const LoginUser = (req: any, res: any) => {
       console.log(err)
     }
     
-    // Get User Data from Db
+    //* Get User Data from Db
     const User = rows.map((row: any) => {
       return {
         UserToken: row.Token,
@@ -72,7 +72,7 @@ export const LoginUser = (req: any, res: any) => {
       }
     })
 
-    //If Credentals are wrong Send wrong credentials status
+    //*If Credentals are wrong Send wrong credentials status
     if (User == "" || User == null) {
       return (
         res.json([

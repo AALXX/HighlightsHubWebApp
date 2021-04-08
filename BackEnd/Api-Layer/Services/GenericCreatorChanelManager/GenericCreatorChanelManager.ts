@@ -54,7 +54,7 @@ export const GetPublicChanelToken = (req: any, res: any) => {
 };
 
 
-// Get Chanel Public Data
+//* Get Chanel Public Data
 const GetChanelInfos = (PublicToken: any, res:any, callback: any,) => {
   const GetCreatorChanelInfo = `SELECT * FROM chanels WHERE PublicToken="${PublicToken}"`;
 

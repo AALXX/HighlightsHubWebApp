@@ -1,15 +1,16 @@
-//Apliction pakeges
+//* Apliction pakeges
 import express, { Application, Request, Response } from "express";
 const UniversalServerApi: Application = express();
 const http = require("http").createServer(UniversalServerApi);
 import cors from "cors";
 
-//Chanel/Creato Packages
+//* Chanel/Creator Packages
 import {
   GetChanelVideos,
   InsertChanelIntoDb,
-  VerifyifUserHasChanel,
-  LoginToChanel
+  LoginToChanel,
+  UserChanelDataByPrivateToken,
+  GetUserChanelVideos
 } from "../Services/ChanelManager/ChanelManager";
 import {
   SendVideos,
@@ -17,14 +18,13 @@ import {
 } from "../Services/LandingPageManager/LandingPageManager";
 import { LikeTheVideoFunc, GetVideoData, HasUserLikedTheVideo} from "../Services/Video-PlayerManager/VideoPlayerManager";
 
-//User Packages
+//* User Packages
 import { GetusserAcount, RegisterUser, LoginUser } from "../Services/ManageUserAccount/GetUserAcount";
 
-// CommentSystem packages
-
+//* CommentSystem packages
 import { InsertCommentToDatabase, GetVideoComments } from "../Services/CommentSystemManager/CommentSystem"
 
-//Creator Packages
+//* Creator Packages
 import {
   GetPublicChanelToken,
   GetCreatorChanelPubliucData,
@@ -41,21 +41,28 @@ const corsOptions = {
 UniversalServerApi.use(cors(corsOptions));
 UniversalServerApi.use(express.json());
 
-
-//UserAccount
-UniversalServerApi.post("/api/register", (req: Request, res: Response) => {
+//* UserAccount
+UniversalServerApi.post(
+  "/api/register",
+  (req: Request, res: Response) => {
   RegisterUser(req, res);
 })
 
-UniversalServerApi.post("/api/login-user", (req: Request, res: Response) => {
+UniversalServerApi.post(
+  "/api/login-user",
+  (req: Request, res: Response) => {
   LoginUser(req, res);
 })
 
-UniversalServerApi.get("/api/get-user/:name", (req: Request, res: Response) => {
+UniversalServerApi.get(
+  "/api/get-user/:name",
+  (req: Request, res: Response) => {
   GetusserAcount(req, res);
 });
 
-UniversalServerApi.get("/api/login/", (req: Request, res: Response) => {
+UniversalServerApi.get(
+  "/api/login/",
+  (req: Request, res: Response) => {
   res.json([
     {
       IsLoggedIn: 0,
@@ -63,7 +70,7 @@ UniversalServerApi.get("/api/login/", (req: Request, res: Response) => {
   ]);
 });
 
-//Video Sharing
+//* Video Sharing
 UniversalServerApi.post(
   "/api/like-a-video/",
   (req: Request, res: Response) => {
@@ -107,7 +114,7 @@ UniversalServerApi.get(
   }
 );
 
-//CommentSystem
+//* CommentSystem
 UniversalServerApi.post(
   "/api/postacomment/",
   (req: Request, res: Response) => {
@@ -122,7 +129,7 @@ UniversalServerApi.post(
   }
 )
 
-//User Chanel
+//* User Chanel
 UniversalServerApi.post("/api/upload/", (req: Request, res: Response) => {
   Upload(req, res);
 });
@@ -131,14 +138,22 @@ UniversalServerApi.post("/api/createchanel/", (req: Request, res: Response) => {
   InsertChanelIntoDb(req, res);
 });
 
-UniversalServerApi.get(
-  "/api/checkforchanel/:name",
+UniversalServerApi.post(
+  "/api/get-user-chanel-data-by-private-token/",
   (req: Request, res: Response) => {
-    VerifyifUserHasChanel(req, res);
+    UserChanelDataByPrivateToken(req.body.ChanelToken, res)
   }
 );
 
-//GenericCreator
+UniversalServerApi.post(
+  "/api/get-user-chanel-videos-by-private-token/",
+  (req: Request, res: Response) => {
+    GetUserChanelVideos(req.body.ChanelToken, res)
+  }
+);
+
+
+//* GenericCreator
 UniversalServerApi.get(
   "/api/get-creator-chanel-by-video/:videotoken",
   (req: Request, res: Response) => {
@@ -159,6 +174,7 @@ UniversalServerApi.get(
     GetCreatorChanelPubliucData(req, res);
   }
 );
+
 
 UniversalServerApi.get(
   "/api/get-creator-chanel-avatar/:publicchaneltoken",

@@ -38,7 +38,7 @@ const UploadPage = () => {
         <div>
             <h1>Inserta video file</h1>
             <input type="file" name="file" onChange={fileChangedHandler} />
-            <button onClick={PublishVideo}> MakeItPublic </button>
+            <button onClick={PublishVideo}> Publish </button>
         </div>
     );
 }

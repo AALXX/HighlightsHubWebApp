@@ -21,8 +21,7 @@ let upload = multer({
   storage: storage,
 }).single("file");
 
-// CrateChanel
-
+//* CrateChanel
 export async function InsertChanelIntoDb(req: any, res: any) {
 
   upload(req, res, (err: any) => {
@@ -67,37 +66,58 @@ export async function InsertChanelIntoDb(req: any, res: any) {
   });
 }
 
-// Login Into Chanel
+//* Login Into Chanel
 export const LoginToChanel = (req: any, res: any) => {
 
-  const ChanelLoginQuerryString = `SELECT * FROM chanels WHERE ChanelEmail=?`;
-  connection.query(ChanelLoginQuerryString, [req.body.ChanelMail], (err: any, rows: any) => {
+  const ChanelLoginQuerryString = `SELECT * FROM chanels WHERE ChanelEmail=? AND ChanelOwnderToken=?`;
+  connection.query(ChanelLoginQuerryString, [req.body.ChanelMail, req.body.UserToken], (err: any, rows: any) => {
     if (err) {
       console.log(err)
     }
 
-    // GetChanel Data by e-mail
-    const Chanel = rows.map((row: any) => {
+    const ChanelPasswordFromDb = rows.map((row: any) => {
       return {
         HashedPassword: row.ChanelPassword,
-        ChanelToken: row.ChanelToken
       }
     })
 
-    //Compare hasedPassword with one from the usser
-    bcrypt.compare(req.body.ChanelPassword, Chanel[0].HashedPassword, function (err, isMatch) {
+    //* GetChanel Data by e-mail
+    const Chanel = rows.map((row: any) => {
+      return {
+        ChanelToken: row.ChanelToken,
+        WrongCredentials: false,
+      }
+    })
+
+    //* If Credentals are wrong Send wrong credentials status
+    if (Chanel == "" || Chanel == null) {
+      return (
+        res.json([
+          {
+            WrongCredentials: true,
+          },
+        ])
+      )
+    }
+
+    //*Compare hasedPassword with one from the usser
+    bcrypt.compare(req.body.ChanelPassword, ChanelPasswordFromDb[0].HashedPassword, function (err, isMatch) {
       if (err) {
         throw err
       } else if (!isMatch) {
-        console.log("Password doesn't match!")
-        res.end()
+        //* If Password is wrong Send wrong credentials status
+        res.json([
+          {
+            WrongCredentials: true,
+          },
+        ])
       } else {
-        const IsAuthentificatedSqlQuerry = `UPDATE chanels SET IsLoggedIn="1"  WHERE ChanelToken="${Chanel[0].ChanelToken}";`
+        const IsAuthentificatedSqlQuerry = `UPDATE chanels SET IsLoggedIn="1"  WHERE ChanelToken="${ChanelPasswordFromDb[0].ChanelToken}";`
         connection.query(IsAuthentificatedSqlQuerry, (err: any) => {
           if (err) {
             console.log(err)
           }
-          res.json(Chanel[0].ChanelToken)
+          res.json(Chanel)
         })
       }
     })
@@ -106,43 +126,52 @@ export const LoginToChanel = (req: any, res: any) => {
 
 }
 
-//VerifyIfThe User has a Chanel
-export const VerifyifUserHasChanel = (req: any, res: any) => {
-  const sqlQuerry = `SELECT * FROM chanels WHERE ChanelOwnderToken="${req.params.name}"`;
-  //TODO Add a ele statemant to not send
-  connection.query(sqlQuerry, (err: any, rows: any) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-
-    const chanel = rows.map((row: any) => {
-      return {
-        IsLoggedIn: row.IsLoggedIn,
-        ChanelToken: row.ChanelToken,
-      };
-    });
-
-    if (chanel == "" || chanel == null) {
-      return (
-        res.json([
-          {
-            IsLoggedIn: 0,
-          },
-        ])
-      )
-    }
-    res.json(chanel);
-  });
-}
-
-//Get Chanel Videos
+//* Get Chanel Videos
 export const GetChanelVideos = (req: any, res: any) => {
   GetChanelVids(req.params.name, (err: boolean, Videos: any) => {
     res.json(Videos)
   });
 }
 
+//* Get UserChanel  Data
+export const UserChanelDataByPrivateToken = (ChanelPrivateToken:string, res:any) => {
+  const GetCreatorChanelInfo = `SELECT * FROM chanels WHERE ChanelToken="${ChanelPrivateToken}"`;
 
+  connection.query(GetCreatorChanelInfo, (err: any, rows: string[]) => {
+    if (err) {
+      console.log(err);
+    }
+    
+    const UserrChanelInfos = rows.map((row: any) => {
+      return {
+        ChanelExists: true,
+        ChanelName: row.ChanelName,
+        ChanelFolowers: row.Folowers,
+        ChanelAvatarPath: row.ChanelAvatarPath,
+      };
+    });
 
-export default { InsertChanelIntoDb, VerifyifUserHasChanel, GetChanelVideos };
+    const PublicInfoisEmpty = Object.keys(UserrChanelInfos).length === 0
+
+    //*Check if infos are Empty
+    if (!PublicInfoisEmpty) {
+      res.json(UserrChanelInfos)
+    } else {
+      res.json([
+        {
+          ChanelExists: false,
+        },
+      ]);
+    }
+
+  });
+}
+
+//* Get UserAccount Videos
+export const GetUserChanelVideos = (PrivateChanelToken:any, res:any) => {
+  GetChanelVids(PrivateChanelToken, (err: boolean, Videos: any) => {
+    res.json(Videos)
+  });
+}
+
+export default { InsertChanelIntoDb, GetChanelVideos };

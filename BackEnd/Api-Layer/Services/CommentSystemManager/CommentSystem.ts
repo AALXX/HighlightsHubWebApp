@@ -39,7 +39,7 @@ export const GetVideoComments = (req: any, res: any) => {
           CommentContent: row.CommentContent
         }
       })
-      res.json(VideoComment)
+      res.json(VideoComment);
     })
   }
 }

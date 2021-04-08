@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router'
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import axios from 'axios';
+import Cookie from "js-cookie";
+
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
@@ -13,14 +15,22 @@ const ChanelLogin = () => {
     const LoginIntoChanel = () => {
         const data = {
             ChanelMail: ChanelMail,
-            ChanelPassword: ChanelPassword
+            ChanelPassword: ChanelPassword,
+            UserToken: Cookie.get("UserToken")
         };
 
         axios.post(`${APIBACKEND}/login-chanel`, data).then((res) => {
-            if (res.data.ChanelToken !== null && res.data.ChanelToken !== "") {
-                localStorage.setItem("ChanelToken", res.data.ChanelToken)
-                router.push('/user-chanel')
+
+            if (res.data[0].WrongCredentials === true) {
+                return window.alert("Wrong credentials")
             }
+            
+            Cookie.set("ChanelToken", res.data[0].ChanelToken, {
+                expires: 360 * 86400,
+                sameSite: "strict",
+                path: "/"
+            })
+            router.push('/user-chanel')
         })
     }
 
