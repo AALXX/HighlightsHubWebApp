@@ -60,8 +60,7 @@ const GetVideoData = async (UserToken) => {
 
 LandingPage.getInitialProps = async ({ req, res }) => {
 
-  //* Check if is rendered client-side / server-side
-  
+  //* Check if is rendered client-side / server-side 
   if (req) {
 
     //*Create instance

@@ -1,17 +1,27 @@
-import Head from 'next/head'
-import Router from 'next/router'
+import Head from 'next/head';
+import { useRouter } from 'next/router'
 import axios from "axios";
-import Cookies from 'cookies'
-const cookieCutter = require('cookie-cutter')
+import {useEffect} from "react"
+import Cookies from 'cookies';
+const cookieCutter = require('cookie-cutter');
 
 import styles from "../../styles/Account.module.css"
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
 const AccountPage = (props) => {
+  const Router = useRouter();
+
   const Delete = () => {
     cookieCutter.set('UserToken', '', { expires: new Date(0) })
   };
+
+  useEffect(() => {
+    if (props.HasTokenCookie === false) {
+      Router.push("/account/login")
+  }
+
+  }, [])
 
   return (
     <div>

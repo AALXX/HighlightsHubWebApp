@@ -130,11 +130,15 @@ UniversalServerApi.post(
 )
 
 //* User Chanel
-UniversalServerApi.post("/api/upload/", (req: Request, res: Response) => {
+UniversalServerApi.post(
+  "/api/upload/",
+  (req: Request, res: Response) => {
   Upload(req, res);
 });
 
-UniversalServerApi.post("/api/createchanel/", (req: Request, res: Response) => {
+UniversalServerApi.post(
+  "/api/createchanel/",
+  (req: Request, res: Response) => {
   InsertChanelIntoDb(req, res);
 });
 
@@ -190,6 +194,7 @@ UniversalServerApi.post(
   }
 )
 
+//* Api Listen to Port
 http.listen(7000, function () {
   console.log("Server listening on port 7000");
 });
