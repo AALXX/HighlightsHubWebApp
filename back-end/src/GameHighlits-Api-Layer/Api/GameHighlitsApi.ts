@@ -4,6 +4,7 @@ import express from 'express';
 //* imports from route folder
 import sampleRoutes from "../routes/routeSample";
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
+import VideoPlayerRoutesControler from "../routes/VideoPlayerRoutes/VideoPlayesRoutesControler"
 
 //*Configs
 import config from "../../config/config";
@@ -13,11 +14,12 @@ const router = express();
 
 //* Loging the request
 router.use((req, res, next) => {
-  logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}]`);
-  
-  res.on("finish", () => {
-    logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}], STATUS- [${res.statusCode}]`);
-  })
+
+  // logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}]`);
+
+  //   res.on("finish", () => {
+  //    logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}], STATUS- [${res.statusCode}]`);
+  // })
   next();
 });
 
@@ -38,8 +40,9 @@ router.use((req, res, next) => {
 })
 
 //* Routes
-router.use("/sample", sampleRoutes);
 router.use("/api/user-account-manager/", UserAccountRoutesControler);
+
+router.use("/api/video-player-manager/", VideoPlayerRoutesControler);
 
 
 
