@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import axios from "axios";
+import { useEffect } from "react"
+
+//*Import Cookies packages
 import Cookies from 'cookies'
 import Cookie from "js-cookie";
 
-
 import { APIBACKEND } from "../../EnviormentalVariables"
-import { useEffect } from "react"
 import VideoTamplate from "../../Components/VideoTemplate/VideoTamplate"
 import styles from "../../styles/UserChanel.module.css"
 
@@ -17,8 +18,6 @@ const UserChanelPage = (props) => {
         if (props.HasChanel === false) {
             Router.push("/user-chanel/chanel-login")
         }
-
-
     }, [])
 
     //* Render jsx
@@ -31,6 +30,7 @@ const UserChanelPage = (props) => {
             <button onClick={() => { Cookie.remove("ChanelToken") }}>Log out</button>
             {props.HasChanel ? (
                 <div><h1>Has no chanel</h1></div>
+
             ) : (
                 <div>
                     <div className={styles.UserChanelTop}>
@@ -40,6 +40,8 @@ const UserChanelPage = (props) => {
                         <h1>Folowers: {props.ChanelFolowers}</h1>
                     </div>
 
+                    {props.VideoList === undefined? (<div>
+                    </div>): (<div>
                     {props.VideoList.map((Video, index) => (
                         <div key={index}>
                             <VideoTamplate
@@ -48,6 +50,9 @@ const UserChanelPage = (props) => {
                             />
                         </div>
                     ))}
+
+                    </div>)}
+                    
                 </div>
             )}
         </div>
@@ -60,7 +65,7 @@ const GetChanelData = async (ChanelToken) => {
         ChanelToken: ChanelToken
     }
 
-    //*Requests
+    //* Requests
     const ChanelData = await axios.post(`${APIBACKEND}/get-user-chanel-data-by-private-token/`, data);
     const ChanelVideos = await axios.post(`${APIBACKEND}/get-user-chanel-videos-by-private-token/`, data);
 
@@ -87,7 +92,7 @@ UserChanelPage.getInitialProps = async ({ req, res }) => {
         //* Create a cookies instance
         const ServerSideCookies = new Cookies(req, res)
 
-        if (ServerSideCookies.get("ChanelToken") === undefined || ServerSideCookies.get("ChanelToken") === null) {
+        if (ServerSideCookies.get("ChanelToken") === undefined || ServerSideCookies.get("ChanelToken") === null || ServerSideCookies.get("UserToken") === undefined || ServerSideCookies.get("UserToken") === null) {
             return {
                 HasChanel: false
             }
@@ -102,7 +107,7 @@ UserChanelPage.getInitialProps = async ({ req, res }) => {
 
     } else {
 
-        if (Cookie.get("ChanelToken") === undefined || Cookie.get("ChanelToken") === null) {
+        if (Cookie.get("ChanelToken") === undefined || Cookie.get("ChanelToken") === null || Cookie.get("UserToken") === undefined || Cookie.get("UserToken") === null) {
             return {
                 HasChanel: false
             }

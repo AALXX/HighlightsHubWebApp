@@ -21,20 +21,20 @@ const LoginForm = () => {
         e.preventDefault();
 
         const data = {
-            mailuid: mailuid,
+            UserMail: mailuid,
             Password: Password
         };
 
-        if (data.mailuid != null && data.Password != null) {
+        if (data.UserMail != null && data.Password != null) {
 
-            axios.post(`${APIBACKEND}/login-user`, data)
+            axios.post(`${APIBACKEND}/user-account-manager/login-user-account`, data)
                 .then((res) => {
-
-                    if (res.data[0].WrongCredentials === true) {
-                        return window.alert("Wrong credentials")
+                    if (res.data.UserFound === false) {
+                        window.alert(res.data.message)
                     }
-                    Cookie.set("UserToken", res.data[0].UserToken,{
-                        expires: 360*86400,
+
+                    Cookie.set("UserToken", res.data.UserToken, {
+                        expires: 360 * 86400,
                         sameSite: "strict",
                         path: "/"
                     })
@@ -58,12 +58,18 @@ const LoginForm = () => {
         };
 
         if (data.PassWord != null && data.Mailuid != null && data.PassWord != null && data.RepeatePassWord != null) {
+
+            if (data.PassWord !== data.RepeatePassWord){
+                window.alert("Password Don't Match")
+            }
+            
             axios.post(
-                `${APIBACKEND}/register`,
+                `${APIBACKEND}/user-account-manager/register-user-account`,
                 data
-            )
-                .then((res) => (cookieCutter.set('UserToken', res.data)))
-                .catch((err) => console.log(err));
+            ).then((res) => {
+                Cookie.set('UserToken', res.data.UserToken)
+                //TODO push url to accoun page
+            }).catch((err) => console.log(err));
         } else (
             console.log("U didn't filled all forms")
         )

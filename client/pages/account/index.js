@@ -3,7 +3,8 @@ import { useRouter } from 'next/router'
 import axios from "axios";
 import {useEffect} from "react"
 import Cookies from 'cookies';
-const cookieCutter = require('cookie-cutter');
+import Cookie from "js-cookie";
+
 
 import styles from "../../styles/Account.module.css"
 
@@ -13,7 +14,7 @@ const AccountPage = (props) => {
   const Router = useRouter();
 
   const Delete = () => {
-    cookieCutter.set('UserToken', '', { expires: new Date(0) })
+    Cookie.remove('UserToken')
   };
 
   useEffect(() => {
@@ -49,28 +50,33 @@ AccountPage.getInitialProps = async ({ req, res }) => {
     //* Create a cookies instance
     const ServerSideCookies = new Cookies(req, res)
     if (ServerSideCookies.get("UserToken") === null || ServerSideCookies.get("UserToken") === undefined) {
-      HasTokenCookie = false
       //TODO ADD REDIRECT TO LOGIn
+      
+      return{
+        HasTokenCookie: false
+      }
     }
 
-    const UserData = await axios.get(`${APIBACKEND}/get-user/${ServerSideCookies.get("UserToken")}`);
+    const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${ServerSideCookies.get("UserToken")}`);
 
     return {
       HasTokenCookie: HasTokenCookie,
-      UserName: UserData.data[0].AcountName
+      UserName: UserData.data.AcountName
     }
   } else {
 
     let HasTokenCookie = true;
-    if (cookieCutter.get("UserToken") === null || cookieCutter.get("UserToken") === undefined) {
-      Router.push("/account/login")
+    if (Cookie.get("UserToken") === null || Cookie.get("UserToken") === undefined) {
+      return{
+        HasTokenCookie: false
+      }
     }
 
-    const UserData = await axios.get(`${APIBACKEND}/get-user/${cookieCutter.get("UserToken")}`);
+    const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${Cookie.get("UserToken")}`);
 
     return {
       HasTokenCookie: HasTokenCookie,
-      UserName: UserData.data[0].AcountName
+      UserName: UserData.data.AcountName
     }
   }
 }

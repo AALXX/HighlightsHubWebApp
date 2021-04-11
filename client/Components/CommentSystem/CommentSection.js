@@ -20,18 +20,21 @@ const CommentSection = ({ VideoPublicToken }) => {
 
     //* post comment to Api
     const PostComment = async (event) => {
-        event.preventDefault()
+        event.preventDefault() 
         try {
             const data = {
                 VideoToken: VideoToken,
                 CommentText: CommentText,
                 UserToken: Cookie.get("UserToken")
             }
-            await axios.post(`${APIBACKEND}/postacomment/`, data).then((res) => { console.log(res) })
+
+            await axios.post(`${APIBACKEND}/postacomment/`, data).then((res) => { 
+                
+                setVideoCommentsList([...VideoCommentsList, res.data[0]])
+            })
 
         } catch (error) {
-            console.log("there was a problem")
-
+            throw new Error(`there was a problem with fetchin: ${error}`)
         }
     }
 
