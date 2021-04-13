@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
+import ChanelManager  from "../ChanelManager/ChanelManager";
 
 const NAMESPACE = 'VideoPlayerManagerService';
 
@@ -66,7 +67,7 @@ const SendTheVideo = (req: Request, res: Response, next: NextFunction) => {
         } else {
 
           console.log("Nu are headders")
-          // return res.status(404);
+          return res.status(404);
         }
 
       }).catch(error => {
@@ -102,16 +103,28 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
         let VideosTonkensLenght = Object.keys(data).length;
         let VideoToBeSend = data[Math.floor(Math.random() * VideosTonkensLenght)];
 
-        const VideoDatas = {
-          VideoToken: VideoToBeSend.VideoToken,
-          VideoLikes: VideoToBeSend.VideoLikes,
-          VideoTitle: VideoToBeSend.VideoName,
-        }
-
-
-        res.status(202).json(VideoDatas);
-
+        
         //TODO GET CHANEL INFORMATIONS FROM CHANELAMANAGER
+        ChanelManager.GetChanelInformatiosFromVideo(VideoToBeSend.ChanelId, false, (err: boolean, ChanelData: any) => {
+
+          if (err) {
+            logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
+            res.status(202).json({
+              message:"a error has occured"
+            })
+          }
+          
+          // console.log(ChanelData);
+          
+          const VideoDatas = {
+            VideoToken: VideoToBeSend.VideoToken,
+            VideoLikes: VideoToBeSend.VideoLikes,
+            VideoTitle: VideoToBeSend.VideoName,
+            ChanelNameFromVideo: ChanelData.ChanelName
+          }
+          res.status(202).json(VideoDatas);
+          
+        });
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -132,6 +145,7 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
     });
 }
 
+
 //* Get user and Video Id from db
 const GetUserAndVideoID = (UserToken: string, res: Response, VideoToken: string, callback: any) => {
   const getUserIdAndVideoIdQuerryString = `SELECT * FROM users WHERE Token="${UserToken}"; SELECT * FROM videos WHERE VideoToken="${VideoToken}";`
@@ -150,7 +164,7 @@ const GetUserAndVideoID = (UserToken: string, res: Response, VideoToken: string,
         if (User !== undefined || Object.keys(User).length !== 0 || Video !== undefined || Object.keys(Video).length !== 0) {
           //* pack userId and VideoId To be sendTo callback
           const data = {
-            idUsers: User[0].idUsers,
+            idUser: User[0].idUsers,
             idVideo: Video[0].idVideo
           }
           callback(null, data);
@@ -181,14 +195,16 @@ const GetUserAndVideoID = (UserToken: string, res: Response, VideoToken: string,
 }
 
 
+
+
 //*Check If The User Liked The Video
-const UserLikedTheVideoCheck = (req: any, res: any) => {
+const UserLikedTheVideoCheck = (UserToken: string, VideoToken: string, res: any, callback: any) => {
 
-  if (req.body.UserToken != null && req.body.VideoToken != null) {
+  if (UserToken != null && VideoToken != null) {
 
-    GetUserAndVideoID(req.body.UserToken, res, req.body.VideoToken, (err: any, data: any) => {
+    GetUserAndVideoID(UserToken, res, VideoToken, (err: any, data: any) => {
       if (err) {
-        res.status(500);
+        callback(true, null);
       }
 
       const GetUserIdAndVideoId = `SELECT * FROM video_class WHERE IdVideo="${data.idVideo}"`;
@@ -199,41 +215,41 @@ const UserLikedTheVideoCheck = (req: any, res: any) => {
 
             //* Parse rows from database
             let UserThatLikedThevideo = JSON.parse(JSON.stringify(results));
-            
-            let UserLiked = false;
+
             let UserThatLikedVideoIdsSorted = UserThatLikedThevideo.sort(function (a: any, b: any) {
               return a.UserId - b.UserId
             });
-            
-            UserLiked = BinarySearchAlgorythmIfUserLiked(data.idUsers, UserThatLikedVideoIdsSorted);
-            res.status(202).json({
-              UserLiked: UserLiked
-            })
+
+            let UserLikedBoolean = BinarySearchAlgorythmIfUserLiked(data.idUser, UserThatLikedVideoIdsSorted);
+
+            data = {
+              VideoId: data.idVideo,
+              UserId: data.idUser,
+              UserLikedBoolean: UserLikedBoolean
+            }
+
+            callback(null, data)
 
           }).catch(error => {
             logging.error(NAMESPACE, error.message, error);
-            return res.status(500).json({
-              message: error.message,
-              error
-            });
+            callback(true, null);
           }).finally(() => {
             connection.end();
           });
-
         }).catch(error => {
           logging.error(NAMESPACE, error.message, error);
-          return res.status(500).json({
-            message: error.message,
-            error
-          });
+          callback(true, null);
         });
-    })
-
+    });
+  } else {
+    res.status(202).json({
+      message: "User Token or video token empty"
+    });
   }
-}
+};
 
 //* Binary Search if UserId is in Array
-const  BinarySearchAlgorythmIfUserLiked = (UserId: number, UserIdsArray: any)=> {
+const BinarySearchAlgorythmIfUserLiked = (UserId: number, UserIdsArray: any) => {
   let lower = 0;
   let upper = UserIdsArray.length - 1;
 
@@ -252,11 +268,48 @@ const  BinarySearchAlgorythmIfUserLiked = (UserId: number, UserIdsArray: any)=> 
 }
 
 //* Like The Video Function by VideoToken
+export const LikeTheVideoFunc = (req: any, res: any) => {
 
-//*Get Chanel
+  logging.info(NAMESPACE, "Video Player Manager Service LikeTheVideoFunc function called ");
+
+
+  UserLikedTheVideoCheck(req.body.UserToken, req.body.VideoToken, res, (err: boolean, Data: any) => {
+    if (err) {
+      res.status(500);
+    }
+
+    if (Data.UserLikedBoolean === true) {
+      const UnlikeVideoSqlQuerry = `UPDATE videos SET VideoLikes=VideoLikes+${1} WHERE VideoToken="${req.body.VideoToken}"; DELETE FROM video_class WHERE (IdVideo=${Data.VideoId} AND UserId=${Data.UserId});`
+      Connect().then(connection => {
+        Query(connection, UnlikeVideoSqlQuerry).then(() => {
+          res.status(202).json({
+            UserLikedBolean: true
+          });
+        }).finally(() => {
+          connection.end();
+        });
+      });
+    } else {
+      const UnlikeVideoSqlQuerry = `UPDATE videos SET VideoLikes=VideoLikes-${1} WHERE VideoToken="${req.body.VideoToken}"; INSERT INTO video_class(IdVideo,UserId) VALUES("${Data.VideoId}", "${Data.UserId}");`
+      Connect().then(connection => {
+        Query(connection, UnlikeVideoSqlQuerry).then(() => {
+          res.status(202).json({
+            UserLikedBolean: false
+          });
+        }).finally(() => {
+          connection.end();
+        });
+      });
+    }
+
+  });
+
+}
+
 
 export default {
   SendTheVideo,
   GetRandomVideoToken,
-  UserLikedTheVideoCheck
+  UserLikedTheVideoCheck,
+  LikeTheVideoFunc
 };

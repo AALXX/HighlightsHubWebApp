@@ -9,10 +9,9 @@ import { APIBACKEND } from "../../EnviormentalVariables"
 
 const VideoPlayer = ({
     VideoPublicToken,
-    ChanelName,
     VideoLikes,
     VideoTitle,
-    HasUserLikedTheVideo,
+    Chanelname,
     ChanelPublicToken,
 }) => {
     const videoRef = useRef();
@@ -21,7 +20,7 @@ const VideoPlayer = ({
     const router = useRouter()
 
     const [VidLikes, setVidLikes] = useState(0);
-    const [HasUserLiked, setHasUserLiked] = useState(false);
+    const [ChanelName, setChanelName] = useState("");
 
     useEffect(() => {
         if (previousUrl.current !== VideoPublicToken) {
@@ -29,8 +28,10 @@ const VideoPlayer = ({
         }
 
         setVidLikes(VideoLikes);
-        setHasUserLiked(HasUserLikedTheVideo);
-    }, [VideoPublicToken, VideoLikes, HasUserLikedTheVideo]);
+        setChanelName(Chanelname)
+        //TODO GEt chanel Infos by chanelToken
+
+    }, [VideoPublicToken, VideoLikes]);
 
     const LikeVideoFunc = () => {
         const VideoData = {
@@ -39,15 +40,14 @@ const VideoPlayer = ({
         };
 
         axios.post(
-            `${APIBACKEND}/like-a-video`,
+            `${APIBACKEND}/video-player-manager/like-the-video`,
             VideoData
-        ).then(() => {      
-            if (HasUserLiked === true) {
-                setVidLikes(VidLikes - 1);
-                setHasUserLiked(false);
-            } else {
+        ).then((res) => {
+            if (res.data.UserLikedBolean === true) {
                 setVidLikes(VidLikes + 1);
-                setHasUserLiked(true);
+            } else {
+                setVidLikes(VidLikes - 1);
+
             }
         })
     };
@@ -63,7 +63,7 @@ const VideoPlayer = ({
                 ref={videoRef}
             >
                 <source
-                    src={`${APIBACKEND}/getspecificvideo/${VideoPublicToken}`}
+                    src={`${APIBACKEND}/video-player-manager/get-specific-video/${VideoPublicToken}`}
                     type="video/mp4"
                 />
             </video>

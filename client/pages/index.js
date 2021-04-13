@@ -19,42 +19,38 @@ const LandingPage = (props) => {
 
       <VideoPlayer
         VideoPublicToken={props.VideoToken}
-        ChanelName={props.VideoChanelName}
+        Chanelname={props.ChanelName}
         VideoLikes={props.VideoLikes}
-        HasUserLikedTheVideo={props.HasUserLikedTheVideo}
-        ChanelPublicToken={props.ChanelPublicToken}
         VideoTitle={props.VideoTitle}
       />
 
-      <CommentSection
+      {/* <CommentSection
         VideoPublicToken={props.VideoToken}
-      />
+      /> */}
     </div>
   )
 }
 
 const GetVideoData = async (UserToken) => {
   //*Get a video from backend
-  const RandomVideo = await axios.get(`${APIBACKEND}/getrandomvideos/`);
+  const RandomVideo = await axios.get(`${APIBACKEND}/video-player-manager/get-random-video/`);
 
   const VideoData = {
     UserToken: UserToken,
     VideoToken: RandomVideo.data.VideoToken,
   };
+  // //* GetChanelData
+  // const CreatorChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-by-video/${RandomVideo.data.VideoToken}`)
 
-  //*Chech if user liked It
-  const HasUserLikedTheVideo = await axios.post(`${APIBACKEND}/has-user-liked-video`, VideoData);
-  //* GetChanelData
-  const CreatorChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-by-video/${RandomVideo.data.VideoToken}`)
+  // console.log(RandomVideo.data.ChanelNameFromVideo)
 
   //* Return Data
   return {
-    ChanelName: RandomVideo.data.ChanelName,
     VideoToken: RandomVideo.data.VideoToken,
     VideoLikes: RandomVideo.data.VideoLikes,
     VideoTitle: RandomVideo.data.VideoTitle,
-    HasUSerLikedTheVideo: HasUserLikedTheVideo.data[0].HasUserLiked,
-    CreatorChanelPublicToken: CreatorChanelData.data
+    ChanelName: RandomVideo.data.ChanelNameFromVideo,
+    // CreatorChanelPublicToken: CreatorChanelData.data
   }
 }
 
@@ -69,11 +65,10 @@ LandingPage.getInitialProps = async ({ req, res }) => {
 
     return {
       VideoToken: VideoPlayerDatas.VideoToken,
-      VideoChanelName: VideoPlayerDatas.ChanelName,
       VideoLikes: VideoPlayerDatas.VideoLikes,
-      HasUserLikedTheVideo: VideoPlayerDatas.HasUSerLikedTheVideo,
-      ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
       VideoTitle: VideoPlayerDatas.VideoTitle,
+      ChanelName: VideoPlayerDatas.ChanelName,
+      // ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
     }
 
   } else {
@@ -83,11 +78,10 @@ LandingPage.getInitialProps = async ({ req, res }) => {
     
     return {
       VideoToken: VideoPlayerDatas.VideoToken,
-      VideoChanelName: VideoPlayerDatas.ChanelName,
       VideoLikes: VideoPlayerDatas.VideoLikes,
-      HasUserLikedTheVideo: VideoPlayerDatas.HasUSerLikedTheVideo,
-      ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
       VideoTitle: VideoPlayerDatas.VideoTitle,
+      ChanelName: VideoPlayerDatas.ChanelName
+      // ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
     }
   }
 }
