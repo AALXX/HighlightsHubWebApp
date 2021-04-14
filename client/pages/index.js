@@ -22,6 +22,7 @@ const LandingPage = (props) => {
         Chanelname={props.ChanelName}
         VideoLikes={props.VideoLikes}
         VideoTitle={props.VideoTitle}
+        ChanelPublicToken={props.ChanelPublicToken}
       />
 
       {/* <CommentSection
@@ -39,10 +40,6 @@ const GetVideoData = async (UserToken) => {
     UserToken: UserToken,
     VideoToken: RandomVideo.data.VideoToken,
   };
-  // //* GetChanelData
-  // const CreatorChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-by-video/${RandomVideo.data.VideoToken}`)
-
-  // console.log(RandomVideo.data.ChanelNameFromVideo)
 
   //* Return Data
   return {
@@ -50,7 +47,7 @@ const GetVideoData = async (UserToken) => {
     VideoLikes: RandomVideo.data.VideoLikes,
     VideoTitle: RandomVideo.data.VideoTitle,
     ChanelName: RandomVideo.data.ChanelNameFromVideo,
-    // CreatorChanelPublicToken: CreatorChanelData.data
+    ChanelPublicToken: RandomVideo.data.ChanelPublicToken
   }
 }
 
@@ -60,7 +57,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
   if (req) {
 
     //*Create instance
-    const ServerSideCookies = new Cookies(req, res)
+    const ServerSideCookies = new Cookies(req, res);
     const VideoPlayerDatas = await GetVideoData(ServerSideCookies.get("UserToken"));
 
     return {
@@ -68,7 +65,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
       VideoLikes: VideoPlayerDatas.VideoLikes,
       VideoTitle: VideoPlayerDatas.VideoTitle,
       ChanelName: VideoPlayerDatas.ChanelName,
-      // ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
+      ChanelPublicToken: VideoPlayerDatas.ChanelPublicToken,
     }
 
   } else {
@@ -80,8 +77,8 @@ LandingPage.getInitialProps = async ({ req, res }) => {
       VideoToken: VideoPlayerDatas.VideoToken,
       VideoLikes: VideoPlayerDatas.VideoLikes,
       VideoTitle: VideoPlayerDatas.VideoTitle,
-      ChanelName: VideoPlayerDatas.ChanelName
-      // ChanelPublicToken: VideoPlayerDatas.CreatorChanelPublicToken,
+      ChanelName: VideoPlayerDatas.ChanelName,
+      ChanelPublicToken: VideoPlayerDatas.ChanelPublicToken,
     }
   }
 }

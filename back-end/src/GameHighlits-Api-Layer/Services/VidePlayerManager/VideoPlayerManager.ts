@@ -104,7 +104,6 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
         let VideoToBeSend = data[Math.floor(Math.random() * VideosTonkensLenght)];
 
         
-        //TODO GET CHANEL INFORMATIONS FROM CHANELAMANAGER
         ChanelManager.GetChanelInformatiosFromVideo(VideoToBeSend.ChanelId, false, (err: boolean, ChanelData: any) => {
 
           if (err) {
@@ -120,7 +119,8 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
             VideoToken: VideoToBeSend.VideoToken,
             VideoLikes: VideoToBeSend.VideoLikes,
             VideoTitle: VideoToBeSend.VideoName,
-            ChanelNameFromVideo: ChanelData.ChanelName
+            ChanelNameFromVideo: ChanelData.ChanelName,
+            ChanelPublicToken:ChanelData.PublicChanelToken
           }
           res.status(202).json(VideoDatas);
           

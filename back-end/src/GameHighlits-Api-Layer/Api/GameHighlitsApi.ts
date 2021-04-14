@@ -2,7 +2,6 @@ import http from 'http';
 import express from 'express';
 
 //* imports from route folder
-import sampleRoutes from "../routes/routeSample";
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
 import VideoPlayerRoutesControler from "../routes/VideoPlayerRoutes/VideoPlayesRoutesControler"
 

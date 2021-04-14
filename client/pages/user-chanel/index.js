@@ -40,19 +40,19 @@ const UserChanelPage = (props) => {
                         <h1>Folowers: {props.ChanelFolowers}</h1>
                     </div>
 
-                    {props.VideoList === undefined? (<div>
-                    </div>): (<div>
-                    {props.VideoList.map((Video, index) => (
-                        <div key={index}>
-                            <VideoTamplate
-                                VideoName={Video.VideoName}
-                                VideoToken={Video.VideoToken}
-                            />
-                        </div>
-                    ))}
+                    {props.VideoList === undefined ? (<div>
+                    </div>) : (<div>
+                        {props.VideoList.map((Video, index) => (
+                            <div key={index}>
+                                <VideoTamplate
+                                    VideoName={Video.VideoName}
+                                    VideoToken={Video.VideoToken}
+                                />
+                            </div>
+                        ))}
 
                     </div>)}
-                    
+
                 </div>
             )}
         </div>
