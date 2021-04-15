@@ -24,9 +24,17 @@ const GetUserAccountData = (req: Request, res: Response) => {
       Query(connection, GetAccountQueryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
+
+        if (Object.keys(data).length === 0) {
+          return res.status(200).json({
+            succeded:false
+          })
+        }
+        
         const UserAccountData = {
           AcountName: data[0].uidUsers,
-          message: null
+          message: null,
+          succeded:true
         }
 
         res.status(200).json(UserAccountData);

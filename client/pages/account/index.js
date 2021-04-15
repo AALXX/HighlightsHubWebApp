@@ -18,7 +18,7 @@ const AccountPage = (props) => {
   };
 
   useEffect(() => {
-    if (props.HasTokenCookie === false) {
+    if (props.AccountExists === false) {
       Router.push("/account/login")
   }
 
@@ -45,7 +45,7 @@ const AccountPage = (props) => {
 AccountPage.getInitialProps = async ({ req, res }) => {
   if (req) {
 
-    let HasTokenCookie = true;
+    let AccountExists = true;
 
     //* Create a cookies instance
     const ServerSideCookies = new Cookies(req, res)
@@ -53,29 +53,39 @@ AccountPage.getInitialProps = async ({ req, res }) => {
       //TODO ADD REDIRECT TO LOGIn
       
       return{
-        HasTokenCookie: false
+        AccountExists: false
       }
     }
 
     const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${ServerSideCookies.get("UserToken")}`);
 
+    if(UserData.data.succeded === false){
+      return{
+        AccountExists: false
+      }
+    }
+
     return {
-      HasTokenCookie: HasTokenCookie,
+      AccountExists: AccountExists,
       UserName: UserData.data.AcountName
     }
   } else {
 
-    let HasTokenCookie = true;
+    let AccountExists = true;
     if (Cookie.get("UserToken") === null || Cookie.get("UserToken") === undefined) {
       return{
-        HasTokenCookie: false
+        AccountExists: false
       }
     }
 
     const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${Cookie.get("UserToken")}`);
-
+    if(UserData.data.succeded === false){
+      return{
+        AccountExists: false
+      }
+    }
     return {
-      HasTokenCookie: HasTokenCookie,
+      AccountExists: AccountExists,
       UserName: UserData.data.AcountName
     }
   }

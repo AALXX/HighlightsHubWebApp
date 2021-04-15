@@ -104,7 +104,7 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
         let VideoToBeSend = data[Math.floor(Math.random() * VideosTonkensLenght)];
 
         
-        ChanelManager.GetChanelInformatiosFromVideo(VideoToBeSend.ChanelId, false, (err: boolean, ChanelData: any) => {
+        ChanelManager.GetChanelInformatios(VideoToBeSend.ChanelId, false, (err: boolean, ChanelData: any) => {
 
           if (err) {
             logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");

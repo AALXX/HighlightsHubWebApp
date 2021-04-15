@@ -1,49 +1,101 @@
 import axios from "axios";
+import { useEffect } from "react";
 import VideoTamplate from "../../Components/VideoTemplate/VideoTamplate";
 import styles from "../../styles/GenericChanel.module.css"
 
+
 import { APIBACKEND } from "../../EnviormentalVariables"
 
-const GenericChanelPage = ({ PublicChanelToken, ChanelName, ChanelFolowers, VideoList }) => {
+const GenericChanelPage = (props) => {
+
+    useEffect(() => {
+
+        if (props.ChanelExists === false) {
+            window.alert("this chanel doesen't exists")
+        }
+
+    }, [])
+
     return (
         <div className={styles.GeneralCreatorChanelContentPage}>
 
-            <div className={styles.GenericCreatorChanelTop}>
-                <img className={styles.ChanelAvatarImage} src={`${APIBACKEND}/get-creator-chanel-avatar/${PublicChanelToken}`} alt="" width="150" height="150" />
-                <h1>{ChanelName}</h1>
-                <h1>Folowers: {ChanelFolowers}</h1>
-                <button>Follow</button>
-            </div>
-            <br />
-            {VideoList.map((Video, index) => (
-                <div key={index}>
-                    <VideoTamplate
-                        VideoToken={Video.VideoToken}
-                        VideoName={Video.VideoName}
-                    />
+            {props.ChanelExists ? (
+                <div>
+                    <div className={styles.GenericCreatorChanelTop}>
+                        {/* <img className={styles.ChanelAvatarImage} src={`${APIBACKEND}/get-creator-chanel-avatar/${PublicChanelToken}`} alt="" width="150" height="150" /> */}
+                        <h1>{props.ChanelName}</h1>
+                        <h1>Folowers: {props.ChanelFolowers}</h1>
+                        <button>Follow</button>
+                    </div>
+                    <br />
+                    {props.VideoList.map((Video, index) => (
+                        <div key={index}>
+                            <VideoTamplate
+                                VideoToken={Video.VideoToken}
+                                VideoName={Video.VideoName}
+                            />
+                        </div>
+                    ))}
                 </div>
-            ))}
+            ) : (
+                <div><h1>Chanel doesen't exist</h1></div>
+            )}
         </div>
     )
 }
 
-//* Make get requests
-GenericChanelPage.getInitialProps = async (ctx) => {
-    const { query } = ctx;
-    const ChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-data/${query.ChanelToken}`);
-    const ChanelVideos = await axios.get(`${APIBACKEND}/get-creator-chanel-videos/${query.ChanelToken}`);
+//* Get creator chanel by public tocken
+const GetCreatorChanelData = async (ChanelPubicToken) => {
 
-    let tmpVideoList = [];
-    for (let index = 0; index < ChanelVideos.data.length; index++) {
-        tmpVideoList.push(ChanelVideos.data[index])
+    //*Get creator chanel data
+    const CreatorChanelData = await axios.post(`${APIBACKEND}/chanel-manager/get-creator-chanel-data/`, { ChanelPubicToken });
+
+    if (CreatorChanelData.data.ChanelExists === false) {
+        return { ChanelExists: false }
     }
-    
+    //*Get Chanel videos
+    const data = {
+        ChanelId: CreatorChanelData.data.ChanelData.ChanelId
+    }
+    const ChanelVideos = await axios.post(`${APIBACKEND}/chanel-manager/get-chanel-videos/`, data);
+
+    let VideoList = [];
+    for (let index = 0; index < ChanelVideos.data.Videos.length; index++) {
+        VideoList.push(ChanelVideos.data.Videos[index])
+    }
+
     return {
-        ChanelName: ChanelData.data[0].ChanelName,
-        ChanelFolowers: ChanelData.data[0].ChanelFolowers,
-        VideoList:tmpVideoList,
-        PublicChanelToken: query.ChanelToken
+        ChanelName: CreatorChanelData.data.ChanelData.ChanelName,
+        ChanelFolowers: CreatorChanelData.data.ChanelData.ChanelFolowers,
+        VideoList: VideoList,
+        ChanelExists: true
     }
+}
+
+GenericChanelPage.getInitialProps = async ({ req, res, query }) => {
+
+    //*Determinate if is clientside/render-side rendering
+    if (req) {
+        const CreatroChanelData = await GetCreatorChanelData(query.ChanelToken);
+
+        return {
+            ChanelName: CreatroChanelData.ChanelName,
+            ChanelFolowers: CreatroChanelData.ChanelFolowers,
+            VideoList: CreatroChanelData.VideoList,
+            ChanelExists: CreatroChanelData.ChanelExists
+        }
+    } else {
+
+        const CreatroChanelData = await GetCreatorChanelData(query.ChanelToken);
+
+        return {
+            ChanelName: CreatroChanelData.ChanelName,
+            ChanelFolowers: CreatroChanelData.ChanelFolowers,
+            VideoList: CreatroChanelData.VideoList,
+            ChanelExists: CreatroChanelData.ChanelExists
+        }
+    }
+
 }
 
 export default GenericChanelPage;

@@ -15,7 +15,7 @@ const UserChanelPage = (props) => {
     const Router = useRouter();
 
     useEffect(() => {
-        if (props.HasChanel === false) {
+        if (props.HasChanelCheck === false) {
             Router.push("/user-chanel/chanel-login")
         }
     }, [])
@@ -61,27 +61,33 @@ const UserChanelPage = (props) => {
 
 const GetChanelData = async (ChanelToken) => {
 
-    const data = {
-        ChanelToken: ChanelToken
-    }
 
+
+    
     //* Requests
-    const ChanelData = await axios.post(`${APIBACKEND}/get-user-chanel-data-by-private-token/`, data);
-    const ChanelVideos = await axios.post(`${APIBACKEND}/get-user-chanel-videos-by-private-token/`, data);
+    const ChanelData = await axios.post(`${APIBACKEND}/chanel-manager/get-user-own-chanel-data/`, {ChanelToken});
 
-    let tmpVideoList = [];
-    for (let index = 0; index < ChanelVideos.data.length; index++) {
-        tmpVideoList.push(ChanelVideos.data[index])
+    const data = {
+        ChanelId:ChanelData.data.ChanelData.ChanelId
     }
+    
+    const ChanelVideos = await axios.post(`${APIBACKEND}/chanel-manager/get-chanel-videos/`, data);
 
-    if (!ChanelData.data[0].ChanelExists) {
-        return { HasChanel: false }
+    
+    if (!ChanelData.data.ChanelExists) {
+        return { HasChanelCheck: false }
+    }
+    
+    let VideoList = [];
+    for (let index = 0; index < ChanelVideos.data.Videos.length; index++) {
+        VideoList.push(ChanelVideos.data.Videos[index])
     }
 
     return {
-        ChanelName: ChanelData.data[0].ChanelName,
-        ChanelFolowers: ChanelData.data[0].ChanelFolowers,
-        VideoList: tmpVideoList,
+        HasChanelCheck: true,
+        ChanelName: ChanelData.data.ChanelData.ChanelName,
+        ChanelFolowers: ChanelData.data.ChanelData.ChanelFolowers,
+        VideoList: VideoList,
     }
 }
 
@@ -94,31 +100,33 @@ UserChanelPage.getInitialProps = async ({ req, res }) => {
 
         if (ServerSideCookies.get("ChanelToken") === undefined || ServerSideCookies.get("ChanelToken") === null || ServerSideCookies.get("UserToken") === undefined || ServerSideCookies.get("UserToken") === null) {
             return {
-                HasChanel: false
+                HasChanelCheck: false
             }
         }
 
         const ChanelData = await GetChanelData(ServerSideCookies.get("ChanelToken"));
         return {
+            HasChanelCheck: ChanelData.HasChanelCheck,
             ChanelName: ChanelData.ChanelName,
             ChanelFolowers: ChanelData.ChanelFolowers,
-            VideoList: ChanelData.VideoList
+            VideoList: ChanelData.VideoList,
         }
 
     } else {
 
         if (Cookie.get("ChanelToken") === undefined || Cookie.get("ChanelToken") === null || Cookie.get("UserToken") === undefined || Cookie.get("UserToken") === null) {
             return {
-                HasChanel: false
+                HasChanelCheck: false
             }
         }
 
         const ChanelData = await GetChanelData(Cookie.get("ChanelToken"));
 
         return {
+            HasChanelCheck: ChanelData.HasChanelCheck,
             ChanelName: ChanelData.ChanelName,
             ChanelFolowers: ChanelData.ChanelFolowers,
-            VideoList: ChanelData.VideoList
+            VideoList: ChanelData.VideoList,
         }
     }
 }

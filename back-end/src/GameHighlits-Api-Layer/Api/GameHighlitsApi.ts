@@ -4,6 +4,7 @@ import express from 'express';
 //* imports from route folder
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
 import VideoPlayerRoutesControler from "../routes/VideoPlayerRoutes/VideoPlayesRoutesControler"
+import ChanelRoutesControler from "../routes/ChanelRoutes/ChanelRoutesController"
 
 //*Configs
 import config from "../../config/config";
@@ -43,6 +44,7 @@ router.use("/api/user-account-manager/", UserAccountRoutesControler);
 
 router.use("/api/video-player-manager/", VideoPlayerRoutesControler);
 
+router.use("/api/chanel-manager/", ChanelRoutesControler);
 
 
 //* Error Handleling
