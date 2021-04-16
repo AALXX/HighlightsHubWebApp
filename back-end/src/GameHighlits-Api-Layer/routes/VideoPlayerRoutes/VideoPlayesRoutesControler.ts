@@ -8,5 +8,7 @@ router.get("/get-specific-video/:VideoToken", VideoPlayerManager.SendTheVideo);
 router.get("/get-random-video/", VideoPlayerManager.GetRandomVideoToken);
 router.post("/like-the-video/", VideoPlayerManager.LikeTheVideoFunc);
 
+router.get("/get-specific-video-data/:PublicVideoToken", VideoPlayerManager.GetSpecificVideoData);
+
 
 export = router;

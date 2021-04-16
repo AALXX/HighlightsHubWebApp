@@ -32,14 +32,11 @@ const LandingPage = (props) => {
   )
 }
 
-const GetVideoData = async (UserToken) => {
+const GetVideoData = async () => {
   //*Get a video from backend
   const RandomVideo = await axios.get(`${APIBACKEND}/video-player-manager/get-random-video/`);
 
-  const VideoData = {
-    UserToken: UserToken,
-    VideoToken: RandomVideo.data.VideoToken,
-  };
+
 
   //* Return Data
   return {
@@ -57,8 +54,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
   if (req) {
 
     //*Create instance
-    const ServerSideCookies = new Cookies(req, res);
-    const VideoPlayerDatas = await GetVideoData(ServerSideCookies.get("UserToken"));
+    const VideoPlayerDatas = await GetVideoData();
 
     return {
       VideoToken: VideoPlayerDatas.VideoToken,
@@ -70,7 +66,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
 
   } else {
 
-    const VideoPlayerDatas = await GetVideoData(Cookie.get("UserToken"));
+    const VideoPlayerDatas = await GetVideoData();
 
     
     return {

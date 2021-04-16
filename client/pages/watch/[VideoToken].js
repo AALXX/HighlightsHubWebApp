@@ -1,7 +1,6 @@
 import Head from 'next/head'
 import axios from "axios";
-import Cookies from 'cookies'
-import Cookie from "js-cookie";
+import { useEffect } from "react";
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 import VideoPlayer from "../../Components/VideoPlayer/VideoPlayer.js";
@@ -11,46 +10,60 @@ import styles from "../../styles/WatchVideo.module.css"
 
 const WatchVideoPage = (props) => {
 
+    useEffect(() => {
+        if (props.IsError === true) {
+            window.alert("Video Doesent exits")
+        }
+    }, [])
 
     return (
-        <div className={styles.WathVideoPageContent}>
-            <Head><title>Watching: {props.VideoTitle}</title></Head>
+        <div>
 
-            <VideoPlayer
-                VideoPublicToken={props.VideoToken}
-                ChanelName={props.VideoChanelName}
-                VideoLikes={props.VideoLikes}
-                HasUserLikedTheVideo={props.HasUserLikedTheVideo}
-                ChanelPublicToken={props.ChanelPublicToken}
-                VideoTitle={props.VideoTitle}
-            />
+            {props.IsError ? (
+                <div><h1>Video doesen't exists</h1></div>
 
-            <CommentSection
+            ) : (
+
+                <div className={styles.WathVideoPageContent}>
+                    <Head><title>Watching: {props.VideoTitle}</title></Head>
+
+                    <VideoPlayer
+                        VideoPublicToken={props.VideoToken}
+                        Chanelname={props.ChanelName}
+                        VideoLikes={props.VideoLikes}
+                        VideoTitle={props.VideoTitle}
+                        ChanelPublicToken={props.ChanelPublicToken}
+                    />
+
+                    {/* <CommentSection
                 VideoPublicToken={props.VideoToken}
-            />
+            /> */}
+                </div>
+
+            )}
+
         </div>
     )
 }
 
-const GetVideoData = async (VideoToken, UserToken) => {
+const GetVideoData = async (PublicVideoToken) => {
 
-    const VideoData = {
-        UserToken: UserToken,
-        VideoToken: VideoToken,
+    const Video = await axios.get(`${APIBACKEND}/video-player-manager/get-specific-video-data/${PublicVideoToken}`);
+
+    if (Video.data.error === true) {
+        return {
+            IsError: true,
+
+        }
     }
 
-    const HasUserLikedVideo = await axios.post(`${APIBACKEND}/has-user-liked-video`, VideoData)
-    const GetVideoData = await axios.get(`${APIBACKEND}/get-video-data/${VideoToken}`);
-
-    const GetChanelInfos = await axios.get(`${APIBACKEND}/get-creator-chanel-by-video/${VideoToken}`)
-    const ChanelData = await axios.get(`${APIBACKEND}/get-creator-chanel-data/${GetChanelInfos.data}`);
-
     return {
-        HasUserLikedTheVideo: HasUserLikedVideo.data[0].HasUserLiked,
-        VideoTitle: GetVideoData.data[0].VideoName,
-        VideoLikes: GetVideoData.data[0].VideoLikes,
-        ChanelName: ChanelData.data[0].ChanelName,
-        ChnalePublicToken: GetChanelInfos.data
+        VideoToken: Video.data.VideoToken,
+        VideoLikes: Video.data.VideoLikes,
+        VideoTitle: Video.data.VideoTitle,
+        ChanelName: Video.data.ChanelNameFromVideo,
+        ChanelPublicToken: Video.data.ChanelPublicToken,
+        IsError: false
     }
 }
 
@@ -59,31 +72,27 @@ WatchVideoPage.getInitialProps = async ({ req, res, query }) => {
     //* Check if is rendered client-side or server-side
     if (req) {
         //*Create instance
-        const ServerSideCookies = new Cookies(req, res)
-        const VideoData = await GetVideoData(query.VideoToken, ServerSideCookies.get("UserToken"))
-
+        const VideoData = await GetVideoData(query.VideoToken)
 
         return {
-            VideoToken: query.VideoToken,
-            VideoChanelName: VideoData.ChanelName,
+            IsError: VideoData.IsError,
+            VideoToken: VideoData.VideoToken,
             VideoLikes: VideoData.VideoLikes,
-            HasUserLikedTheVideo: VideoData.HasUSerLikedTheVideo,
-            ChanelPublicToken: VideoData.CreatorChanelPublicToken,
             VideoTitle: VideoData.VideoTitle,
-
+            ChanelName: VideoData.ChanelName,
+            ChanelPublicToken: VideoData.ChanelPublicToken,
         }
     } else {
 
-        const VideoData = await GetVideoData(query.VideoToken, Cookie.get("UserToken"))
+        const VideoData = await GetVideoData(query.VideoToken)
 
         return {
-            VideoToken: query.VideoToken,
-            VideoChanelName: VideoData.ChanelName,
+            IsError: VideoData.IsError,
+            VideoToken: VideoData.VideoToken,
             VideoLikes: VideoData.VideoLikes,
-            HasUserLikedTheVideo: VideoData.HasUSerLikedTheVideo,
-            ChanelPublicToken: VideoData.CreatorChanelPublicToken,
             VideoTitle: VideoData.VideoTitle,
-
+            ChanelName: VideoData.ChanelName,
+            ChanelPublicToken: VideoData.ChanelPublicToken,
         }
     }
 }

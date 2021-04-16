@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
+import fs from 'fs';
 
 const NAMESPACE = 'VideoPlayerManagerService';
 
@@ -280,18 +281,48 @@ const GetCreatorChanelData = (req: Request, res: Response, next: NextFunction) =
       const ChanelData: object = {
         ChanelName: ChanelInfos.ChanelName,
         ChanelFolowers: ChanelInfos.ChanelFolowers,
-        ChanelId:ChanelId
+        ChanelId: ChanelId
       }
 
       res.status(200).json({
         ChanelData: ChanelData,
         ChanelExists: true
       })
+    });
+  });
+}
 
-    })
+//* Send the avatar image to fron-end
+const GetChanelAvatar = (req: Request, res: Response, next: NextFunction) => {
+  GetChanelInformatios(req.params.ChanelId, false, (err: boolean, ChanelInfos: any) => {
 
-  })
+    if (err) {
+      return res.status(200).json({
+        ChanelData: false
+      })
+    }
 
+    if (Object.keys(ChanelInfos).length === 0) {
+      return res.status(200).json({
+        ChanelExists: false,
+        message: 'Chanel not exists'
+
+      });
+    }
+
+    if (ChanelInfos.ChanelAvatarPath == "" ||ChanelInfos.ChanelAvatarPath == null) {
+      
+      const imgStream = fs.createReadStream(`${__dirname }/assets/PlaceHolder.jpg`);
+      return imgStream.pipe(res);
+      
+    }
+    
+    const imgStream = fs.createReadStream(
+      ChanelInfos.ChanelAvatarPath
+    );
+    return imgStream.pipe(res);
+
+  });
 }
 
 export default {
@@ -299,5 +330,6 @@ export default {
   GetCreatorChanelData,
   GetOwnerChanelData,
   GetChanelVideos,
-  LoginIntoChanel
+  LoginIntoChanel,
+  GetChanelAvatar
 };

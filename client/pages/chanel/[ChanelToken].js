@@ -22,7 +22,7 @@ const GenericChanelPage = (props) => {
             {props.ChanelExists ? (
                 <div>
                     <div className={styles.GenericCreatorChanelTop}>
-                        {/* <img className={styles.ChanelAvatarImage} src={`${APIBACKEND}/get-creator-chanel-avatar/${PublicChanelToken}`} alt="" width="150" height="150" /> */}
+                        <img className={styles.ChanelAvatarImage} src={`${APIBACKEND}/chanel-manager/get-creator-chanel-avatar/${props.ChanelId}`} alt="" width="150" height="150" />
                         <h1>{props.ChanelName}</h1>
                         <h1>Folowers: {props.ChanelFolowers}</h1>
                         <button>Follow</button>
@@ -68,7 +68,8 @@ const GetCreatorChanelData = async (ChanelPubicToken) => {
         ChanelName: CreatorChanelData.data.ChanelData.ChanelName,
         ChanelFolowers: CreatorChanelData.data.ChanelData.ChanelFolowers,
         VideoList: VideoList,
-        ChanelExists: true
+        ChanelExists: true,
+        ChanelId:CreatorChanelData.data.ChanelData.ChanelId
     }
 }
 
@@ -82,7 +83,8 @@ GenericChanelPage.getInitialProps = async ({ req, res, query }) => {
             ChanelName: CreatroChanelData.ChanelName,
             ChanelFolowers: CreatroChanelData.ChanelFolowers,
             VideoList: CreatroChanelData.VideoList,
-            ChanelExists: CreatroChanelData.ChanelExists
+            ChanelExists: CreatroChanelData.ChanelExists,
+            ChanelId:CreatroChanelData.ChanelId
         }
     } else {
 
@@ -92,7 +94,8 @@ GenericChanelPage.getInitialProps = async ({ req, res, query }) => {
             ChanelName: CreatroChanelData.ChanelName,
             ChanelFolowers: CreatroChanelData.ChanelFolowers,
             VideoList: CreatroChanelData.VideoList,
-            ChanelExists: CreatroChanelData.ChanelExists
+            ChanelExists: CreatroChanelData.ChanelExists,
+            ChanelId:CreatroChanelData.ChanelId
         }
     }
 
