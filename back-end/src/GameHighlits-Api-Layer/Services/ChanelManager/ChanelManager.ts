@@ -326,6 +326,8 @@ const GetChanelAvatar = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export default {
+  GetChanelIdByPrivateToken,
+  GetChanelIdByPublicToken,
   GetChanelInformatios,
   GetCreatorChanelData,
   GetOwnerChanelData,
