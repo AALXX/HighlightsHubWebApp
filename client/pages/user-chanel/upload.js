@@ -3,12 +3,16 @@ import * as FormData from 'form-data'
 
 import { useState } from "react"
 import { APIBACKEND } from "../../EnviormentalVariables"
+import Cookie from "js-cookie";
+import { useRouter } from 'next/router'
 
 const UploadPage = () => {
+    const Router = useRouter();
 
     const [VideoFile, setVideoFileFile] = useState('');
     const [VideoPreviewUrl, setVideoPreviewUrl] = useState('')
-
+    const [VideoTitle, setVideoTitle] = useState("");
+    
     const fileChangedHandler = e => {
         setVideoFileFile(e.target.files[0])
         
@@ -24,13 +28,21 @@ const UploadPage = () => {
 
         const fd = new FormData();
         fd.append('file', VideoFile);
-        fd.append("ChanelToken", localStorage.getItem("ChanelToken"));
+        fd.append("ChanelToken", Cookie.get("ChanelToken"));
+        fd.append("VideoTitle", VideoTitle);
 
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
         }
 
-        axios.post(`${APIBACKEND}/upload`, fd, config);
+        axios.post(`${APIBACKEND}/chanel-manager/upload-video`, fd, config).then(res =>{
+            if(res.data.error){
+                window.alert(res.data.message)
+            }else{
+                window.alert("Posted Succesfully")
+                Router.push("/")
+            }
+        });
     }
 
 
@@ -38,6 +50,8 @@ const UploadPage = () => {
         <div>
             <h1>Inserta video file</h1>
             <input type="file" name="file" onChange={fileChangedHandler} />
+            <br />
+            <input type="text" name="mail" placeholder="video title..." onChange={(e) => {setVideoTitle(e.target.value)}} required/>
             <button onClick={PublishVideo}> Publish </button>
         </div>
     );

@@ -68,7 +68,7 @@ export function Upload (req:any, res:any) {
         };
       });
 
-      let fileName = req.file.filename;
+      let fileName = req.file.filename; 
 
       if (!fs.existsSync(`../videos/${chanels[0].chanelFolder}/${fileName}`)) {
         // TODO:treansform  all fs sync to unsync

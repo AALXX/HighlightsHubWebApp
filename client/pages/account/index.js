@@ -50,7 +50,6 @@ AccountPage.getInitialProps = async ({ req, res }) => {
     //* Create a cookies instance
     const ServerSideCookies = new Cookies(req, res)
     if (ServerSideCookies.get("UserToken") === null || ServerSideCookies.get("UserToken") === undefined) {
-      //TODO ADD REDIRECT TO LOGIn
       
       return{
         AccountExists: false
