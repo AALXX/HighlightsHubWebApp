@@ -12,7 +12,8 @@ const GetUserAccountData = (req: Request, res: Response) => {
 
   //* if /:AccountToken param is null or empty send 404
   if (req.params.AccountToken === "" || req.params.AccountToken === null) {
-    return res.status(404).json({
+    return res.status(200).json({
+      succeded:false,
       message: "User didnt provide a token"
     });
   };

@@ -25,9 +25,9 @@ const LandingPage = (props) => {
         ChanelPublicToken={props.ChanelPublicToken}
       />
 
-      {/* <CommentSection
+      <CommentSection
         VideoPublicToken={props.VideoToken}
-      /> */}
+      />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import Cookies from 'cookies'
 import Cookie from "js-cookie";
 
 import { APIBACKEND } from "../../EnviormentalVariables"
-import VideoTamplate from "../../Components/VideoTemplate/VideoTamplate"
+import OwnerVideoTamplate from "../../Components/VideoTemplate/OwnerVideoTamplate"
 import styles from "../../styles/UserChanel.module.css"
 
 const UserChanelPage = (props) => {
@@ -44,13 +44,12 @@ const UserChanelPage = (props) => {
                     </div>) : (<div>
                         {props.VideoList.map((Video, index) => (
                             <div key={index}>
-                                <VideoTamplate
+                                <OwnerVideoTamplate
                                     VideoName={Video.VideoName}
                                     VideoToken={Video.VideoToken}
                                 />
                             </div>
                         ))}
-
                     </div>)}
 
                 </div>

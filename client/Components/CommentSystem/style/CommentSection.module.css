@@ -25,11 +25,17 @@
         -ms-flex-direction: row;
             flex-direction: row;
   }
+
+  .CommentsField{
+    overflow-y: scroll; 
+
+  }
   
   .CommentInputField {
     margin-top: 2vh;
     height: 5vh;
     width: 40%;
+    overflow-y: scroll; 
   }
   
   .PostCommentButton {

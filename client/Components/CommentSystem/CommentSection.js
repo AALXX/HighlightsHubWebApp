@@ -20,7 +20,7 @@ const CommentSection = ({ VideoPublicToken }) => {
 
     //* post comment to Api
     const PostComment = async (event) => {
-        event.preventDefault() 
+        event.preventDefault()
         try {
             const data = {
                 VideoToken: VideoToken,
@@ -28,9 +28,12 @@ const CommentSection = ({ VideoPublicToken }) => {
                 UserToken: Cookie.get("UserToken")
             }
 
-            await axios.post(`${APIBACKEND}/postacomment/`, data).then((res) => { 
-                
-                setVideoCommentsList([...VideoCommentsList, res.data[0]])
+            await axios.post(`${APIBACKEND}/video-player-manager/post-comment-to-video/`, data).then((res) => {
+
+
+                console.log(res.data);
+
+                setVideoCommentsList([...VideoCommentsList, res.data])
             })
 
         } catch (error) {
@@ -40,13 +43,9 @@ const CommentSection = ({ VideoPublicToken }) => {
 
     useEffect(() => {
         try {
-
-            const data = {
-                VideoToken: VideoToken
-            }
-
             //* fetch Comments data from Api
-            axios.post(`${APIBACKEND}/getvideocomment/`, data).then((res) => {
+            axios.post(`${APIBACKEND}/video-player-manager/get-video-comments/`, { VideoToken }).then((res) => {
+                console.log(res.data)
                 let tmpVideoList = [];
                 for (let index = 0; index < res.data.length; index++) {
                     tmpVideoList.push(res.data[index])
@@ -66,14 +65,16 @@ const CommentSection = ({ VideoPublicToken }) => {
 
     return (
         <div className={styles.CommentSectionBorder}>
-            {VideoCommentsList.map((Comment, index) => (
-                <div key={index}>
-                    <CommentModel
-                        UserName={Comment.UserName}
-                        CommentContent={Comment.CommentContent}
-                    />
-                </div>
-            ))}
+            <div className={styles.CommentsField}>
+                {VideoCommentsList.map((Comment, index) => (
+                    <div key={index}>
+                        <CommentModel
+                            UserName={Comment.UserName}
+                            CommentContent={Comment.CommentContent}
+                        />
+                    </div>
+                ))}
+            </div>
 
             <div className={styles.PostCommentsSection}>
                 <input className={styles.CommentInputField} placeholder="Comment..." onChange={HandleCommentChange} value={CommentText} type="text" />

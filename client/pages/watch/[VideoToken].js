@@ -35,9 +35,9 @@ const WatchVideoPage = (props) => {
                         ChanelPublicToken={props.ChanelPublicToken}
                     />
 
-                    {/* <CommentSection
-                VideoPublicToken={props.VideoToken}
-            /> */}
+                    <CommentSection
+                        VideoPublicToken={props.VideoToken}
+                    />
                 </div>
 
             )}
