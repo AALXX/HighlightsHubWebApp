@@ -17,7 +17,11 @@ const OwnerVideoTamplate = (props) => {
         <button>Delete Video</button>
 
         {ToggledPopUp? (
-                <ChanegTitleDescriptionPopUp closePopup={() =>{setToggledPopUp(!ToggledPopUp)}} />
+                <ChanegTitleDescriptionPopUp closePopup={() =>{setToggledPopUp(!ToggledPopUp)}} 
+                  VideoToken={props.VideoToken} 
+                  VideoName={props.VideoName}
+                  // VideoDescription={props.VideoDescription}
+                />
             ) : null}
     </div>
   );
