@@ -11,10 +11,16 @@ const NavBar = () => {
                 <button className={styles.HomeButton} onClick={() => { setsidebar(true) }}>
                     G H
                 </button>
+                <form>
+                    <input type="text" placeholder="Search..." />
+                    <button>Search</button>
+                </form>
                 <div>
+
                     <button className={styles.uploadText} onClick={() => router.push('/user-chanel/upload')} >
                         Upload
                     </button>
+
 
                     <button className={styles.userText} onClick={() => router.push("/account")}>
                         User

@@ -1,15 +1,15 @@
-import { useRouter } from 'next/router'
-import Head from 'next/head'
 import axios from "axios";
-import { useEffect } from "react"
-
 //*Import Cookies packages
-import Cookies from 'cookies'
+import Cookies from 'cookies';
 import Cookie from "js-cookie";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect } from "react";
+import OwnerVideoTamplate from "../../Components/VideoTemplate/OwnerVideoTamplate";
+import { APIBACKEND } from "../../EnviormentalVariables";
+import styles from "../../styles/UserChanel.module.css";
 
-import { APIBACKEND } from "../../EnviormentalVariables"
-import OwnerVideoTamplate from "../../Components/VideoTemplate/OwnerVideoTamplate"
-import styles from "../../styles/UserChanel.module.css"
+
 
 const UserChanelPage = (props) => {
     const Router = useRouter();

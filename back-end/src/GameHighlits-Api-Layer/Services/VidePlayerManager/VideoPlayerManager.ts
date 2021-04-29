@@ -91,7 +91,7 @@ const SendTheVideo = (req: Request, res: Response, next: NextFunction) => {
 
 //* Send RandomVideo
 const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) => {
-  const getRandomVideosQuerySttring = `SELECT * FROM  videos`;
+  const getRandomVideosQuerySttring = `SELECT * FROM videos ORDER BY RAND() LIMIT 1`;
 
   Connect()
     .then(connection => {
@@ -100,27 +100,33 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
 
         let data = JSON.parse(JSON.stringify(results));
 
-        let VideosTonkensLenght = Object.keys(data).length;
-        let VideoToBeSend = data[Math.floor(Math.random() * VideosTonkensLenght)];
+        if (Object.keys(data).length == 0) {
+          return res.status(202).json({
+            error: true,
+            message:"a error has occured"
+          })
+        }
 
-        
-        ChanelManager.GetChanelInformatios(VideoToBeSend.ChanelId, false, (err: boolean, ChanelData: any) => {
+        ChanelManager.GetChanelInformatios(data[0].ChanelId, false, (err: boolean, ChanelData: any) => {
 
           if (err) {
             logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
-            res.status(202).json({
+            return res.status(202).json({
+              error: true,
               message:"a error has occured"
             })
           }
           
           const VideoDatas = {
-            VideoToken: VideoToBeSend.VideoToken,
-            VideoLikes: VideoToBeSend.VideoLikes,
-            VideoTitle: VideoToBeSend.VideoName,
+            VideoToken: data[0].VideoToken,
+            VideoLikes: data[0].VideoLikes,
+            VideoTitle: data[0].VideoName,
             ChanelNameFromVideo: ChanelData.ChanelName,
-            ChanelPublicToken:ChanelData.PublicChanelToken
+            ChanelPublicToken: ChanelData.PublicChanelToken,
+            error: false,
+            
           }
-          res.status(202).json(VideoDatas);
+          return res.status(202).json(VideoDatas);
           
         });
 

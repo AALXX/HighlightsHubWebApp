@@ -18,7 +18,12 @@ const ChanegTitleDescriptionPopUp = (props) => {
     }, [])
 
     const SendChanges = () =>{
-        axios.post(`${APIBACKEND}/chanel-manager/change-video-title-or-description/`, {VideoName, VideoToken});
+        axios.post(`${APIBACKEND}/chanel-manager/change-video-title-or-description/`, {VideoName, VideoToken}).then((res) =>{
+            if(!res.data.succeded){
+                window.alert("Problem, Can't Change Name");
+            }
+            window.location.reload();
+        });
     }
     
     return (

@@ -17,6 +17,7 @@ router.post("/chanel-login/", OwnerChanelManagerService.LoginIntoChanel);
 
 router.post("/upload-video/", UploadManagerServce.Upload);
 router.post("/change-video-title-or-description/", OwnerChanelManagerService.ChangeVideoTitle);
+router.post("/delete-video/", OwnerChanelManagerService.DeleteVideo);
 
 
 export = router;

@@ -72,8 +72,6 @@ const PostRecivedCommentToDataBase = (req: Request, res: Response, next: NextFun
           error
         });
       });
-      
-      // console.log(data[0].uidUsers);
 
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
@@ -84,7 +82,6 @@ const PostRecivedCommentToDataBase = (req: Request, res: Response, next: NextFun
     }).finally(() => {
       connection.end();
     });
-
   }).catch(error => {
     logging.error(NAMESPACE, error.message, error);
     return res.status(500).json({
@@ -92,8 +89,6 @@ const PostRecivedCommentToDataBase = (req: Request, res: Response, next: NextFun
       error
     });
   });
-    
-
 }
 
 export default {

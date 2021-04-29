@@ -2,7 +2,8 @@ import { Request, Response, NextFunction, json } from 'express';
 
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
-import ChanelManager from "./ChanelManager"
+import ChanelManager from "./ChanelManager";
+import fs from "fs";
 
 const NAMESPACE = 'OwnerChanelMgerService';
 
@@ -108,8 +109,6 @@ const LoginIntoChanel = (req: Request, res: Response, next: NextFunction) => {
 
 //* Chaneg Video Title
 const ChangeVideoTitle = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body)
-
   if (req.body.VideoName === undefined || req.body.VideoName === "" || req.body.VideoToken === "" || req.body.VideoToken === undefined) {
     return res.status(200).json({
       error: true,
@@ -117,23 +116,24 @@ const ChangeVideoTitle = (req: Request, res: Response, next: NextFunction) => {
     })
   }
 
-  const ChanegVideoTitleOrDescription = `SELECT * FROM videos WHERE VideoToken="${req.body.VideoToken}"`;
 
-  // const ChanegVideoTitleOrDescription = `UPDATE videos SET VideoName="${req.body.VideoName}" WHERE EXISTS(SELECT * FROM videos WHERE VideoToken="${req.body.VideoToken}")`
+  const ChanegVideoTitleOrDescription = `UPDATE videos SET VideoName="${req.body.VideoName}" WHERE VideoToken="${req.body.VideoToken}" `
 
   Connect().then(connection => {
     Query(connection, ChanegVideoTitleOrDescription).then(results => {
 
       let data = JSON.parse(JSON.stringify(results));
 
-      console.log(data)
+      if (data.affectedRows === 0) {
+        return res.status(200).json({
+          message: "Video doesen't exist",
+          succeded: false
+        })
+      }
 
-      // if (Object.keys(data).length === 0) {
-      //   return res.status(200).json({
-      //     message: "Video doesen't exist",
-      //     succeded: false
-      //   })
-      // }
+      res.status(200).json({
+        succeded: true
+      })
 
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
@@ -149,8 +149,95 @@ const ChangeVideoTitle = (req: Request, res: Response, next: NextFunction) => {
 
 }
 
+//* Delete A video
+const DeleteVideo = (req: Request, res: Response, next: NextFunction) => {
+
+  console.log(req.body);
+
+  const GetChanelPath = `SELECT VideoPath FROM videos WHERE VideoToken="${req.body.VideoToken}"; `;
+
+  Connect().then(connection => {
+    Query(connection, GetChanelPath).then(results => {
+
+      let data = JSON.parse(JSON.stringify(results));
+
+      if (Object.keys(data).length === 0) {
+        return res.status(200).json({
+          message: "Video doesen't exist",
+          error: true
+        })
+      }
+
+      fs.stat(data[0].VideoPath, (err) => {
+        if (err === null) {
+
+          fs.rm(data[0].VideoPath, (err) => {
+
+            if (err) {
+              return res.status(200).json({
+                message: "error",
+                error: true
+              });
+            }
+          })
+
+          DeleteVideoFromDataBase(req.body.VideoToken)
+          
+          return res.status(200).json({
+            error: false,
+          });
+
+        } else if (err.code === 'ENOENT') {
+          //* file does not exist
+          return res.status(200).json({
+            error: true,
+            message: "Video doesen't exists"
+          });
+        }
+      })
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    }).finally(() => {
+      connection.end();
+    });
+
+  }).catch(error => {
+    logging.error(NAMESPACE, error.message, error);
+    return res.status(505);
+  });
+}
+
+const DeleteVideoFromDataBase = (VideoToken: string) => {
+  const DeleteVideoFromDataBase = `DELETE  FROM videos WHERE VideoToken="${VideoToken}"`;
+
+  Connect().then(connection => {
+    Query(connection, DeleteVideoFromDataBase).then(results => {
+
+      let data = JSON.parse(JSON.stringify(results));
+
+      if (data.affectedRows === 0) {
+        return { error: true };
+      }
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return { error: true };
+    }).finally(() => {
+      connection.end();
+    });
+
+  }).catch(error => {
+    logging.error(NAMESPACE, error.message, error);
+    return { error: true };
+  });
+
+}
+
 export default {
   GetOwnerChanelData,
   LoginIntoChanel,
-  ChangeVideoTitle
+  ChangeVideoTitle,
+  DeleteVideo
 };
