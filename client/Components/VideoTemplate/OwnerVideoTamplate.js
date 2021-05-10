@@ -11,7 +11,7 @@ const OwnerVideoTamplate = (props) => {
   const [ToggledPopUp, setToggledPopUp] = useState(false)
 
 
-  const DeleteVideoRequest = (VideoToken) =>{
+  const DeleteVideo = (VideoToken) =>{
 
     axios.post(`${APIBACKEND}/chanel-manager/delete-video/`, {VideoToken}).then((res)=>{
       console.log(res.data);
@@ -25,7 +25,7 @@ const OwnerVideoTamplate = (props) => {
     <div className={styles.VideoBody}>
         <button onClick={() =>{router.push(`/watch/${props.VideoToken}`)}}> {props.VideoName} </button>
         <button onClick={() =>{setToggledPopUp(!ToggledPopUp)}}>Change Title/Descritption</button>
-        <button onClick={() =>{DeleteVideoRequest(props.VideoToken)}}>Delete Video</button>
+        <button onClick={() =>{DeleteVideo(props.VideoToken)}}>Delete Video</button>
 
         {ToggledPopUp? (
                 <ChanegTitleDescriptionPopUp closePopup={() =>{setToggledPopUp(!ToggledPopUp)}} 

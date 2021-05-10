@@ -1,27 +1,36 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router'
 import axios from "axios";
-import {useEffect} from "react"
+import { useEffect, useState } from "react"
 import Cookies from 'cookies';
 import Cookie from "js-cookie";
 
-
+import EditProfilePopUp from "../../Components/ProfilePageOptions/EditProfilePopUp.js"
 import styles from "../../styles/Account.module.css"
 
-import { APIBACKEND } from "../../EnviormentalVariables"
+import { APIBACKEND } from "../../EnviormentalVariables.js"
 
 const AccountPage = (props) => {
   const Router = useRouter();
 
+  const [ToggledPopUp, setToggledPopUp] = useState(false);
+
+
   const Delete = () => {
-    Cookie.remove('UserToken')
+
+    let ChanelCookeie = Cookie.get('ChanelToken');
+    
+    if(ChanelCookeie !==null){
+      Cookie.remove('ChanelToken');
+    }
+    
+    Cookie.remove('UserToken');
   };
 
   useEffect(() => {
     if (props.AccountExists === false) {
-      Router.push("/account/login")
-  }
-
+      Router.push("/account/login");
+    }
   }, [])
 
   return (
@@ -37,6 +46,17 @@ const AccountPage = (props) => {
         <div className={styles.UserAcountLogoDot}></div>
         <h4 className={styles.WlcomeText}>Hello, {props.UserName} </h4>
       </div>
+      <div>
+
+        <button onClick={() => { setToggledPopUp(!ToggledPopUp) }}>Edit Profile</button>
+      </div>
+
+
+      {ToggledPopUp ? (
+        <EditProfilePopUp closePopup={() => { setToggledPopUp(!ToggledPopUp) }}
+          accountName={props.UserName}
+        />
+      ) : null}
 
     </div>
   )
@@ -50,16 +70,16 @@ AccountPage.getInitialProps = async ({ req, res }) => {
     //* Create a cookies instance
     const ServerSideCookies = new Cookies(req, res)
     if (ServerSideCookies.get("UserToken") === null || ServerSideCookies.get("UserToken") === undefined) {
-      
-      return{
+
+      return {
         AccountExists: false
       }
     }
 
     const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${ServerSideCookies.get("UserToken")}`);
 
-    if(UserData.data.succeded === false){
-      return{
+    if (UserData.data.succeded === false) {
+      return {
         AccountExists: false
       }
     }
@@ -72,14 +92,14 @@ AccountPage.getInitialProps = async ({ req, res }) => {
 
     let AccountExists = true;
     if (Cookie.get("UserToken") === null || Cookie.get("UserToken") === undefined) {
-      return{
+      return {
         AccountExists: false
       }
     }
 
     const UserData = await axios.get(`${APIBACKEND}/user-account-manager/get-user-account-data/${Cookie.get("UserToken")}`);
-    if(UserData.data.succeded === false){
-      return{
+    if (UserData.data.succeded === false) {
+      return {
         AccountExists: false
       }
     }

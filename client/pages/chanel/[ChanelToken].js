@@ -53,6 +53,7 @@ const GetCreatorChanelData = async (ChanelPubicToken) => {
     if (CreatorChanelData.data.ChanelExists === false) {
         return { ChanelExists: false }
     }
+    
     //*Get Chanel videos
     const data = {
         ChanelId: CreatorChanelData.data.ChanelData.ChanelId

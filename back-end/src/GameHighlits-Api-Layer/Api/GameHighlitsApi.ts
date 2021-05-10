@@ -5,6 +5,7 @@ import express from 'express';
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
 import VideoPlayerRoutesControler from "../routes/VideoPlayerRoutes/VideoPlayesRoutesControler"
 import ChanelRoutesControler from "../routes/ChanelRoutes/ChanelRoutesController"
+import SearchingRoutesControler from "../routes/SearchingRoutes/SearchRoutesControler"
 
 //*Configs
 import config from "../../config/config";
@@ -45,6 +46,8 @@ router.use("/api/user-account-manager/", UserAccountRoutesControler);
 router.use("/api/video-player-manager/", VideoPlayerRoutesControler);
 
 router.use("/api/chanel-manager/", ChanelRoutesControler);
+
+router.use("/api/search-manager/", SearchingRoutesControler);
 
 
 //* Error Handleling

@@ -5,6 +5,8 @@ import styles from "./style/NavBar.module.css";
 const NavBar = () => {
     const [sidebar, setsidebar] = useState(false)
     const router = useRouter()
+    const [Input, setInput] = useState([]);
+    
     return (
         <div className={styles.navBar}>
             <nav className={styles.HeaderBar}>

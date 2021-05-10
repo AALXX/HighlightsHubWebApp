@@ -33,6 +33,16 @@ const LoginForm = () => {
                         window.alert(res.data.message)
                     }
 
+                    if(res.data.pwdmathch === false){
+                        window.alert("Wrong Password");
+                    }
+
+                    if(res.data.error === true){
+                        window.alert("there was a error");
+                    }
+                    
+                    
+                    
                     Cookie.set("UserToken", res.data.UserToken, {
                         expires: 360 * 86400,
                         sameSite: "strict",

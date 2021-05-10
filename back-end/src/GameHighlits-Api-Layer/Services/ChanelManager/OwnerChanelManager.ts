@@ -151,9 +151,6 @@ const ChangeVideoTitle = (req: Request, res: Response, next: NextFunction) => {
 
 //* Delete A video
 const DeleteVideo = (req: Request, res: Response, next: NextFunction) => {
-
-  console.log(req.body);
-
   const GetChanelPath = `SELECT VideoPath FROM videos WHERE VideoToken="${req.body.VideoToken}"; `;
 
   Connect().then(connection => {
