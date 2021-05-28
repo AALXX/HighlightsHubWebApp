@@ -34,6 +34,8 @@ const EditProfilePopUp = (props) => {
             if(!res.data.succeded){
                 window.alert("Wrong Credentials");
             }
+
+            
             
         });
     }
