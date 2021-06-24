@@ -8,6 +8,8 @@ import Image from "next/image";
 
 import { APIBACKEND } from "../../EnviormentalVariables"
 
+
+
 const VideoPlayer = ({
     VideoPublicToken,
     VideoLikes,
@@ -36,7 +38,6 @@ const VideoPlayer = ({
         if (previousUrl.current !== VideoTokenState) {
             videoRef?.current.load();
         }
-
 
     }, [VideoPublicToken, VideoLikes]);
 

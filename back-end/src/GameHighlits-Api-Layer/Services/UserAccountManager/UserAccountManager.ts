@@ -18,7 +18,7 @@ const GetUserAccountData = (req: Request, res: Response) => {
     });
   };
 
-  const GetAccountQueryString = `SELECT * FROM users WHERE Token="${req.params.AccountToken}";`;
+  const GetAccountQueryString = `SELECT * FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
   Connect()
     .then(connection => {
 
@@ -33,7 +33,7 @@ const GetUserAccountData = (req: Request, res: Response) => {
         }
 
         const UserAccountData = {
-          AcountName: data[0].uidUsers,
+          AcountName: data[0].UserName,
           message: null,
           succeded: true
         }
@@ -71,7 +71,7 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
   }
 
 
-  const loginAccountQuerryString = `SELECT * FROM users WHERE emailUsers="${req.body.UserMail}"`;
+  const loginAccountQuerryString = `SELECT * FROM users WHERE UserEmail="${req.body.UserMail}"`;
   Connect()
     .then(connection => {
 
@@ -86,7 +86,7 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
           });
         }
 
-        bcrypt.compare(req.body.Password, data[0].pwdUsers, (err, isMatch) => {
+        bcrypt.compare(req.body.Password, data[0].UserPwd, (err, isMatch) => {
           if (err) {
             return res.status(500).json({
               message: "error",
@@ -98,7 +98,7 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
               error: false
             })
           } else {
-            return res.status(202).json({ UserToken: data[0].Token, pwdmathch: true, error: false });
+            return res.status(202).json({ UserToken: data[0].PrivateToken, pwdmathch: true, error: false });
           }
         })
 
@@ -127,7 +127,8 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
 //*Rehister Account To dataBase
 const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "Register User Account Service called");
-  let UserToken = hat();
+  let PublicUserToken = hat();
+  let PrivateUserToken = hat();
   const saltRounds = 10;
 
   if (req.body.Username === "" || req.body.Username === null || req.body.Mailuid === "" || req.body.Mailuid === null || req.body.PassWord === "" || req.body.PassWord === null || req.body.RepeatePassWord === "" || req.body.RepeatePassWord === null) {
@@ -145,15 +146,16 @@ const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) =>
 
         let UserCredentials = {
           UserName: req.body.Username,
-          UserToken: UserToken,
+          PrivateUserToken : PrivateUserToken,
+          PublicUserToken : PublicUserToken,
           UserEmail: req.body.Mailuid,
           HashedPasWord: hash
         }
 
-        const RegisterqueryString = `INSERT INTO users(uidUsers,Token ,emailUsers,pwdUsers) VALUES ("${UserCredentials.UserName}","${UserCredentials.UserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
+        const RegisterqueryString = `INSERT INTO users(UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken }","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
 
         Query(connection, RegisterqueryString).then(() => {
-          return res.status(202).json({ UserToken: UserToken });
+          return res.status(202).json({ UserToken: PrivateUserToken });
         }).catch(error => {
           logging.error(NAMESPACE, error.message, error);
           return res.status(500).json({
@@ -267,12 +269,51 @@ const ChangeAccountSettings = (req: Request, res: Response, next: NextFunction) 
       return res.status(505);
     });
   })
+}
 
+//* Get User Account public data by publick token
+const GetUserAccountDataByPublicToken = (PublickToken:string, callback:any) => {
+  logging.info(NAMESPACE, "Get User Account Service called");
 
+  //* if /:AccountToken param is null or empty send 404
+  if (PublickToken === "" || PublickToken === null) {
+    return callback(true, null);
+  };
+
+  const GetAccountQueryString = `SELECT * FROM users WHERE PublicToken="${PublickToken}";`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetAccountQueryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+
+        if (Object.keys(data).length === 0) {
+          return callback(true, null);
+        }
+
+        const UserAccountData = {
+          AcountName: data[0].uidUsers,
+        }
+
+        callback(false, UserAccountData);
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return callback(true, null);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return callback(true, null);
+    });
 }
 
 export default {
   GetUserAccountData,
+  GetUserAccountDataByPublicToken,
   LoginUserAccount,
   RegisterUserAccount,
   ChangeAccountSettings

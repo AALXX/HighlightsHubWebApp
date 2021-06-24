@@ -100,7 +100,7 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
 
         let data = JSON.parse(JSON.stringify(results));
 
-        if (Object.keys(data).length == 0) {
+        if (Object.keys(data).length === 0) {
           return res.status(202).json({
             error: true,
             message:"a error has occured"

@@ -70,7 +70,7 @@ const LoginForm = () => {
         if (data.PassWord != null && data.Mailuid != null && data.PassWord != null && data.RepeatePassWord != null) {
 
             if (data.PassWord !== data.RepeatePassWord){
-                window.alert("Password Don't Match")
+                return window.alert("Password Don't Match")
             }
             
             axios.post(

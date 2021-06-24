@@ -14,6 +14,8 @@ router.get("/get-creator-chanel-avatar/:ChanelId", ChanelManagerService.GetChane
 router.post("/get-user-own-chanel-data/", OwnerChanelManagerService.GetOwnerChanelData);
 router.post("/get-chanel-videos/", ChanelManagerService.GetChanelVideos);
 router.post("/chanel-login/", OwnerChanelManagerService.LoginIntoChanel);
+router.post("/chanel-create/", OwnerChanelManagerService.CreateChanel);
+
 
 router.post("/upload-video/", UploadManagerServce.Upload);
 router.post("/change-video-title-or-description/", OwnerChanelManagerService.ChangeVideoTitle);

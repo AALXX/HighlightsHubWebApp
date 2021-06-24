@@ -1,6 +1,6 @@
 import express from "express";
 import VideoPlayerManager from "../../Services/VidePlayerManager/VideoPlayerManager";
-import VideoCommentsManager from "../../Services/VidePlayerManager/VideoCommentmanager";
+import VideoCommentsManager from "../../Services/VidePlayerManager/VideoCommentManager";
 
 const router = express.Router();
 

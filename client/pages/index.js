@@ -37,7 +37,7 @@ const GetVideoData = async () => {
   const RandomVideo = await axios.get(`${APIBACKEND}/video-player-manager/get-random-video/`);
 
   if(RandomVideo.data.error === true){
-    return window.alert("There aren't videos");
+    return <h1>No videoAvailabele</h1>
   }
 
   //* Return Data

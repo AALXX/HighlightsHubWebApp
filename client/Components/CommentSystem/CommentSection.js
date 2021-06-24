@@ -45,7 +45,6 @@ const CommentSection = ({ VideoPublicToken }) => {
         try {
             //* fetch Comments data from Api
             axios.post(`${APIBACKEND}/video-player-manager/get-video-comments/`, { VideoToken }).then((res) => {
-                console.log(res.data)
                 let tmpVideoList = [];
                 for (let index = 0; index < res.data.length; index++) {
                     tmpVideoList.push(res.data[index])

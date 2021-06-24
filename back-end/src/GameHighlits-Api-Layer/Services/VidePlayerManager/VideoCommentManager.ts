@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 import logging from "../../../config/logging";
+import ChanelManager from "../UserAccountManager/UserAccountManager"
 import { Connect, Query } from "../../../config/mysql";
 
 const NAMESPACE = 'VideoPlayerManagerService';
@@ -14,7 +15,7 @@ const GetVideoComments = (req: Request, res: Response, next: NextFunction) => {
     });
   }
   
-  const GetVideoComments = `SELECT UserName, CommentContent, RespondToUserToken, Date FROM comments WHERE VideoToken="${req.body.VideoToken}"`;
+  const GetVideoComments = `SELECT UserPublicToken, CommentContent, RespondToUserToken, PublishedDate FROM comments WHERE VideoToken="${req.body.VideoToken}"`;
   
   Connect()
   .then(connection => {
@@ -22,7 +23,21 @@ const GetVideoComments = (req: Request, res: Response, next: NextFunction) => {
       
       //* Parse rows from database
       let data = JSON.parse(JSON.stringify(results));
-      return res.status(200).json(data);
+
+      if (data[0] !== undefined) {
+        let CommentUserTokenList = [];
+        for (let i in data) {
+          CommentUserTokenList.push(data[i].UserPublicToken);
+        }
+        console.log(CommentUserTokenList)
+        // console.log(data[0].UserPublicToken)
+  
+        // ChanelManager.GetUserAccountDataByPublicToken(data[0].UserPublicToken, (err: boolean, Userdata:any) => {
+        //   console.log(Userdata)
+        // })
+        
+        return res.status(200).json(data);
+      }
       
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
