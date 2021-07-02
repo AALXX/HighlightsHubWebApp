@@ -30,7 +30,7 @@ let upload = multer({
 const SendVidsDataToDb = (req: Request, res:Response, filepath: string) => {
   const VideoToken = hat();
 
-  ChanelManager.GetChanelIdByPrivateToken(req.body.ChanelToken, (err: boolean, ChanelId: any) => {
+  ChanelManager.GetChanelPublicTokenByPrivateToken(req.body.ChanelToken, (err: boolean, ChanelId: any) => {
     if (err) {
       res.status(500);
     }
@@ -74,10 +74,11 @@ const Upload = (req: Request, res: Response, next: NextFunction) => {
 
         let data = JSON.parse(JSON.stringify(results));
 
-        fs.stat(`../videos/${data[0].ChanelFolder}/${req.file.originalname}`, (err) => {
+        
+        fs.stat(`../videos/${data[0].ChanelFolder}/${req.file?.originalname}`, (err) => {
           if (err === null) {
 
-            fs.rmSync(`../videos/tmp/${req.file.originalname}`);
+            fs.rmSync(`../videos/tmp/${req.file?.originalname}`);
 
             return res.status(200).json({
               error: true,
@@ -85,7 +86,7 @@ const Upload = (req: Request, res: Response, next: NextFunction) => {
             })
           } else if (err.code === 'ENOENT') {
             //* file does not exist
-            fs.mkdir(`../videos/${data[0].ChanelFolder}/${req.file.originalname}`, (err) => {
+            fs.mkdir(`../videos/${data[0].ChanelFolder}/${req.file?.originalname}`, (err) => {
               if (err) {
                 return res.status(200).json({
                   error: true,
@@ -93,7 +94,7 @@ const Upload = (req: Request, res: Response, next: NextFunction) => {
                 })
               }
               //* Directory Created Succesfully
-              fs.rename(`../videos/tmp/${req.file.originalname}`, `../videos/${data[0].ChanelFolder}/${req.file.originalname}/${req.body.VideoTitle}.mp4`, (err) => {
+              fs.rename(`../videos/tmp/${req.file?.originalname}`, `../videos/${data[0].ChanelFolder}/${req.file?.originalname}/${req.body.VideoTitle}.mp4`, (err) => {
                 if (err) {
                   return res.status(200).json({
                     error: true,
@@ -101,7 +102,7 @@ const Upload = (req: Request, res: Response, next: NextFunction) => {
                   })
                 }
                 //*File Moved succesfully
-                SendVidsDataToDb(req, res, `../videos/${data[0].ChanelFolder}/${req.file.originalname}/${req.body.VideoTitle}.mp4`);
+                SendVidsDataToDb(req, res, `../videos/${data[0].ChanelFolder}/${req.file?.originalname}/${req.body.VideoTitle}.mp4`);
                 return res.status(200).json({
                   error: false,
                 })

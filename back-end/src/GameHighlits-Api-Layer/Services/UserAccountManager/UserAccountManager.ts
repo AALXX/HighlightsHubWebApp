@@ -127,9 +127,6 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
 //*Rehister Account To dataBase
 const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "Register User Account Service called");
-  let PublicUserToken = hat();
-  let PrivateUserToken = hat();
-  const saltRounds = 10;
 
   if (req.body.Username === "" || req.body.Username === null || req.body.Mailuid === "" || req.body.Mailuid === null || req.body.PassWord === "" || req.body.PassWord === null || req.body.RepeatePassWord === "" || req.body.RepeatePassWord === null) {
     return res.status(404).json({
@@ -137,22 +134,27 @@ const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) =>
     });
   }
 
+  const saltRounds = 10;
   bcrypt.hash(req.body.PassWord, saltRounds, (err, hash) => {
     if (err) {
       return res.status(500);
     }
+
+    let PublicUserToken = hat();
+    let PrivateUserToken = hat();
+    
     Connect()
       .then(connection => {
 
         let UserCredentials = {
           UserName: req.body.Username,
-          PrivateUserToken : PrivateUserToken,
-          PublicUserToken : PublicUserToken,
+          PrivateUserToken: PrivateUserToken,
+          PublicUserToken: PublicUserToken,
           UserEmail: req.body.Mailuid,
           HashedPasWord: hash
         }
 
-        const RegisterqueryString = `INSERT INTO users(UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken }","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
+        const RegisterqueryString = `INSERT INTO users(UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken}","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
 
         Query(connection, RegisterqueryString).then(() => {
           return res.status(202).json({ UserToken: PrivateUserToken });
@@ -235,10 +237,10 @@ const ChangeAccountSettings = (req: Request, res: Response, next: NextFunction) 
     if (!isMatch) {
       return res.status(200).json({
         error: false,
-        matchcredentials:false
+        matchcredentials: false
       })
     }
-    
+
     const ChangeAccountSettingsSqlQuery = `UPDATE users SET uidUsers="${req.body.NewAccountName}" WHERE Token="${req.body.AccountToken}"`;
     Connect()
       .then(connection => {
@@ -258,21 +260,21 @@ const ChangeAccountSettings = (req: Request, res: Response, next: NextFunction) 
           })
 
         }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(505);
+        }).finally(() => {
+          connection.end();
+        });
+
+      }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
         return res.status(505);
-      }).finally(() => {
-        connection.end();
       });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(505);
-    });
   })
 }
 
 //* Get User Account public data by publick token
-const GetUserAccountDataByPublicToken = (PublickToken:string, callback:any) => {
+const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
   logging.info(NAMESPACE, "Get User Account Service called");
 
   //* if /:AccountToken param is null or empty send 404

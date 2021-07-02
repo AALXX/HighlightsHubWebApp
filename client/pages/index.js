@@ -39,7 +39,7 @@ const GetVideoData = async () => {
   if(RandomVideo.data.error === true){
     return <h1>No videoAvailabele</h1>
   }
-
+  
   //* Return Data
   return {
     VideoToken: RandomVideo.data.VideoToken,
@@ -57,7 +57,7 @@ LandingPage.getInitialProps = async ({ req, res }) => {
 
     //*Create instance
     const VideoPlayerDatas = await GetVideoData();
-
+    
     return {
       VideoToken: VideoPlayerDatas.VideoToken,
       VideoLikes: VideoPlayerDatas.VideoLikes,

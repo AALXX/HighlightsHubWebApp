@@ -107,7 +107,7 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
           })
         }
 
-        ChanelManager.GetChanelInformatios(data[0].ChanelId, false, (err: boolean, ChanelData: any) => {
+        ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
 
           if (err) {
             logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
@@ -118,14 +118,15 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
           }
           
           const VideoDatas = {
+            error: false,
             VideoToken: data[0].VideoToken,
             VideoLikes: data[0].VideoLikes,
-            VideoTitle: data[0].VideoName,
+            VideoTitle: data[0].VideoTitle,
             ChanelNameFromVideo: ChanelData.ChanelName,
-            ChanelPublicToken: ChanelData.PublicChanelToken,
-            error: false,
+            ChanelPublicToken: ChanelData.ChanelPublicToken,
             
           }
+          
           return res.status(202).json(VideoDatas);
           
         });
@@ -306,9 +307,7 @@ const GetSpecificVideoData = (req: Request, res: Response, next: NextFunction) =
         return res.status(202).json({error: true,message: "Video not found"});
       }
       
-      // console.log(data)
-      
-      ChanelManager.GetChanelInformatios(data[0].ChanelId, false, (err: boolean, ChanelData: any) => {
+      ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
         
         if (err) {
           logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
@@ -316,7 +315,6 @@ const GetSpecificVideoData = (req: Request, res: Response, next: NextFunction) =
             message:"a error has occured"
           })
         }
-        
         
         const VideoDatas = {
           VideoToken: data[0].VideoToken,

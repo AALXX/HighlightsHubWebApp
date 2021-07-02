@@ -18,7 +18,6 @@ const WatchVideoPage = (props) => {
 
     return (
         <div>
-
             {props.IsError ? (
                 <div><h1>Video doesen't exists</h1></div>
 
@@ -57,6 +56,8 @@ const GetVideoData = async (PublicVideoToken) => {
         }
     }
 
+    console.log(Video)
+    
     return {
         VideoToken: Video.data.VideoToken,
         VideoLikes: Video.data.VideoLikes,

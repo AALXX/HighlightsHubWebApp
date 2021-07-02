@@ -66,7 +66,6 @@ const VideoPlayer = ({
             if (res.data.error === true) {
                 return window.alert("There aren't videos");
             }
-
             setVideoTokenState(res.data.VideoToken);
             setVideoTitleState(res.data.VideoTitle);
 

@@ -5,6 +5,7 @@ import { Connect, Query } from "../../../config/mysql";
 import ChanelManager from "./ChanelManager";
 import fs from "fs";
 import hat from 'hat';
+import bcrypt from 'bcrypt';
 
 import AmLibs from "../../../libs/FolderCheck/folderCheck"
 
@@ -13,7 +14,7 @@ const NAMESPACE = 'OwnerChanelMgerService';
 //*Create Chanel
 const CreateChanel = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "Create Chanel Service called");
-  if (req.body.ChanelName === "" || req.body.Password === "" || req.body.ChanelEmail === "" || req.body.ChanelName === undefined || req.body.Password === undefined || req.body.ChanelEmail === undefined) {
+  if (req.body.ChanelName === "" || req.body.ChanelPassword === "" || req.body.ChanelEmail === "" || req.body.ChanelName === undefined || req.body.ChanelPassword === undefined || req.body.ChanelEmail === undefined) {
     return res.status(200).json({
       message: "Uncompleted forms",
       succeded: false
@@ -23,29 +24,36 @@ const CreateChanel = (req: Request, res: Response, next: NextFunction) => {
   let PublicChanelToken = hat();
   let PrivateChanelToken = hat();
   let ChanelFolderName = `../videos/${hat()}`;
-  AmLibs.CreateChanelFolder(ChanelFolderName, (FinalFolderName: string) => {
+  const saltRounds = 10;
 
-    const InsertChanelDataIntoDbQueryString = `INSERT INTO chanels (ChanelName, PrivateChanelToken, PublicChanelToken, ChanelPwd, ChanelEmail, ChanelFolowers, ChanelFolderPath) 
-                                              VALUES ("${req.body.ChanelName}","${PrivateChanelToken}" ,"${PublicChanelToken}", "${req.body.Password}" ,"${req.body.ChanelEmail}", "0", "${FinalFolderName}/")`;
+  bcrypt.hash(req.body.ChanelPassword, saltRounds, (err, hashedPasswod) => {
+    if (err) {
+      return res.status(500);
+    }
+    AmLibs.CreateChanelFolder(ChanelFolderName, (FinalFolderName: string) => {
 
-    Connect().then(connection => {
-      Query(connection, InsertChanelDataIntoDbQueryString ).then(results => {
+      const InsertChanelDataIntoDbQueryString = `INSERT INTO chanels (ChanelName, PrivateChanelToken, PublicChanelToken, ChanelPwd, ChanelEmail, ChanelFolowers, ChanelFolderPath) 
+                                              VALUES ("${req.body.ChanelName}","${PrivateChanelToken}" ,"${PublicChanelToken}", "${hashedPasswod}" ,"${req.body.ChanelEmail}", "0", "${FinalFolderName}/")`;
+      
+      Connect().then(connection => {
+        Query(connection, InsertChanelDataIntoDbQueryString).then(results => {
 
-        let data = JSON.parse(JSON.stringify(results));
+          let data = JSON.parse(JSON.stringify(results));
 
+
+        }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(505);
+        }).finally(() => {
+          connection.end();
+        });
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
         return res.status(505);
-      }).finally(() => {
-        connection.end();
       });
 
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(505);
     });
-
   });
 };
 
@@ -53,30 +61,26 @@ const CreateChanel = (req: Request, res: Response, next: NextFunction) => {
 const GetOwnerChanelData = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "GetOwnerChanelData Service called");
 
-  if (req.body.ChanelToken === "" || req.body.ChanelToken === "") {
+  if (req.body.PrivateChanelToken === "" || req.body.PrivateChanelToken === undefined) {
     return res.status(200).json({
       ChanelExists: false
     })
   }
 
-  ChanelManager.GetChanelIdByPrivateToken(req.body.ChanelToken, (err: boolean, ChanelId: any) => {
+  ChanelManager.GetChanelPublicTokenByPrivateToken(req.body.PrivateChanelToken , (err: boolean, ChanelPublicToken: any) => {
     if (err) {
-
-      const ChanelData = {
-        ChanelExists: false
-
-      }
-
+      
       return res.status(200).json({
-        ChanelData: ChanelData
+        ChanelExists: false
       })
     }
-
-    ChanelManager.GetChanelInformatios(ChanelId, false, (err: boolean, ChanelInfos: any) => {
+    
+    //*Call Get Chanel Infos function
+    ChanelManager.GetChanelInformatios(ChanelPublicToken, false, (err: boolean, ChanelInfos: any) => {
 
       if (err) {
         return res.status(200).json({
-          ChanelData: false
+          ChanelExists: false
         })
       }
 
@@ -91,13 +95,13 @@ const GetOwnerChanelData = (req: Request, res: Response, next: NextFunction) => 
         ChanelEmail: ChanelInfos.ChanelEmail,
         ChanelAvatarPath: ChanelInfos.ChanelAvatarPath,
         ChanelFolowers: ChanelInfos.Folowers,
-        ChanelId: ChanelId
+        ChanelPublicToken: ChanelInfos.ChanelPublicToken
       }
 
 
       res.status(200).json({
-        ChanelData: ChanelData,
-        ChanelExists: true
+        ChanelExists: true,
+        ChanelData: ChanelData
       })
 
     })
@@ -109,20 +113,19 @@ const GetOwnerChanelData = (req: Request, res: Response, next: NextFunction) => 
 const LoginIntoChanel = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "LoginIntoChanel Service called");
 
-  if (req.body.ChanelMail === "" || req.body.ChanelPassword === "" || req.body.UserToken === "" || req.body.ChanelMail === undefined || req.body.ChanelPassword === undefined || req.body.UserToken === undefined) {
+  if (req.body.ChanelMail === "" || req.body.ChanelPassword === "" || req.body.ChanelMail === undefined || req.body.ChanelPassword === undefined ) {
     return res.status(200).json({
       message: "Uncompleted forms",
       succeded: false
     });
   }
 
-  const LoginIntoChanel = `SELECT ChanelToken FROM chanels WHERE ChanelEmail="${req.body.ChanelMail}"`;
+  const LoginIntoChanel = `SELECT PrivateChanelToken, ChanelPwd FROM chanels WHERE ChanelEmail="${req.body.ChanelMail}"`;
 
   Connect().then(connection => {
     Query(connection, LoginIntoChanel).then(results => {
 
       let data = JSON.parse(JSON.stringify(results));
-
       if (Object.keys(data).length === 0) {
         return res.status(200).json({
           message: "Chanel doesen't exist",
@@ -130,10 +133,22 @@ const LoginIntoChanel = (req: Request, res: Response, next: NextFunction) => {
         })
       }
 
-      res.status(200).json({
-        succeded: true,
-        ChanelToken: data[0].ChanelToken
 
+
+      bcrypt.compare(req.body.ChanelPassword, data[0].ChanelPwd, (err, isMatch) => {
+        if (err) {
+          return res.status(500).json({
+            message: err,
+            error: true
+          });
+        } else if (!isMatch) {
+          return res.status(200).json({
+            pwdmathch: false,
+            error: false
+          })
+        } else {
+          return res.status(202).json({ ChanelToken: data[0].PrivateChanelToken, pwdmathch: true, error: false });
+        }
       })
 
     }).catch(error => {

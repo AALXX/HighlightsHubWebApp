@@ -45,7 +45,7 @@ const UserChanelPage = (props) => {
                         {props.VideoList.map((Video, index) => (
                             <div key={index}>
                                 <OwnerVideoTamplate
-                                    VideoName={Video.VideoName}
+                                    VideoName={Video.VideoTitle}
                                     VideoToken={Video.VideoToken}
                                 />
                             </div>
@@ -58,19 +58,12 @@ const UserChanelPage = (props) => {
     )
 }
 
-const GetChanelData = async (ChanelToken) => {
+const GetChanelData = async (PrivateChanelToken) => {
 
-
-
-    
     //* Requests
-    const ChanelData = await axios.post(`${APIBACKEND}/chanel-manager/get-user-own-chanel-data/`, {ChanelToken});
-
-    const data = {
-        ChanelId:ChanelData.data.ChanelData.ChanelId
-    }
+    const ChanelData = await axios.post(`${APIBACKEND}/chanel-manager/get-user-own-chanel-data/`, {PrivateChanelToken});
     
-    const ChanelVideos = await axios.post(`${APIBACKEND}/chanel-manager/get-chanel-videos/`, data);
+    const ChanelVideos = await axios.get(`${APIBACKEND}/chanel-manager/get-chanel-videos/${ChanelData.data.ChanelData.ChanelPublicToken}`);
 
     
     if (!ChanelData.data.ChanelExists) {
@@ -81,6 +74,8 @@ const GetChanelData = async (ChanelToken) => {
     for (let index = 0; index < ChanelVideos.data.Videos.length; index++) {
         VideoList.push(ChanelVideos.data.Videos[index])
     }
+
+    console.log(VideoList)
 
     return {
         HasChanelCheck: true,

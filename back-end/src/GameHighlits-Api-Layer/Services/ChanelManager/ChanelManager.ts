@@ -8,8 +8,8 @@ const NAMESPACE = 'ChanelManagerService';
 
 
 //* Get ChanelInformations
-const GetChanelInformatios = (ChaChanelId: string, SendPrivateInformations: Boolean, callback: any) => {
-  const GetChanelFromVideoSqlQueryString = `SELECT * FROM chanels  WHERE idChanel="${ChaChanelId}"`;
+const GetChanelInformatios = (PublicChanelToken: string, SendPrivateInformations: Boolean, callback: any) => {
+  const GetChanelFromVideoSqlQueryString = `SELECT * FROM chanels  WHERE PublicChanelToken="${PublicChanelToken}"`;
   Connect()
     .then(connection => {
 
@@ -17,18 +17,20 @@ const GetChanelInformatios = (ChaChanelId: string, SendPrivateInformations: Bool
 
         let data = JSON.parse(JSON.stringify(results));
 
+        if (Object.keys(data).length === 0) {
+          return;
+        }
+        
         const PublicChanelData = {
           ChanelName: data[0].ChanelName,
-          PublicChanelToken: data[0].PublicToken,
           ChanelAvatarPath: data[0].ChanelAvatarPath,
-          ChanelFolowers: data[0].Folowers,
-          ChanelOwnerId: data[0].ChanelOwnerId
+          ChanelFolowers: data[0].ChanelFolowers,
+          ChanelPublicToken: data[0].PublicChanelToken
         }
 
         const privateChanelData = {
           ChanelEmail: data[0].ChanelEmail,
-          ChanelHashedPassword: data[0].ChanelPassword
-
+          ChanelHashedPassword: data[0].ChanelPwd
         }
 
         if (SendPrivateInformations === false) {
@@ -51,10 +53,10 @@ const GetChanelInformatios = (ChaChanelId: string, SendPrivateInformations: Bool
     });
 }
 
-//* Get ChanelId ByPrivateToken
-const GetChanelIdByPrivateToken = (PrivateChanelToken: string, callback: any) => {
+//* Get Public Token  By PrivateToken
+const GetChanelPublicTokenByPrivateToken = (PrivateChanelToken: string, callback: any) => {
 
-  const GetChanelId = `SELECT idChanel FROM chanels WHERE ChanelToken="${PrivateChanelToken}"`;
+  const GetChanelId = `SELECT PublicChanelToken FROM chanels WHERE PrivateChanelToken="${PrivateChanelToken}"`;
 
   Connect()
     .then(connection => {
@@ -67,7 +69,8 @@ const GetChanelIdByPrivateToken = (PrivateChanelToken: string, callback: any) =>
           return callback(true, null);
         }
 
-        callback(false, data[0].idChanel);
+        callback(false, data[0].PublicChanelToken);
+        
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -116,22 +119,24 @@ const GetChanelIdByPublicToken = (PublicChanelToken: string, callback: any) => {
 
 //* Get ChanelVideos
 const GetChanelVideos = (req: Request, res: Response, next: NextFunction) => {
-  if (req.body.ChanelToken === "" || req.body.ChanelToken === null) {
+
+  if (req.params.ChanelPublicToken === "" || req.params.ChanelPublicToken === undefined) {
     return res.status(200).json({
       ChanelExists: false
     })
   }
 
-  const GetChanelVideos = `SELECT VideoName, VideoToken FROM videos WHERE ChanelId="${req.body.ChanelId}"`;
+  
+  const GetChanelVideos = `SELECT VideoTitle, VideoToken FROM videos WHERE PublicChanelToken="${req.params.ChanelPublicToken}"`;
 
   Connect()
     .then(connection => {
 
       Query(connection, GetChanelVideos).then(results => {
 
-        let data = JSON.parse(JSON.stringify(results));
+        let Videos = JSON.parse(JSON.stringify(results));
 
-        res.status(200).json({ Videos: data })
+        res.status(200).json({ Videos: Videos })
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -153,15 +158,7 @@ const GetCreatorChanelData = (req: Request, res: Response, next: NextFunction) =
 
   logging.info(NAMESPACE, "get Creator Chanel Service called");
 
-  GetChanelIdByPublicToken(req.body.ChanelPubicToken, (err: boolean, ChanelId: string) => {
-    if (err) {
-      return res.status(200).json({
-        ChanelExists: false,
-        message: 'Chanel not exists'
-      })
-    }
-
-    GetChanelInformatios(ChanelId, false, (err: boolean, ChanelInfos: any) => {
+    GetChanelInformatios(req.body.ChanelPubicToken, false, (err: boolean, ChanelInfos: any) => {
 
       if (err) {
         return res.status(200).json({
@@ -181,15 +178,14 @@ const GetCreatorChanelData = (req: Request, res: Response, next: NextFunction) =
       const ChanelData: object = {
         ChanelName: ChanelInfos.ChanelName,
         ChanelFolowers: ChanelInfos.ChanelFolowers,
-        ChanelId: ChanelId
+        ChanelPublicToken:ChanelInfos.ChanelPublicToken
       }
 
-      res.status(200).json({
+      return res.status(200).json({
+        ChanelExists: true,
         ChanelData: ChanelData,
-        ChanelExists: true
       })
     });
-  });
 }
 
 //* Send the avatar image to fron-end
@@ -226,7 +222,7 @@ const GetChanelAvatar = (req: Request, res: Response, next: NextFunction) => {
 }
 
 export default {
-  GetChanelIdByPrivateToken,
+  GetChanelPublicTokenByPrivateToken,
   GetChanelIdByPublicToken,
   GetChanelInformatios,
   GetCreatorChanelData,

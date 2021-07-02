@@ -15,11 +15,6 @@ const ChanelLogin = () => {
 
     const LoginIntoChanel = () => {
         
-        if (ChanelPassword !== ReapeatedChanelPassword){
-            return window.alert("ChanelPassword and reapeated aren't the same");
-            
-        }
-        
         const data = {
             ChanelMail: ChanelMail,
             ChanelPassword: ChanelPassword,
@@ -45,7 +40,6 @@ const ChanelLogin = () => {
         <div>
             <input type="text" placeholder="E-mail..." onChange={(e) => { setChanelMail(e.target.value) }} required />
             <input type="password" name="Pwd" placeholder="Password..." onChange={(e) => { setChanelPassword(e.target.value) }} required />
-            <input type="password" name="Pwd" placeholder="Reapeate Password..." onChange={(e) => { setRepeatedChanelPassword(e.target.value) }} required />
             <button type="submit" name="login-submit" onClick={LoginIntoChanel} >Login</button>
             <br />
             <button type="submit" name="login-submit" onClick={()=>{router.push('/user-chanel/create-chanel/')}}> Create a Chanel </button>

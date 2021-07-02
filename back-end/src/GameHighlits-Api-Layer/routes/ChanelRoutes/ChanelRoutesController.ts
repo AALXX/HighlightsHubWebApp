@@ -12,7 +12,7 @@ router.get("/get-creator-chanel-avatar/:ChanelId", ChanelManagerService.GetChane
 
 //* User Chanel
 router.post("/get-user-own-chanel-data/", OwnerChanelManagerService.GetOwnerChanelData);
-router.post("/get-chanel-videos/", ChanelManagerService.GetChanelVideos);
+router.get("/get-chanel-videos/:ChanelPublicToken", ChanelManagerService.GetChanelVideos);
 router.post("/chanel-login/", OwnerChanelManagerService.LoginIntoChanel);
 router.post("/chanel-create/", OwnerChanelManagerService.CreateChanel);
 
