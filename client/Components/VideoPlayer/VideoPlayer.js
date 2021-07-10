@@ -51,6 +51,11 @@ const VideoPlayer = ({
             `${APIBACKEND}/video-player-manager/like-the-video`,
             VideoData
         ).then((res) => {
+
+            if(res.data.UserExist === false){
+                window.alert("Can't like without a account");
+            }
+            
             if (res.data.UserLikedBolean === true) {
                 setVidLikes(VidLikes + 1);
             } else {

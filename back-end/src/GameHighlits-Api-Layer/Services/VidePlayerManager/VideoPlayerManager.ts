@@ -3,7 +3,8 @@ import { Request, Response, NextFunction } from 'express';
 
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
-import ChanelManager  from "../ChanelManager/ChanelManager";
+import ChanelManager from "../ChanelManager/ChanelManager";
+import GetUserPublicTokenTool from "../../../libs/GetUserTokenTools/GetUserPublicToken"
 
 const NAMESPACE = 'VideoPlayerManagerService';
 
@@ -41,9 +42,10 @@ const SendTheVideo = (req: Request, res: Response, next: NextFunction) => {
         const videoSize = fs.statSync(videoPath).size;
 
         //* parse range
-        const chnuk_size = 10 ** 6; //* 1mb
+        const chnuk_size = 1 * 1e+6; //* 1mb
 
         if (range != undefined) {
+
           const start = Number(range.replace(/\D/g, ""));
           const end = Math.min(start + chnuk_size, videoSize - 1);
           const contentLenght = end - start + 1;
@@ -66,7 +68,6 @@ const SendTheVideo = (req: Request, res: Response, next: NextFunction) => {
 
         } else {
 
-          console.log("Nu are headders")
           return res.status(404);
         }
 
@@ -103,7 +104,7 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
         if (Object.keys(data).length === 0) {
           return res.status(202).json({
             error: true,
-            message:"a error has occured"
+            message: "a error has occured"
           })
         }
 
@@ -113,10 +114,10 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
             logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
             return res.status(202).json({
               error: true,
-              message:"a error has occured"
+              message: "a error has occured"
             })
           }
-          
+
           const VideoDatas = {
             error: false,
             VideoToken: data[0].VideoToken,
@@ -124,61 +125,12 @@ const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) =>
             VideoTitle: data[0].VideoTitle,
             ChanelNameFromVideo: ChanelData.ChanelName,
             ChanelPublicToken: ChanelData.ChanelPublicToken,
-            
+
           }
-          
+
           return res.status(202).json(VideoDatas);
-          
+
         });
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(500).json({
-          message: error.message,
-          error
-        });
-      }).finally(() => {
-        connection.end();
-      });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(500).json({
-        message: error.message,
-        error
-      });
-    });
-}
-
-
-//* Get user and Video Id from db
-const GetUserAndVideoID = (UserToken: string, res: Response, VideoToken: string, callback: any) => {
-  const getUserIdAndVideoIdQuerryString = `SELECT * FROM users WHERE Token="${UserToken}"; SELECT * FROM videos WHERE VideoToken="${VideoToken}";`
-
-  Connect()
-    .then(connection => {
-      Query(connection, getUserIdAndVideoIdQuerryString).then(results => {
-
-        //*Parse rows from database
-        let data = JSON.parse(JSON.stringify(results));
-
-
-        let User = JSON.parse(JSON.stringify(data[0]));
-        let Video = JSON.parse(JSON.stringify(data[1]));
-
-        if (User !== undefined || Object.keys(User).length !== 0 || Video !== undefined || Object.keys(Video).length !== 0) {
-          //* pack userId and VideoId To be sendTo callback
-          const data = {
-            idUser: User[0].idUsers,
-            idVideo: Video[0].idVideo
-          }
-          callback(null, data);
-
-        } else {
-          res.status(202).json({
-            message: "Video dosen'tExists",
-          })
-        }
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -203,69 +155,69 @@ const GetUserAndVideoID = (UserToken: string, res: Response, VideoToken: string,
 
 
 //*Check If The User Liked The Video
-const UserLikedTheVideoCheck = (UserToken: string, VideoToken: string, res: any, callback: any) => {
+const UserLikedTheVideoCheck = (UserPrivateToken: string, VideoToken: string, res: any, callback: any) => {
 
-  if (UserToken != null && VideoToken != null) {
+  if (UserPrivateToken === null && VideoToken === null && UserPrivateToken === undefined && VideoToken === undefined) {
+    callback(true, null);
+  }
 
-    GetUserAndVideoID(UserToken, res, VideoToken, (err: any, Idsdata: any) => {
-      if (err) {
-        callback(true, null);
-      }
+  GetUserPublicTokenTool.GetUserPublicTokenByPrivateToken(UserPrivateToken, VideoToken, (err: boolean, PublicUserToken: string) => {
 
 
-      const GetUserIdAndVideoId = `SELECT * FROM video_class WHERE IdVideo="${Idsdata.idVideo}" AND UserId="${Idsdata.idUser}"`;
+    const GetUserIdAndVideoId = `SELECT * FROM likes_class WHERE VideoToken="${VideoToken}" AND UserPublicToken="${PublicUserToken}"`;
 
-      Connect()
-        .then(connection => {
-          Query(connection, GetUserIdAndVideoId).then(results => {
 
-            //* Parse rows from database
-            let data = JSON.parse(JSON.stringify(results));
+    Connect()
+      .then(connection => {
+        Query(connection, GetUserIdAndVideoId).then(results => {
 
-            if (Object.keys(data).length === 0) {
-              
-              return callback(false, { VideoId: Idsdata.idVideo, UserId: Idsdata.idUser, UserLikedBoolean: false});
-            }
-            
-            return callback(false, { VideoId: Idsdata.idVideo, UserId: Idsdata.idUser, UserLikedBoolean: true});
+          //* Parse rows from database
+          let data = JSON.parse(JSON.stringify(results));
 
-          }).catch(error => {
-            logging.error(NAMESPACE, error.message, error);
-            callback(true, null);
-          }).finally(() => {
-            connection.end();
-          });
+          if (Object.keys(data).length === 0) {
+
+            return callback(false, {UserPublicToken: PublicUserToken, UserLikedBoolean: false });
+          }
+
+          return callback(false, {UserPublicToken: PublicUserToken, UserLikedBoolean: true });
+
         }).catch(error => {
           logging.error(NAMESPACE, error.message, error);
           callback(true, null);
+        }).finally(() => {
+          connection.end();
         });
-    });
-  } else {
-    res.status(202).json({
-      message: "User Token or video token empty"
-    });
-  }
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        callback(true, null);
+      });
+  });
+
+
 };
 
 
 //* Like The Video Function by VideoToken
 export const LikeTheVideoFunc = (req: any, res: any) => {
 
-  logging.info(NAMESPACE, "Video Player Manager Service LikeTheVideoFunc function called ");
-
-
+  if (req.body.UserToken === undefined || req.body.VideoToken === undefined || req.body.UserToken === null || req.body.VideoToken === null) {
+    return res.status(202).json({
+      UserExist: false
+    });
+  }
+  
   UserLikedTheVideoCheck(req.body.UserToken, req.body.VideoToken, res, (err: boolean, Data: any) => {
     if (err) {
       res.status(500);
     }
 
-    if (Data.UserLikedBoolean === false) {
 
-      
-      const likeVideoSqlQuerry = `UPDATE videos SET VideoLikes=VideoLikes+${1} WHERE VideoToken="${req.body.VideoToken}"; INSERT INTO video_class(IdVideo,UserId) VALUES("${Data.VideoId}", "${Data.UserId}");`
+    if (Data.UserLikedBoolean === false) {
+      const likeVideoSqlQuerry = `UPDATE videos SET VideoLikes=VideoLikes+${1} WHERE VideoToken="${req.body.VideoToken}"; INSERT INTO likes_class(UserPublicToken, VideoToken) VALUES("${Data.UserPublicToken}", "${req.body.VideoToken}");`
       Connect().then(connection => {
         Query(connection, likeVideoSqlQuerry).then(() => {
           return res.status(202).json({
+            UserExist: true,
             UserLikedBolean: true
           });
         }).finally(() => {
@@ -273,10 +225,11 @@ export const LikeTheVideoFunc = (req: any, res: any) => {
         });
       });
     } else {
-      const UnlikeVideoSqlQuerry = `UPDATE videos SET VideoLikes=VideoLikes-${1} WHERE VideoToken="${req.body.VideoToken}"; DELETE FROM video_class WHERE (IdVideo=${Data.VideoId} AND UserId=${Data.UserId});`
+      const DisLikeVideoSqlQuerryString = `UPDATE videos SET VideoLikes=VideoLikes-${1} WHERE VideoToken="${req.body.VideoToken}"; DELETE FROM likes_class WHERE (UserPublicToken="${Data.UserPublicToken}" AND VideoToken="${req.body.VideoToken}");`
       Connect().then(connection => {
-        Query(connection, UnlikeVideoSqlQuerry).then(() => {
+        Query(connection, DisLikeVideoSqlQuerryString).then(() => {
           return res.status(202).json({
+            UserExist: true,
             UserLikedBolean: false
           });
         }).finally(() => {
@@ -293,43 +246,43 @@ export const LikeTheVideoFunc = (req: any, res: any) => {
 const GetSpecificVideoData = (req: Request, res: Response, next: NextFunction) => {
 
   logging.info(NAMESPACE, `Get - Specific video data`)
-  
+
   const GetVideoDataByTokenQueryString = `SELECT * FROM videos WHERE VideoToken="${req.params.PublicVideoToken}"`;
-  
+
   Connect().then(connection => {
     Query(connection, GetVideoDataByTokenQueryString).then(results => {
-      
+
       //* Parse rows from database
       let data = JSON.parse(JSON.stringify(results));
-      
-      
+
+
       if (Object.keys(data).length === 0) {
-        return res.status(202).json({error: true,message: "Video not found"});
+        return res.status(202).json({ error: true, message: "Video not found" });
       }
-      
+
       ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
-        
+
         if (err) {
           logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
           res.status(202).json({
-            message:"a error has occured"
+            message: "a error has occured"
           })
         }
-        
+
         const VideoDatas = {
           VideoToken: data[0].VideoToken,
           VideoLikes: data[0].VideoLikes,
           VideoTitle: data[0].VideoName,
           ChanelNameFromVideo: ChanelData.ChanelName,
           ChanelPublicToken: ChanelData.PublicChanelToken,
-          error:false
+          error: false
         }
-        
+
         logging.info(NAMESPACE, `Get - ${VideoDatas.VideoTitle} video data`)
         res.status(202).json(VideoDatas);
-        
+
       });
-      
+
 
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);

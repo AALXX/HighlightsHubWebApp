@@ -20,7 +20,7 @@ const NavBar = () => {
                 <div>
 
                     <button className={styles.uploadText} onClick={() => router.push('/user-chanel/upload')} >
-                        Upload
+                        Uplod
                     </button>
 
 

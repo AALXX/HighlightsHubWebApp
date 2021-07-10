@@ -65,6 +65,7 @@ const GetChanelData = async (PrivateChanelToken) => {
     
     const ChanelVideos = await axios.get(`${APIBACKEND}/chanel-manager/get-chanel-videos/${ChanelData.data.ChanelData.ChanelPublicToken}`);
 
+    // console.log(ChanelData)
     
     if (!ChanelData.data.ChanelExists) {
         return { HasChanelCheck: false }
@@ -75,7 +76,6 @@ const GetChanelData = async (PrivateChanelToken) => {
         VideoList.push(ChanelVideos.data.Videos[index])
     }
 
-    console.log(VideoList)
 
     return {
         HasChanelCheck: true,

@@ -17,11 +17,7 @@ const CreateChanelFolder = (FolderToBeChechPath: string, callback:any) => {
   });
 };
 
-const tets = (prop:string) => {
-  return prop;
-}
 
 export default {
   CreateChanelFolder,
-  tets
 };

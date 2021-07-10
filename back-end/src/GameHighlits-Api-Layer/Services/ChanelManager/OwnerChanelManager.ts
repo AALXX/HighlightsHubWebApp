@@ -90,11 +90,12 @@ const GetOwnerChanelData = (req: Request, res: Response, next: NextFunction) => 
         });
       }
 
+
       const ChanelData: object = {
         ChanelName: ChanelInfos.ChanelName,
         ChanelEmail: ChanelInfos.ChanelEmail,
         ChanelAvatarPath: ChanelInfos.ChanelAvatarPath,
-        ChanelFolowers: ChanelInfos.Folowers,
+        ChanelFolowers: ChanelInfos.ChanelFolowers,
         ChanelPublicToken: ChanelInfos.ChanelPublicToken
       }
 
