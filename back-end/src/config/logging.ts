@@ -1,5 +1,5 @@
 const getTimeStamp = (): string => {
-  return new Date().toISOString();
+  return new Date().toString();
 }
 
 const info = (namespace:string, message:string, object?:any) => {

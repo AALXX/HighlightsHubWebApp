@@ -1,13 +1,12 @@
 import '../styles/globals.css'
-import Layout from "../Components/Layout/Layout"
+import Layout from '../Layout/Layout'
 
-function GameHighlightsApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }) {
   return (
     <Layout>
       <Component {...pageProps} />
-
     </Layout>
   )
 }
 
-export default GameHighlightsApp
+export default MyApp
