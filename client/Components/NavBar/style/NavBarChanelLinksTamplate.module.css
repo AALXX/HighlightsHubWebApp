@@ -1,0 +1,14 @@
+.container{
+    display: flex;
+    background-color: #363636;
+    width: 10em;
+    height: 2.5em;
+    margin-top: .5em;
+}
+
+.ChnelNameText{
+    color:#E40000;
+    font-size: 1em;
+    font-family: "Exo 2";
+    margin: auto;
+}

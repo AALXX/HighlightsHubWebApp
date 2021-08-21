@@ -161,11 +161,13 @@ const UserLikedTheVideoCheck = (UserPrivateToken: string, VideoToken: string, re
     callback(true, null);
   }
 
-  GetUserPublicTokenTool.GetUserPublicTokenByPrivateToken(UserPrivateToken, VideoToken, (err: boolean, PublicUserToken: string) => {
+  GetUserPublicTokenTool.GetUserPublicTokenByPrivateToken(UserPrivateToken, (err: boolean, PublicUserToken: string) => {
+    if (err) {
+      callback(true, null);
 
+    }
 
     const GetUserIdAndVideoId = `SELECT * FROM likes_class WHERE VideoToken="${VideoToken}" AND UserPublicToken="${PublicUserToken}"`;
-
 
     Connect()
       .then(connection => {
@@ -176,10 +178,10 @@ const UserLikedTheVideoCheck = (UserPrivateToken: string, VideoToken: string, re
 
           if (Object.keys(data).length === 0) {
 
-            return callback(false, {UserPublicToken: PublicUserToken, UserLikedBoolean: false });
+            return callback(false, { UserPublicToken: PublicUserToken, UserLikedBoolean: false });
           }
 
-          return callback(false, {UserPublicToken: PublicUserToken, UserLikedBoolean: true });
+          return callback(false, { UserPublicToken: PublicUserToken, UserLikedBoolean: true });
 
         }).catch(error => {
           logging.error(NAMESPACE, error.message, error);
@@ -205,7 +207,7 @@ export const LikeTheVideoFunc = (req: any, res: any) => {
       UserExist: false
     });
   }
-  
+
   UserLikedTheVideoCheck(req.body.UserToken, req.body.VideoToken, res, (err: boolean, Data: any) => {
     if (err) {
       res.status(500);

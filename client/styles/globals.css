@@ -3,8 +3,8 @@ body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    background-color: #565656
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif,;
+    background-color: #474747
 }
 
 a {
@@ -14,4 +14,13 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "Exo 2";
+  src:  url("../public/fonts/Exo2/Exo2-Regular.ttf") format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+
 }

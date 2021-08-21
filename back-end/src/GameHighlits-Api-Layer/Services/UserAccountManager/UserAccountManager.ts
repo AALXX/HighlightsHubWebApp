@@ -1,10 +1,21 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, json } from 'express';
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
+import InternalTools from "../../../libs/GetUserTokenTools/GetUserPublicToken"
 
 const NAMESPACE = 'AccountManagerService';
+
+
+//*Interfarces
+interface ChanelsTokens {
+  ChanelId:string
+  ChanelName: any;
+};
+interface ChanelsTokens {
+  ChanelId: string;
+};
 
 //*Get user Account by provided user token
 const GetUserAccountData = (req: Request, res: Response) => {
@@ -70,7 +81,6 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
     });
   }
 
-
   const loginAccountQuerryString = `SELECT * FROM users WHERE UserEmail="${req.body.UserMail}"`;
   Connect()
     .then(connection => {
@@ -102,8 +112,6 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
           }
         })
 
-
-
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
         return res.status(500).json({
@@ -123,7 +131,6 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
     });
 };
 
-
 //*Rehister Account To dataBase
 const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "Register User Account Service called");
@@ -142,7 +149,7 @@ const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) =>
 
     let PublicUserToken = hat();
     let PrivateUserToken = hat();
-    
+
     Connect()
       .then(connection => {
 
@@ -189,29 +196,29 @@ const CheckPassword = (InputedPassword: string, Token: string, callback: any) =>
         let data = JSON.parse(JSON.stringify(results));
 
         if (Object.keys(data).length === 0) {
-          callback(false, false);
+          return callback(false, false);
         }
 
         bcrypt.compare(InputedPassword, data[0].pwdUsers, (err, isMatch) => {
           if (err) {
-            callback(true, null);
+            return callback(true, null);
           } else if (!isMatch) {
-            callback(false, false);
+            return  callback(false, false);
           } else {
-            callback(false, true);
+            return  callback(false, true);
           }
         })
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
-        callback(true, null);
+        return callback(true, null);
       }).finally(() => {
         connection.end();
       });
 
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
-      callback(true, null);
+      return callback(true, null);
     });
 }
 
@@ -233,7 +240,6 @@ const ChangeAccountSettings = (req: Request, res: Response, next: NextFunction) 
         error: true
       })
     }
-    console.log(isMatch);
     if (!isMatch) {
       return res.status(200).json({
         error: false,
@@ -313,10 +319,113 @@ const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) =>
     });
 }
 
+const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) => {
+
+  //* if AccountToken param is null or empty send 404
+  if (req.params.AccountToken === "" || req.params.AccountToken === null) {
+    return res.status(200).json({
+      error: true,
+    });
+  };
+
+  InternalTools.GetUserPublicTokenByPrivateToken(req.params.AccountToken, (err: boolean, PublicToken: string) => {
+
+    if (err) {
+      return res.status(200).json({
+        error: true
+      })
+
+    }
+
+    //*it defines a type for chanel tokens object
+    GetFolowedChanelsTokens(PublicToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
+      if (err) {
+        return res.status(200).json({
+          error: true 
+        })
+      }
+      
+      let Chanels:any = [];
+      
+      //*it is here to get all chanels data because it makes multiple requests to db
+      for (let i = 0; i < ChanelsTokens.length; i++) {
+        let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelId).catch((err) => {
+          return res.status(200).json({
+            error: true
+          });
+        });;
+
+        
+        let ChanelData_Obj = {
+          ChanelsId:ChanelsTokens[i].ChanelId,
+          ChanelName: ChanelsName,
+        };
+
+        Chanels.push(ChanelData_Obj);
+      }
+
+
+      return res.status(200).json(
+        Chanels,
+
+      )
+    });
+  });
+}
+
+const GetFolowedChanelNames = async (ChanelId: string) => new Promise((resolve, reject) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelName FROM chanels WHERE PublicChanelToken="${ChanelId}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        resolve(data[0].ChanelName);
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        reject(error);
+
+      })
+        .finally(() => {
+          connection.end();
+        });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      reject(error);
+    });
+});
+
+const GetFolowedChanelsTokens = (AcountId: string, callBack: any) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelId FROM folow_class WHERE UserId="${AcountId}"`;
+
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        callBack(false, data);
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return callBack(true, null);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return callBack(true, null);
+    });
+}
+
 export default {
   GetUserAccountData,
   GetUserAccountDataByPublicToken,
   LoginUserAccount,
   RegisterUserAccount,
-  ChangeAccountSettings
+  ChangeAccountSettings,
+  GetUserFolowedChanels
 };

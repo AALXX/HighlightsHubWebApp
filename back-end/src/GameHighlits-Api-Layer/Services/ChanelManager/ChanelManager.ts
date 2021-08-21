@@ -174,7 +174,6 @@ const GetCreatorChanelData = (req: Request, res: Response, next: NextFunction) =
         });
       }
 
-
       const ChanelData: object = {
         ChanelName: ChanelInfos.ChanelName,
         ChanelFolowers: ChanelInfos.ChanelFolowers,
