@@ -1,0 +1,289 @@
+.PageContainer {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 80vh;
+
+}
+
+/* Chanel UpperBar*/
+.ChanelUpperBar {
+    display: flex;
+    flex-direction: row;
+    margin-top: 2vh;
+    height: 7.5rem;
+    background-color: #3f3f3f;
+    width: 97%;
+    margin-left: 1.5vw;
+}
+
+.AccountProfileImage {
+    border: solid 1px black;
+    border-radius: 50%;
+    height: 5.2rem;
+    width: 5.2rem;
+    margin-top: .8rem;
+    margin-left: 2rem;
+}
+
+.ChanelStats {
+    display: flex;
+    flex-direction: column;
+    margin-left: 1.2rem;
+    width: 15%;
+    height: 80%;
+    margin-top: .7rem;
+}
+
+.AccountNameText {
+    color: #E40000;
+    font-family: "exo 2";
+    font-size: 1rem;
+    margin: auto;
+}
+
+.ChanelStatsBar {
+    width: 10rem;
+    margin: auto;
+
+}
+
+.AccountFolowersText {
+    color: #E40000;
+    font-family: "exo 2";
+    font-size: 1rem;
+    margin: auto;
+}
+
+
+/* Content */
+.Content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+.Videos {
+    border: solid;
+    width: 75%;
+    height: 85%;
+    margin-left: 1.5vw;
+    margin-top: 2vh;
+}
+
+.ChanelInfos {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    height: 85%;
+    margin-left: 2vw;
+    margin-top: 2vh;
+    background-color: #3f3f3f;
+}
+
+.AboutChanelPart {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+
+}
+
+.AboutChanelText {
+    color: #E40000;
+    font-family: "exo 2";
+    font-size: 1.2rem;
+    margin: auto;
+}
+
+.AboutChanelLine {
+    width: 40%;
+    margin: auto;
+}
+
+.AboutChanelPargraphText {
+    color: #E40000;
+    font-family: "exo 2";
+    font-size: .8rem;
+    margin: auto;
+}
+
+.ChanelWallPart {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10%;
+    font-size: 1.2rem;
+}
+
+.MostHighlithedGamesPart {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    margin-bottom: 5vh;
+}
+
+.MostHighlithedGamesText {
+    color: #E40000;
+    font-family: "exo 2";
+    font-size: 1.1rem;
+    margin: auto;
+}
+
+.EmptySign {
+    display: flex;
+    width: 80%;
+    height: 15vh;
+    background-color: black;
+    margin: auto;
+}
+
+.EmptyText {
+    color: white;
+    font-family: "exo 2";
+    margin: auto;
+    font-size: 1.5rem;
+}
+
+/** MediaQuerryes */
+@media (max-width: 500px) {
+
+    .ChanelUpperBar {
+        display: flex;
+        flex-direction: row;
+        margin-top: 2vh;
+        height: 5.5rem;
+        background-color: #3f3f3f;
+        width: 97%;
+        margin-left: 1.5vw;
+    }
+
+    .AccountProfileImage {
+        border-radius: 50%;
+        height: 3.5rem;
+        width: 3.5rem;
+        margin-top: 1rem;
+        margin-left: 2rem;
+    }
+
+    .ChanelStats {
+        display: flex;
+        flex-direction: column;
+        margin-left: .5rem;
+        width: 40%;
+        height: 80%;
+        margin-top: .7rem;
+    }
+
+    .AccountNameText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .8rem;
+        margin: auto;
+    }
+
+    .ChanelStatsBar {
+        width: 5rem;
+        margin: auto;
+    }
+
+    .AccountFolowersText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .8rem;
+        margin: auto;
+
+    }
+
+    /* Content */
+    .Content {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+    }
+
+    .Videos {
+        border: solid;
+        width: 70%;
+        height: 85%;
+        margin-left: 1.5vw;
+        margin-top: 2vh;
+    }
+
+    .ChanelInfos {
+        display: flex;
+        flex-direction: column;
+        width: 25%;
+        height: 85%;
+        margin-left: 2vw;
+        margin-top: 2vh;
+        background-color: #3f3f3f;
+    }
+
+    .AboutChanelPart {
+        display: flex;
+        flex-direction: column;
+        margin-top: 1rem;
+
+    }
+
+    .AboutChanelText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .8rem;
+        margin: auto;
+    }
+
+    .AboutChanelLine {
+        width: 50%;
+        margin: auto;
+    }
+
+    .AboutChanelPargraphText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .5rem;
+        margin-left: 10%;
+    }
+
+    .ChanelWallPart {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20%;
+        font-size: .8rem;
+    }
+
+    .EmptySign {
+        display: flex;
+        width: 80%;
+        height: 10vh;
+        background-color: black;
+        margin: auto;
+    }
+
+    .EmptyText {
+        color: white;
+        font-family: "exo 2";
+        margin: auto;
+        font-size: .5rem;
+    }
+
+    .MostHighlithedGamesPart {
+        display: flex;
+        flex-direction: column;
+        margin-top: auto;
+        margin-bottom: 5vh;
+
+    }
+
+    .MostHighlithedGamesText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .5rem;
+        margin:auto;
+
+    }
+
+
+
+}

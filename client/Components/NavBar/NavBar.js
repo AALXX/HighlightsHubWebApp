@@ -3,13 +3,15 @@ import style from "./style/NavBar.module.css";
 import Link from "next/Link"
 import axios from "axios"
 import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
+
 
 import ChanelLinkTamplate from "./NavBarChanelLinksModel"
 
 export default function NavBar() {
     const [sidebar, setsidebar] = useState(false)
     const [Input, setInput] = useState([]);
-
+    const router = useRouter()
     const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
 
     useEffect(() => {
@@ -41,7 +43,7 @@ export default function NavBar() {
                         <img src='/assets/NavBarIcons/SearchBarIcon.svg' alt='next' className={style.SearchIcon} />
                     </button>
                 </div>
-                <button className={style.AccountImageButton} >
+                <button className={style.AccountImageButton} onClick={() => router.push('/u')} >
                     <img src='/assets/NavBarIcons/RedAccountDefaultImage.svg' alt='AccountImageButton' className={style.AccountImage} />
                 </button>
             </nav>

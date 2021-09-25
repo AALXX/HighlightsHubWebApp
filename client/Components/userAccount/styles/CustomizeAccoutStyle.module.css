@@ -1,0 +1,123 @@
+.popup {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.popup_inner {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 25%;
+    right: 25%;
+    width: 40vw;
+    height: 88vh;
+    top: 25%;
+    bottom: 25%;
+    margin: auto;
+    background: #464646;
+    border: 2px solid #656565;
+    z-index: 1;
+}
+
+.PupUpbackground {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+.XButton {
+    color: #E40000;
+    background-color: transparent;
+    border: transparent;
+    outline: none;
+    cursor: pointer;
+    margin-left: auto;
+    margin-top: 1vh;
+    margin-right: 1vw;
+}
+
+.BasicPanelHorizontalLine {
+    width: 13em;
+    margin-top: 1em;
+}
+
+/* Account Name Part */
+.AccountNameDiv {
+    display: flex;
+    flex-direction: row;
+    background-color: #353535;
+    border: solid 1px #6b6b6b;
+    width: 11.5vw;
+    margin-left: 1vh;
+    height: 2.5em;
+
+}
+
+.AccountnaNameInput {
+    color: #E40000;
+    background-color: transparent;
+    border: solid 1px transparent;
+    font-size: 2vh;
+    font-family: 'exo 2';
+    width: 5.2em;
+    height: 2em;
+    margin-left: 1vh;
+    margin-top: .5em;
+    margin: auto;
+}
+
+.AccountnaNameText {
+    margin-left: 2vw;
+    color: #E40000;
+    font-family: 'exo 2';
+    font-size: 2vh;
+    margin: auto;
+}
+
+.ChangeNameButton {
+    color: #E40000;
+    font-size: 1em;
+    background-color: #353535;
+    border: solid 1px #6b6b6b;
+    outline: none;
+    cursor: pointer;
+    height: 2.5em;
+    margin-left: .5vw;
+    margin-top: .5em;
+    width: 97%;
+}
+
+.ChangeNameButton:hover {
+    background-color: #3a3a3a;
+}
+
+/* MakeProfilePublic*/
+
+.MakeProfilePublicChecked {
+    display: flex;
+    flex-direction: row;
+}
+
+.ShowProfileText {
+    margin-left: 1vw;
+    color: #E40000;
+    font-family: 'exo 2';
+    font-size: 2vh;
+}
+
+.ShowProfileCheckBox{
+    align-self: center;
+    margin-left: 1vw;
+    width: 1vw;
+    height: 2vh;
+    background: #a50000;
+}

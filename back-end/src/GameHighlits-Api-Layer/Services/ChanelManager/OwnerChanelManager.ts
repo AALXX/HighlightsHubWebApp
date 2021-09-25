@@ -7,7 +7,7 @@ import fs from "fs";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
 
-import AmLibs from "../../../libs/FolderCheck/folderCheck"
+import AmLibs from "../../../CommonFunctions/FolderCheck/folderCheck"
 
 const NAMESPACE = 'OwnerChanelMgerService';
 

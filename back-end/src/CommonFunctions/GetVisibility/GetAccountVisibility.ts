@@ -1,0 +1,1 @@
+//*Check if account is public/private

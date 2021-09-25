@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
 import ChanelManager from "../ChanelManager/ChanelManager";
-import GetUserPublicTokenTool from "../../../libs/GetUserTokenTools/GetUserPublicToken"
+import GetUserPublicTokenTool from "../../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 
 const NAMESPACE = 'VideoPlayerManagerService';
 

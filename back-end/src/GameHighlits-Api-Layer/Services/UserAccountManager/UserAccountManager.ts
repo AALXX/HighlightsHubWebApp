@@ -3,33 +3,29 @@ import logging from "../../../config/logging";
 import { Connect, Query } from "../../../config/mysql";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
-import InternalTools from "../../../libs/GetUserTokenTools/GetUserPublicToken"
+import fs, { exists } from "fs"
 
+
+import InternalTools from "../../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
+import AccountChecks from "../../../CommonFunctions/AccountChecks/AccountExistCheck"
 const NAMESPACE = 'AccountManagerService';
 
 
 //*Interfarces
 interface ChanelsTokens {
-  ChanelId:string
-  ChanelName: any;
-};
-interface ChanelsTokens {
   ChanelId: string;
 };
 
 //*Get user Account by provided user token
-const GetUserAccountData = (req: Request, res: Response) => {
-  logging.info(NAMESPACE, "Get User Account Service called");
-
+const GetOwnerUserAccountData = (req: Request, res: Response) => {
   //* if /:AccountToken param is null or empty send 404
   if (req.params.AccountToken === "" || req.params.AccountToken === null) {
     return res.status(200).json({
-      succeded: false,
-      message: "User didnt provide a token"
+      error: true,
     });
   };
 
-  const GetAccountQueryString = `SELECT * FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
+  const GetAccountQueryString = `SELECT UserName, UserEmail, AccountFolowers, ChanelDescription FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
   Connect()
     .then(connection => {
 
@@ -37,25 +33,27 @@ const GetUserAccountData = (req: Request, res: Response) => {
 
         let data = JSON.parse(JSON.stringify(results));
 
+        //*it checks if data object has values if not it sends back account ecist false
         if (Object.keys(data).length === 0) {
           return res.status(200).json({
-            succeded: false
+            error: true,
+            AccountExist: false
           })
         }
 
-        const UserAccountData = {
-          AcountName: data[0].UserName,
-          message: null,
-          succeded: true
-        }
-
-        res.status(200).json(UserAccountData);
+        res.status(200).json({
+          AccountExist: true,
+          error: false,
+          AccountName: data[0].UserName,
+          AccountEmail: data[0].UserEmail,
+          AccountFolowers: data[0].AccountFolowers,
+          ChanelDescription: data[0].ChanelDescription,
+        });
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
         return res.status(500).json({
-          message: error.message,
-          error
+          error: true
         });
       }).finally(() => {
         connection.end();
@@ -64,20 +62,73 @@ const GetUserAccountData = (req: Request, res: Response) => {
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
       return res.status(500).json({
-        message: error.message,
-        error
+        error: true
       });
     });
 };
+
+const GetAccountImage = (req: Request, res: Response) => {
+
+  const loginAccountQuerryString = `SELECT AccountAvatarIconPath FROM users WHERE PublicToken="${req.params.PublicAccountToken}"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, loginAccountQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        if (Object.keys(data).length === 0) {
+
+          return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
+            res.writeHead(200, {
+              "Content-Type": "image/png"
+            }),
+              res.end(image);
+          });
+
+        }
+
+        if (data[0].AccountAvatarIconPath === null) {
+          return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
+            res.writeHead(200, {
+              "Content-Type": "image/png"
+            }),
+              res.end(image);
+          });
+        }
+        
+        res.writeHead(200, {
+          "Content-Type": "image/png"
+        });
+
+        fs.readFile(data[0].AccountAvatarIconPath, (err, image) => {
+          res.end(image);
+        });
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(500).json({
+          error: true
+        });
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(500).json({
+        error: true
+      });
+    });
+}
 
 //*Login user account into Database
 const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
 
   logging.info(NAMESPACE, "LogIn User Account Service called");
 
-  if (req.body.UserMail === "" || req.body.UserMail === null || req.body.Password === "" || req.body.Password === null) {
-    return res.status(404).json({
-      message: "User didnt provide a e-mail or password"
+  if (req.body.UserEmail === "" || req.body.UserEmail === undefined || req.body.Password === "" || req.body.Password === undefined) {
+    return res.status(200).json({
+      error: true,
     });
   }
 
@@ -135,54 +186,68 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
 const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) => {
   logging.info(NAMESPACE, "Register User Account Service called");
 
-  if (req.body.Username === "" || req.body.Username === null || req.body.Mailuid === "" || req.body.Mailuid === null || req.body.PassWord === "" || req.body.PassWord === null || req.body.RepeatePassWord === "" || req.body.RepeatePassWord === null) {
-    return res.status(404).json({
-      message: "User didnt provide credentials or password"
+  if (req.body.UserName === "" || req.body.UserName === undefined || req.body.UserEmail === "" || req.body.UserEmail === undefined || req.body.Password === "" || req.body.Password === undefined) {
+    return res.status(200).json({
+      error: true,
     });
   }
 
-  const saltRounds = 10;
-  bcrypt.hash(req.body.PassWord, saltRounds, (err, hash) => {
+
+  AccountChecks.UserNameAndEmailCheck(req.body.UserName, req.body.UserEmail, (err: boolean, exist: boolean) => {
+
     if (err) {
-      return res.status(500);
+      return res.status(200).json({
+        error: false,
+      })
     }
 
-    let PublicUserToken = hat();
-    let PrivateUserToken = hat();
+    if (exist) {
+      return res.status(200).json({
+        error: false,
+        UserNameExistsorEmailExists: true,
+      })
+    }
 
-    Connect()
-      .then(connection => {
+    const saltRounds = 10;
+    bcrypt.hash(req.body.Password, saltRounds, (err, hash) => {
+      if (err) {
+        return res.status(500);
+      }
 
-        let UserCredentials = {
-          UserName: req.body.Username,
-          PrivateUserToken: PrivateUserToken,
-          PublicUserToken: PublicUserToken,
-          UserEmail: req.body.Mailuid,
-          HashedPasWord: hash
-        }
+      let PublicUserToken = hat();
+      let PrivateUserToken = hat();
 
-        const RegisterqueryString = `INSERT INTO users(UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken}","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
+      let UserCredentials = {
+        UserName: req.body.UserName,
+        PrivateUserToken: PrivateUserToken,
+        PublicUserToken: PublicUserToken,
+        UserEmail: req.body.UserEmail,
+        HashedPasWord: hash
+      }
 
-        Query(connection, RegisterqueryString).then(() => {
-          return res.status(202).json({ UserToken: PrivateUserToken });
+      Connect()
+        .then(connection => {
+
+          const RegisterqueryString = `INSERT INTO users (UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken}","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
+
+          Query(connection, RegisterqueryString).then(() => {
+            return res.status(200).json({ UserToken: PrivateUserToken, PublicUserToken: PublicUserToken });
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500);
+          }).finally(() => {
+            connection.end();
+          });
+
         }).catch(error => {
           logging.error(NAMESPACE, error.message, error);
-          return res.status(500).json({
-            message: error.message,
-            error
-          });
-        }).finally(() => {
-          connection.end();
+          return res.status(500);
         });
+    });
 
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(500).json({
-          message: error.message,
-          error
-        });
-      });
   });
+
 }
 
 const CheckPassword = (InputedPassword: string, Token: string, callback: any) => {
@@ -203,9 +268,9 @@ const CheckPassword = (InputedPassword: string, Token: string, callback: any) =>
           if (err) {
             return callback(true, null);
           } else if (!isMatch) {
-            return  callback(false, false);
+            return callback(false, false);
           } else {
-            return  callback(false, true);
+            return callback(false, true);
           }
         })
 
@@ -223,61 +288,84 @@ const CheckPassword = (InputedPassword: string, Token: string, callback: any) =>
 }
 
 //* Change AccountSettings to one send by user
-const ChangeAccountSettings = (req: Request, res: Response, next: NextFunction) => {
-  logging.info(NAMESPACE, "Change User Account Service called");
+const ChangeAccountName = (req: Request, res: Response, next: NextFunction) => {
 
-  if (req.body.UserMail === "" || req.body.UserMail === null || req.body.Password === "" || req.body.Password === null) {
+  if (req.body.AccountToken === undefined || req.body.AccountToken === null || req.body.newAccountName === undefined || req.body.newAccountName === null) {
     return res.status(200).json({
-      message: "User didnt completed inputs "
+      error: true
     });
   }
 
-  CheckPassword(req.body.UserInputedPassword, req.body.AccountToken, (err: boolean, isMatch: any) => {
+  const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserName="${req.body.newAccountName}" WHERE PrivateToken="${req.body.AccountToken}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
 
-    if (err) {
+        let data = JSON.parse(JSON.stringify(results));
 
-      return res.status(200).json({
-        error: true
-      })
-    }
-    if (!isMatch) {
-      return res.status(200).json({
-        error: false,
-        matchcredentials: false
-      })
-    }
-
-    const ChangeAccountSettingsSqlQuery = `UPDATE users SET uidUsers="${req.body.NewAccountName}" WHERE Token="${req.body.AccountToken}"`;
-    Connect()
-      .then(connection => {
-        Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
-
-          let data = JSON.parse(JSON.stringify(results));
-
-          if (data.affectedRows === 0) {
-            return res.status(200).json({
-              message: "Account doesen't exist",
-              succeded: false
-            })
-          }
-
-          res.status(200).json({
-            succeded: true
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
           })
+        }
 
-        }).catch(error => {
-          logging.error(NAMESPACE, error.message, error);
-          return res.status(505);
-        }).finally(() => {
-          connection.end();
-        });
+        res.status(200).json({
+          error: false
+        })
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
         return res.status(505);
+      }).finally(() => {
+        connection.end();
       });
-  })
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
 }
+
+//*Make profile public/private
+const ChangeProfileVisibility = (req: Request, res: Response) => {
+  logging.info(NAMESPACE, "Change User Name Service called");
+  if (req.body.AccountToken === undefined || req.body.AccountToken === null) {
+    return res.status(200).json({
+      error: true
+    });
+  }
+
+  // const ChangeAccountSettingsSqlQuery = `UPDATE users SET public="${req.body.newAccountName}" WHERE PrivateToken="${req.body.AccountToken}"`;
+  // Connect()
+  //   .then(connection => {
+  //     Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
+
+  //       let data = JSON.parse(JSON.stringify(results));
+
+  //       if (data.affectedRows === 0) {
+  //         return res.status(200).json({
+  //           error: true,
+  //         })
+  //       }
+
+  //       res.status(200).json({
+  //         error: false
+  //       })
+
+  //     }).catch(error => {
+  //       logging.error(NAMESPACE, error.message, error);
+  //       return res.status(505);
+  //     }).finally(() => {
+  //       connection.end();
+  //     });
+
+  //   }).catch(error => {
+  //     logging.error(NAMESPACE, error.message, error);
+  //     return res.status(505);
+  //   });
+
+}
+
 
 //* Get User Account public data by publick token
 const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
@@ -341,12 +429,12 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
     GetFolowedChanelsTokens(PublicToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
       if (err) {
         return res.status(200).json({
-          error: true 
+          error: true
         })
       }
-      
-      let Chanels:any = [];
-      
+
+      let Chanels: any = [];
+
       //*it is here to get all chanels data because it makes multiple requests to db
       for (let i = 0; i < ChanelsTokens.length; i++) {
         let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelId).catch((err) => {
@@ -355,9 +443,9 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
           });
         });;
 
-        
+
         let ChanelData_Obj = {
-          ChanelsId:ChanelsTokens[i].ChanelId,
+          ChanelsId: ChanelsTokens[i].ChanelId,
           ChanelName: ChanelsName,
         };
 
@@ -422,10 +510,11 @@ const GetFolowedChanelsTokens = (AcountId: string, callBack: any) => {
 }
 
 export default {
-  GetUserAccountData,
+  GetOwnerUserAccountData,
   GetUserAccountDataByPublicToken,
   LoginUserAccount,
   RegisterUserAccount,
-  ChangeAccountSettings,
-  GetUserFolowedChanels
+  ChangeAccountName,
+  GetUserFolowedChanels,
+  GetAccountImage
 };
