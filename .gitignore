@@ -4,6 +4,7 @@
 /client/node_modules
 /back-end/node_modules
 /client/config
+/client/.next
 /.pnp
 .pnp.js
 
