@@ -49,6 +49,7 @@ export default function OwnerAccountPage(props) {
                 <br />
                 <div className={style.EmptySign}><h1 className={style.EmptyText}>EMPTY</h1></div>
               </div>
+              
 
               <div className={style.MostHighlithedGamesPart}>
                 <h2 className={style.MostHighlithedGamesText}>Highlithed Games</h2>

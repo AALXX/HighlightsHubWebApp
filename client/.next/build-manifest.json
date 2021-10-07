@@ -24,15 +24,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/u/login": [
+    "/u/upload": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/u/login.js"
-    ],
-    "/u/signup": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/u/signup.js"
+      "static/chunks/pages/u/upload.js"
     ]
   },
   "ampFirstPages": []

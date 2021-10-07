@@ -1,4 +1,4 @@
-const env = require('./config/.env-config.js')
+const env = require('./config/env-config.js')
 
 
 module.exports = {

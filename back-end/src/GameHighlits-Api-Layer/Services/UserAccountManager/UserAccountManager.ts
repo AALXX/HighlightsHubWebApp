@@ -1,19 +1,19 @@
 import { Request, Response, NextFunction, json } from 'express';
-import logging from "../../../config/logging";
-import { Connect, Query } from "../../../config/mysql";
+import logging from "../../config/logging";
+import { Connect, Query } from "../../config/mysql";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
 import fs, { exists } from "fs"
 
 
-import InternalTools from "../../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
-import AccountChecks from "../../../CommonFunctions/AccountChecks/AccountExistCheck"
+import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
+import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
 const NAMESPACE = 'AccountManagerService';
 
 
 //*Interfarces
 interface ChanelsTokens {
-  ChanelId: string;
+  ChanelToken: string;
 };
 
 //*Get user Account by provided user token
@@ -25,7 +25,7 @@ const GetOwnerUserAccountData = (req: Request, res: Response) => {
     });
   };
 
-  const GetAccountQueryString = `SELECT UserName, UserEmail, AccountFolowers, ChanelDescription FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
+  const GetAccountQueryString = `SELECT UserName, UserEmail, ChanelFolowers, ChanelDescription FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
   Connect()
     .then(connection => {
 
@@ -46,7 +46,7 @@ const GetOwnerUserAccountData = (req: Request, res: Response) => {
           error: false,
           AccountName: data[0].UserName,
           AccountEmail: data[0].UserEmail,
-          AccountFolowers: data[0].AccountFolowers,
+          AccountFolowers: data[0].ChanelFolowers,
           ChanelDescription: data[0].ChanelDescription,
         });
 
@@ -69,13 +69,14 @@ const GetOwnerUserAccountData = (req: Request, res: Response) => {
 
 const GetAccountImage = (req: Request, res: Response) => {
 
-  const loginAccountQuerryString = `SELECT AccountAvatarIconPath FROM users WHERE PublicToken="${req.params.PublicAccountToken}"`;
+  const GetAccountImageQuerryString = `SELECT AccountAvatarIconPath FROM users WHERE PublicToken="${req.params.PublicAccountToken}"`;
   Connect()
     .then(connection => {
 
-      Query(connection, loginAccountQuerryString).then(results => {
+      Query(connection, GetAccountImageQuerryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
+        console.log(data)
         if (Object.keys(data).length === 0) {
 
           return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
@@ -86,6 +87,8 @@ const GetAccountImage = (req: Request, res: Response) => {
           });
 
         }
+
+
 
         if (data[0].AccountAvatarIconPath === null) {
           return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
@@ -131,18 +134,15 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
       error: true,
     });
   }
-
-  const loginAccountQuerryString = `SELECT * FROM users WHERE UserEmail="${req.body.UserMail}"`;
+  const loginAccountQuerryString = `SELECT PrivateToken, UserPwd, PublicToken FROM users WHERE UserEmail="${req.body.UserEmail}"`;
   Connect()
     .then(connection => {
 
       Query(connection, loginAccountQuerryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
-
         if (Object.keys(data).length === 0) {
           return res.status(200).json({
-            message: "User Not Found",
             UserFound: false
           });
         }
@@ -150,16 +150,16 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
         bcrypt.compare(req.body.Password, data[0].UserPwd, (err, isMatch) => {
           if (err) {
             return res.status(500).json({
-              message: "error",
               error: true
             });
           } else if (!isMatch) {
             return res.status(200).json({
+              UserFound: true,
               pwdmathch: false,
               error: false
             })
           } else {
-            return res.status(202).json({ UserToken: data[0].PrivateToken, pwdmathch: true, error: false });
+            return res.status(202).json({ UserToken: data[0].PrivateToken, PublicUserToken: data[0].PublicToken,  pwdmathch: true, error: false, UserFound: true });
           }
         })
 
@@ -416,17 +416,9 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
     });
   };
 
-  InternalTools.GetUserPublicTokenByPrivateToken(req.params.AccountToken, (err: boolean, PublicToken: string) => {
-
-    if (err) {
-      return res.status(200).json({
-        error: true
-      })
-
-    }
 
     //*it defines a type for chanel tokens object
-    GetFolowedChanelsTokens(PublicToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
+    GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
       if (err) {
         return res.status(200).json({
           error: true
@@ -435,17 +427,16 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
 
       let Chanels: any = [];
 
-      //*it is here to get all chanels data because it makes multiple requests to db
+      //*get all chanels data because it makes multiple requests to db
       for (let i = 0; i < ChanelsTokens.length; i++) {
-        let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelId).catch((err) => {
+        let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelToken).catch((err) => {
           return res.status(200).json({
             error: true
           });
         });;
 
-
         let ChanelData_Obj = {
-          ChanelsId: ChanelsTokens[i].ChanelId,
+          ChanelsId: ChanelsTokens[i].ChanelToken,
           ChanelName: ChanelsName,
         };
 
@@ -458,17 +449,16 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
 
       )
     });
-  });
 }
 
-const GetFolowedChanelNames = async (ChanelId: string) => new Promise((resolve, reject) => {
-  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelName FROM chanels WHERE PublicChanelToken="${ChanelId}"`;
+const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resolve, reject) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT UserName FROM users WHERE PublicToken="${AccountToken}"`;
   Connect()
     .then(connection => {
       Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
-        resolve(data[0].ChanelName);
+        resolve(data[0].UserName);
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -485,8 +475,8 @@ const GetFolowedChanelNames = async (ChanelId: string) => new Promise((resolve, 
     });
 });
 
-const GetFolowedChanelsTokens = (AcountId: string, callBack: any) => {
-  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelId FROM folow_class WHERE UserId="${AcountId}"`;
+const GetFolowedChanelsTokens = (AcountToken: string, callBack: any) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelToken FROM folow_class WHERE UserToken="${AcountToken}"`;
 
   Connect()
     .then(connection => {

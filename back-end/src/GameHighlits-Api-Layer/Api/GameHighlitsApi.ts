@@ -3,13 +3,13 @@ import express from 'express';
 
 //* imports from route folder
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
-import VideoPlayerRoutesControler from "../routes/VideoPlayerRoutes/VideoPlayesRoutesControler"
+import VideosRoutesControler from "../routes/VideosManagerRoutes/VideoPlayesRoutesControler"
 import ChanelRoutesControler from "../routes/ChanelRoutes/ChanelRoutesController"
 import SearchingRoutesControler from "../routes/SearchingRoutes/SearchRoutesControler"
 
 //*Configs
-import config from "../../config/config";
-import logging from '../../config/logging';
+import config from "../config/config";
+import logging from '../config/logging';
 const NAMESPACE = "GameHighlitsApi";
 const router = express();
 
@@ -43,9 +43,9 @@ router.use((req, res, next) => {
 //* Routes
 router.use("/api/user-account-manager/", UserAccountRoutesControler);
 
-router.use("/api/video-player-manager/", VideoPlayerRoutesControler);
+router.use("/api/videos-manager/", VideosRoutesControler);
 
-router.use("/api/chanel-manager/", ChanelRoutesControler);
+// router.use("/api/chanel-manager/", ChanelRoutesControler);
 
 router.use("/api/search-manager/", SearchingRoutesControler);
 

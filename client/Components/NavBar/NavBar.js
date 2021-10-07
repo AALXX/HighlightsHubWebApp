@@ -15,7 +15,12 @@ export default function NavBar() {
     const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
 
     useEffect(() => {
-        axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-user-folowed-chanels/${Cookies.get("UserToken")}`).then((res) => {
+
+        if(Cookies.get("PublicUserToken") === undefined){
+            return setFolowedChanelsList("");
+        }
+
+        axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-user-folowed-chanels/${Cookies.get("PublicUserToken")}`).then((res) => {
             let FolowedChanelsListArr = [];
 
             for (let i = 0; i < res.data.length; i++) {
@@ -57,27 +62,27 @@ export default function NavBar() {
                         <button className={style.SideBarButton}>HOME</button>
                     </Link>
 
-                    <Link href="/" >
+                    <Link href="/u" >
                         <button className={style.SideBarButton}>MY CHANEL</button>
-                    </Link>
-
-                    <Link href="/" >
-                        <button className={style.SideBarButton}>MY HIGHLIGHTS</button>
                     </Link>
 
                     <Link href="/" >
                         <button className={style.SideBarButton}>SAVED HIGHLIGHTS</button>
                     </Link>
+
+                    <Link href="/u/upload" >
+                        <button className={style.SideBarButton}>UPLOAD HIGHLIGHT</button>
+                    </Link>
                     <hr color="#4D4D4D" className={style.HorizontalLine} />
                     <div className={style.FolowedChanelsContainer}>
-                        {FolowedChanelsList.map((Chanel, index) => (
+                        {/* {FolowedChanelsList.map((Chanel, index) => (
                             <div key={index}>
                                 <ChanelLinkTamplate
                                     ChanelName={Chanel.ChanelName}
                                     ChanelId={Chanel.ChanelsId}
                                 />
                             </div>
-                        ))}
+                        ))} */}
                     </div>
 
                 </nav>

@@ -4,10 +4,11 @@ import multer from "multer";
 import hat from "hat";
 import fs from "fs";
 
-import logging from "../../../config/logging";
-import { Connect, Query } from "../../../config/mysql";
+import logging from "../../config/logging";
+import { Connect, Query } from "../../config/mysql";
 
 import ChanelManager from "../ChanelManager/ChanelManager"
+
 
 const NAMESPACE = 'UploadManagerService';
 

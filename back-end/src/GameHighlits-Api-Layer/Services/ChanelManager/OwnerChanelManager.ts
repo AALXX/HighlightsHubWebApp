@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction, json } from 'express';
 
-import logging from "../../../config/logging";
-import { Connect, Query } from "../../../config/mysql";
+import logging from "../../config/logging";
+import { Connect, Query } from "../../config/mysql";
 import ChanelManager from "./ChanelManager";
 import fs from "fs";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
 
-import AmLibs from "../../../CommonFunctions/FolderCheck/folderCheck"
+import AmLibs from "../../CommonFunctions/FolderCheck/folderCheck"
 
 const NAMESPACE = 'OwnerChanelMgerService';
 
