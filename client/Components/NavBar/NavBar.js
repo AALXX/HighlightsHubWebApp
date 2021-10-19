@@ -16,7 +16,7 @@ export default function NavBar() {
 
     useEffect(() => {
 
-        if(Cookies.get("PublicUserToken") === undefined){
+        if (Cookies.get("PublicUserToken") === undefined) {
             return setFolowedChanelsList("");
         }
 
@@ -37,16 +37,19 @@ export default function NavBar() {
                     <h1 className={style.logo}>Logo</h1>
                 </button>
 
-                <div className={style.SearchBarBorder}>
-                    <div className={style.SearchBar}>
-                        <input type="test" className={style.SearchBarInput}
-                            placeholder="Search"
-                            onChange={event => setInput(event.currentTarget.value)}
-                        />
+                <div className={style.SearchBarContainer}>
+                    <div className={style.SearchBarBorder}>
+                        <div className={style.SearchBar}>
+                            <input type="test" className={style.SearchBarInput}
+                                placeholder="Search"
+                                onChange={event => setInput(event.currentTarget.value)}
+                            />
+                        </div>
+
+                        <button className={style.SearchButton} >
+                            <img src='/assets/NavBarIcons/SearchBarIcon.svg' alt='next' className={style.SearchIcon} />
+                        </button>
                     </div>
-                    <button className={style.SearchButton} >
-                        <img src='/assets/NavBarIcons/SearchBarIcon.svg' alt='next' className={style.SearchIcon} />
-                    </button>
                 </div>
                 <button className={style.AccountImageButton} onClick={() => router.push('/u')} >
                     <img src='/assets/NavBarIcons/RedAccountDefaultImage.svg' alt='AccountImageButton' className={style.AccountImage} />

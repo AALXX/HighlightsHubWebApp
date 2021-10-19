@@ -1,7 +1,8 @@
 import '../styles/globals.css'
 import Layout from '../Layout/Layout'
 
-function MyApp({ Component, pageProps }) {
+
+function HighlightsHub({ Component, pageProps }) {
   return (
     <Layout>
       <Component {...pageProps} />
@@ -9,4 +10,4 @@ function MyApp({ Component, pageProps }) {
   )
 }
 
-export default MyApp
+export default HighlightsHub

@@ -1,9 +1,9 @@
 .UpNavBarBackground {
     display: flex;
-    flex: 1;
     background-color: #424242;
     height: 6em;
     flex-direction: row;
+    justify-content: center;    
 }
 
 .logo {
@@ -16,24 +16,30 @@
     background-color: transparent;
     outline: none;
     cursor: pointer;
-
+    /* border: solid; */
+    margin-right: auto;
+    margin-left: 3rem;
 }
 
-/* SearchBar */
+/** SearchBar */
+
+.SearchBarContainer{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
 
 .SearchBarBorder {
     display: flex;
     align-self: center;
-    margin-left: 30%;
-    width: 35em;
-
+    width: 30vw;
+    margin: auto;
 }
 
 .SearchBar {
     width: 100%;
     background-color: #686868;
     display: flex;
-
 }
 
 .SearchBarInput {
@@ -42,7 +48,6 @@
     background-color: transparent;
     height: 1.8875em;
     width: 100%;
-    margin-left: .5em;
     outline: none;
     border: transparent;
 }
@@ -53,7 +58,7 @@
     opacity: 1;
 }
 
-/* SearchBar Button*/
+/** SearchBar Button*/
 .SearchButton {
     height: 1.9em;
     width: 3em;
@@ -78,10 +83,27 @@
     width: 1.5em;
     height: 1.5em;
     align-self: center;
-    margin-left: .3em;
 }
 
-/* SideBar */
+/** AccountImage Button */
+.AccountImageButton {
+    align-self: center;
+    background-color: transparent;
+    border: transparent;
+    outline: none;
+    cursor: pointer;
+    height: 5em;
+    width: 5em;
+    margin-right: 3rem;
+    /* border: solid; */
+}
+
+.AccountImage {
+    width: 3.625em;
+    height: 3.625em;
+}
+
+/** SideBar */
 .SideBarActive{
     position: fixed;
     width: 100%;
@@ -124,7 +146,7 @@
     animation-name: tranlate-right;
 }
 
-/* KeyFrames to translate sidebar*/
+/** KeyFrames to translate sidebar*/
 @keyframes translate-right{
     to{
         transform: translateX(100%);
@@ -137,7 +159,7 @@
     }
 }
 
-/* KeyFrames to translate black background*/
+/** KeyFrames to translate black background*/
 @keyframes translate-BlackBackground{
     0% {opacity: 0;}
     100% {opacity: 1;}
@@ -174,26 +196,13 @@
     font-family: "Exo 2";
 }
 
+.SideBarButton:hover{
+    background-color: #464646;
+}
+
 .FolowedChanelsContainer{
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* AccountImage Button */
-.AccountImageButton {
-    align-self: center;
-    margin-left: auto;
-    margin-right: 4em;
-    background-color: transparent;
-    border: transparent;
-    outline: none;
-    cursor: pointer;
-    height: 5em;
-    width: 5em;
-}
-
-.AccountImage {
-    width: 3.625em;
-    height: 3.625em;
-}

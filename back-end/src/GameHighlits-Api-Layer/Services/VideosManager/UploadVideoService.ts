@@ -34,20 +34,25 @@ const UploadVideoFileToServer = async (req: Request, res: Response) => {
         error: true,
       });
     }
+    //*check if the video exists
     fs.stat(`../videos/${req.body.VideoTitle}`, (err) => {
       if (err === null) {
 
+        //* check if the file exists in tmp folder
         fs.stat(`../videos/tmp/${req.file?.originalname}`, (err) => {
 
           if (err === null) {
+            //*if exists delete the video from tmp folder
             fs.unlink(`../videos/tmp/${req.file?.originalname}`, (err) => {
               if (err) return console.log(err);
               return res.status(200).json({
                 error: true,
+                mesage:"video exists"
               })
             });
 
           }else if (err.code === 'ENOENT') {
+            //* The file does not exists
             return res.status(200).json({
               error: true,
             })
@@ -71,18 +76,18 @@ const UploadVideoFileToServer = async (req: Request, res: Response) => {
             }
 
             //*File Moved succesfully
-            SendVideoDataToDb(req.body.UserPublicToken, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, req.body.VideoTitle, async (err: boolean) => {
+            SendVideoDataToDb(req.body.UserPublicToken, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, req.body.VideoTitle,  req.body.VideoVisibility, async (err: boolean) => {
 
               if (err) {
                 return res.status(200).json({
                   error: true,
                 })
               }
-
-              await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "1280x720").then(async () => {
-                await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "480x360").then(() => {
-                })
-              });
+              //* Creates a 720p and 480p variant of the video
+              // await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "1280x720").then(async () => {
+              //   await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "480x360").then(() => {
+              //   })
+              // });
 
               return res.status(200).json({
                 error: false
@@ -96,12 +101,12 @@ const UploadVideoFileToServer = async (req: Request, res: Response) => {
   });
 };
 
-const SendVideoDataToDb = (publicToken: string, filepath: string, VideoTitle: string, callback: any) => {
+const SendVideoDataToDb = (publicToken: string, filepath: string, VideoTitle: string,  VideoVisibility:string ,callback: any) => {
   const VideoToken = hat();
   let today = new Date().toISOString().slice(0, 10)
 
-  const SendVidsDatasSqlQuery = `INSERT INTO videos (VideoTitle, Fires, DatePublished, VideoToken, OwnerToken, VideoPath, public) 
-  VALUES("${VideoTitle}", "0", "${today}","${VideoToken}", "${publicToken}", "${filepath}", "0")`;
+  const SendVidsDatasSqlQuery = `INSERT INTO videos (VideoTitle, Fires, DatePublished, VideoToken, OwnerToken, VideoPath, Visibility) 
+  VALUES("${VideoTitle}", "0", "${today}","${VideoToken}", "${publicToken}", "${filepath}", "${VideoVisibility}")`;
 
   Connect().then(connection => {
     Query(connection, SendVidsDatasSqlQuery).then(() => {

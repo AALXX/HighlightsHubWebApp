@@ -57,7 +57,7 @@ export default function Login(props) {
                     <div className={styles.EmailPart}>
                         <h1 className={styles.EmailText}>E-Mail:</h1>
                         <input className={styles.EmailInput}
-                            type="text"
+                            type="email"
                             placeholder="E-Mail..."
                             onChange={(e) => {
                                 setUserEmail(e.target.value)
