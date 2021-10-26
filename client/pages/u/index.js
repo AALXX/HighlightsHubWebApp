@@ -6,16 +6,19 @@ import * as cookie from 'cookie'
 import Link from "next/Link"
 
 import CustomizeAccountPopUp from "../../Components/userAccount/CustomizeUserAccountPopup"
+import VideoTamplate from "../../Components/userAccount/VideoTamplate"
 
 export default function OwnerAccountPage(props) {
 
   const [AccountPublicToken, setAccountPublicToken] = useState("");
+
   const [AccountEMail, setAccountEMail] = useState("");
   const [ToggledCustomizePopUp, setToggledCustomizePopUp] = useState(false);
 
 
   useEffect(() => {
-    setAccountPublicToken(Cookies.get("PublicUserToken"))
+    setAccountPublicToken(Cookies.get("PublicUserToken"));
+    console.log(props.VideoList)
   }, [])
 
   return (
@@ -33,13 +36,21 @@ export default function OwnerAccountPage(props) {
 
           <div className={style.Content}>
             <div className={style.Videos}>
-
+              <div className={style.VideosGrid}>
+                {props.VideoList.map((Chanel, index) => (
+                  <div key={index}>
+                    <VideoTamplate
+                      VideoTitle={Chanel.VideoTitle}
+                      VideoFires={Chanel.Fires}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             <div className={style.ChanelInfos}>
               <div className={style.AboutChanelPart}>
                 <h2 className={style.AboutChanelText}>About Chanel</h2>
                 <hr color="#676767" className={style.AboutChanelLine} />
-                <br />
                 <h4 className={style.AboutChanelPargraphText}>{props.ChanelDescription}</h4>
               </div>
 
@@ -49,7 +60,7 @@ export default function OwnerAccountPage(props) {
                 <br />
                 <div className={style.EmptySign}><h1 className={style.EmptyText}>EMPTY</h1></div>
               </div>
-              
+
 
               <div className={style.MostHighlithedGamesPart}>
                 <h2 className={style.MostHighlithedGamesText}>Highlithed Games</h2>
@@ -61,9 +72,9 @@ export default function OwnerAccountPage(props) {
         </div>
       ) : (
 
-        <div>
-          <h1>Account Not Found</h1>
-          <Link href="/u/signup" >
+        <div className={style.AccountNotFoundcontainer}>
+          <h1 className={style.AccountNotFoundtext}>Account Not Found</h1>
+          <Link href="/u/login" >
             <a className={style.ToLoginLink}>Already Have an account</a>
           </Link>
         </div>
@@ -92,7 +103,7 @@ export async function getServerSideProps(context) {
 
 
   const AccountData = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-owner-user-account-data/${parsedCookies.UserToken}`);
-
+  const AccountVideos = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-owner-user-account-videos/${parsedCookies.PublicUserToken}`);
 
   if (AccountData.data.AccountExist === false) {
     return {
@@ -102,7 +113,8 @@ export async function getServerSideProps(context) {
         AccountEmail: null,
         AccountFolowers: 0,
         ChanelDescription: "",
-        UserToken: null
+        UserToken: null,
+        VideoList: null,
       }
     }
   }
@@ -114,7 +126,8 @@ export async function getServerSideProps(context) {
       AccountEmail: AccountData.data.AccountEmail,
       AccountFolowers: AccountData.data.AccountFolowers,
       ChanelDescription: AccountData.data.ChanelDescription,
-      UserToken: parsedCookies.UserToken
+      UserToken: parsedCookies.UserToken,
+      VideoList: AccountVideos.data.Videos,
     },
   }
 }

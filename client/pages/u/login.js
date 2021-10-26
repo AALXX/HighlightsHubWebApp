@@ -1,68 +1,61 @@
 
 import styles from "../../styles/Account/Login.module.css"
 import Link from "next/Link"
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
 import axios from "axios";
 import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
 
 export default function Login(props) {
-    
-    const [UserEmail, setUserEmail] = useState("");
-    const [UserPwd, setUserPwd] = useState("");
+
+    const router = useRouter()
+
+    const SubmitLogin = e => {
+        e.preventDefault();
+
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/login-user-account`, { UserEmail: e.target.Email.value, Password: e.target.Password.value})
+            .then((res) => {
+                if (res.data.error) {
+                    return window.alert("an error has ocured");
+                }
+
+                if (!res.data.UserFound) {
+                    return window.alert("User not found");
+                }
 
 
+                if (!res.data.pwdmathch) {
+                    return window.alert("Incrorrect password");
+                }
 
-    const SubmitLogin = () => {
+                const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 999999);
 
-        
-        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/login-user-account`, {UserEmail: UserEmail, Password:UserPwd})
-        .then((res) =>{
-            console.log(res.data)
+                Cookies.set("UserToken", res.data.UserToken, {
+                    expires: inFifteenMinutes
+                });
 
-            if(res.data.error){
-                return window.alert("an error has ocured");
-            }
+                Cookies.set("PublicUserToken", res.data.PublicUserToken, {
+                    expires: inFifteenMinutes
+                });
 
-            if(!res.data.UserFound){
-                return window.alert("User not found");
-            }
-            
-            
-            if(!res.data.pwdmathch){
-                return window.alert("Incrorrect password");
-                
-            }
+                router.push('/u')
 
-
-            const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 1000);
-            
-            Cookies.set("UserToken", res.data.UserToken,  {
-                expires: inFifteenMinutes
-            });
-
-            Cookies.set("PublicUserToken", res.data.PublicUserToken,  {
-                expires: inFifteenMinutes
-            });
-            
-            return;
-        })
+                return;
+            })
     }
 
     return (
         <div className={styles.container}>
-            <div className={styles.LoginCard}>
-                <h1 className={styles.SignUpText}>Log into account</h1>
-                <hr color="#676767" className={styles.Bar} />
-                <div className={styles.SignupContentBody}>
+            <form onSubmit={SubmitLogin}>
+                <div className={styles.LoginCard}>
+                    <h1 className={styles.SignUpText}>Log into account</h1>
+                    <hr color="#676767" className={styles.Bar} />
                     <div className={styles.EmailPart}>
                         <h1 className={styles.EmailText}>E-Mail:</h1>
                         <input className={styles.EmailInput}
                             type="email"
                             placeholder="E-Mail..."
-                            onChange={(e) => {
-                                setUserEmail(e.target.value)
-                            }}
-                            value={UserEmail}
+                            name="Email"
                         />
                     </div>
 
@@ -71,24 +64,20 @@ export default function Login(props) {
                         <input className={styles.PasswordTextInput}
                             type="password"
                             placeholder="User Name..."
-                            onChange={(e) => {
-                                setUserPwd(e.target.value)
-                            }}
-                            value={UserPwd}
-                            maxLength="10"
+                            name="Password"
+                            minLength="5"
                         />
                     </div>
-                </div>
-                <hr color="#676767" className={styles.BottomBar} />
-                <div className={styles.FooterCardContainer}>
-                    <button className={styles.LogInButton} onClick={()=>{SubmitLogin()}}>Log In</button>
-                    <Link href="/u/signup" >
-                        <a className={styles.ToLoginLink}>Don't Have an account</a>
-                    </Link>
+                    <hr color="#676767" className={styles.BottomBar} />
+                    <div className={styles.FooterCardContainer}>
+                        <input className={styles.LogInButton} type="submit" value="Log In" />
 
+                        <Link href="/u/signup" >
+                            <a className={styles.ToLoginLink}>Don't Have an account</a>
+                        </Link>
+                    </div>
                 </div>
-            
-            </div>
+            </form>
         </div>
     )
 }

@@ -3,13 +3,20 @@ import logging from "../../config/logging";
 import { Connect, Query } from "../../config/mysql";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
-import fs, { exists } from "fs"
-
+import fs from "fs"
+import {validationResult } from 'express-validator'
 
 import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
 const NAMESPACE = 'AccountManagerService';
 
+const myValidationResult = validationResult.withDefaults({
+  formatter: error => {
+    return {
+      errorMsg: error.msg,
+    };
+  },
+});
 
 //*Interfarces
 interface ChanelsTokens {
@@ -76,7 +83,6 @@ const GetAccountImage = (req: Request, res: Response) => {
       Query(connection, GetAccountImageQuerryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
-        console.log(data)
         if (Object.keys(data).length === 0) {
 
           return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
@@ -98,7 +104,7 @@ const GetAccountImage = (req: Request, res: Response) => {
               res.end(image);
           });
         }
-        
+
         res.writeHead(200, {
           "Content-Type": "image/png"
         });
@@ -124,16 +130,47 @@ const GetAccountImage = (req: Request, res: Response) => {
     });
 }
 
+//*Get Account Videos
+const GetAccountVideos = (req: Request, res: Response) => {
+  if (req.params.AccountToken === "" || req.params.AccountToken === undefined) {
+    return res.status(200).json({
+      error: true
+    })
+  }
+
+  const GetChanelVideos = `SELECT VideoTitle, VideoToken, Fires FROM videos WHERE OwnerToken="${req.params.AccountToken}"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetChanelVideos).then(results => {
+
+        let Videos = JSON.parse(JSON.stringify(results));
+        res.status(200).json({ Videos: Videos })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(505);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
+}
+
 //*Login user account into Database
-const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
+const LoginUserAccount = (req: any, res: any) => {
 
   logging.info(NAMESPACE, "LogIn User Account Service called");
 
-  if (req.body.UserEmail === "" || req.body.UserEmail === undefined || req.body.Password === "" || req.body.Password === undefined) {
-    return res.status(200).json({
-      error: true,
-    });
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error:true, errors: errors.array() });
   }
+
+
   const loginAccountQuerryString = `SELECT PrivateToken, UserPwd, PublicToken FROM users WHERE UserEmail="${req.body.UserEmail}"`;
   Connect()
     .then(connection => {
@@ -159,7 +196,7 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
               error: false
             })
           } else {
-            return res.status(202).json({ UserToken: data[0].PrivateToken, PublicUserToken: data[0].PublicToken,  pwdmathch: true, error: false, UserFound: true });
+            return res.status(202).json({ UserToken: data[0].PrivateToken, PublicUserToken: data[0].PublicToken, pwdmathch: true, error: false, UserFound: true });
           }
         })
 
@@ -182,16 +219,15 @@ const LoginUserAccount = (req: any, res: any, next: NextFunction) => {
     });
 };
 
-//*Rehister Account To dataBase
-const RegisterUserAccount = (req: Request, res: Response, next: NextFunction) => {
+//*Register Account To dataBase
+const RegisterUserAccount = (req: Request, res: Response) => {
   logging.info(NAMESPACE, "Register User Account Service called");
 
-  if (req.body.UserName === "" || req.body.UserName === undefined || req.body.UserEmail === "" || req.body.UserEmail === undefined || req.body.Password === "" || req.body.Password === undefined) {
-    return res.status(200).json({
-      error: true,
-    });
+  //* Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error:true, errors: errors.array() });
   }
-
 
   AccountChecks.UserNameAndEmailCheck(req.body.UserName, req.body.UserEmail, (err: boolean, exist: boolean) => {
 
@@ -417,38 +453,38 @@ const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) 
   };
 
 
-    //*it defines a type for chanel tokens object
-    GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
-      if (err) {
+  //*it defines a type for chanel tokens object
+  GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
+    if (err) {
+      return res.status(200).json({
+        error: true
+      })
+    }
+
+    let Chanels: any = [];
+
+    //*get all chanels data because it makes multiple requests to db
+    for (let i = 0; i < ChanelsTokens.length; i++) {
+      let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelToken).catch((err) => {
         return res.status(200).json({
           error: true
-        })
-      }
+        });
+      });;
 
-      let Chanels: any = [];
+      let ChanelData_Obj = {
+        ChanelsId: ChanelsTokens[i].ChanelToken,
+        ChanelName: ChanelsName,
+      };
 
-      //*get all chanels data because it makes multiple requests to db
-      for (let i = 0; i < ChanelsTokens.length; i++) {
-        let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelToken).catch((err) => {
-          return res.status(200).json({
-            error: true
-          });
-        });;
-
-        let ChanelData_Obj = {
-          ChanelsId: ChanelsTokens[i].ChanelToken,
-          ChanelName: ChanelsName,
-        };
-
-        Chanels.push(ChanelData_Obj);
-      }
+      Chanels.push(ChanelData_Obj);
+    }
 
 
-      return res.status(200).json(
-        Chanels,
+    return res.status(200).json(
+      Chanels,
 
-      )
-    });
+    )
+  });
 }
 
 const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resolve, reject) => {
@@ -502,6 +538,7 @@ const GetFolowedChanelsTokens = (AcountToken: string, callBack: any) => {
 export default {
   GetOwnerUserAccountData,
   GetUserAccountDataByPublicToken,
+  GetAccountVideos,
   LoginUserAccount,
   RegisterUserAccount,
   ChangeAccountName,

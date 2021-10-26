@@ -3,19 +3,20 @@
     flex:1;
     align-items: center;
     flex-direction: column;
+    margin-top: 1.5rem;
+
 }
 
 .LoginCard{
     display: flex;
     flex-direction: column;
     background-color: #3f3f3f;
-    margin-top: 5rem;
     width: 35rem;
     height: 70vh;
 }
 
 .SignUpText{
-    margin-left: 38%;
+    align-self: center;
     color: #E40000;
     font-size: 1.2rem;
     font-family: "Exo 2 bold";
@@ -25,21 +26,17 @@
     width: 80%;
 }
 
-.SignupContentBody{
-    margin-left: 25%;
-}
-
 
 /* E-Mail Part */
 
 .EmailPart{
     display: flex;
-    /* border: 1px solid; */
-    width: 70%;
-    margin-top: 5%;
+    align-self: center;
+    width: 75%;
+    margin-top: 1.5rem;
 
 }
-
+ 
 .EmailText{
     color: #E40000;
     font-size: 1rem;
@@ -59,8 +56,9 @@
 
 .PasswordPart{
     display: flex;
-    width: 70%;
-    margin-top: 5%;
+    align-self: center;
+    width: 75%;
+    margin-top: 1.5rem;
 
 }
 
@@ -110,4 +108,12 @@
     font-family: "Exo 2";
     color: #E40000;
     margin-bottom: 5%;
+}
+
+@media (max-width: 700px) {
+    .LoginCard{
+        width: 22rem;
+        height: 30rem;
+
+    }
 }

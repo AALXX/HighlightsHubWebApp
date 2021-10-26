@@ -45,8 +45,6 @@ router.use("/api/user-account-manager/", UserAccountRoutesControler);
 
 router.use("/api/videos-manager/", VideosRoutesControler);
 
-// router.use("/api/chanel-manager/", ChanelRoutesControler);
-
 router.use("/api/search-manager/", SearchingRoutesControler);
 
 

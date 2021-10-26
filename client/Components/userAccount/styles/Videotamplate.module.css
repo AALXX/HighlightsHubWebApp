@@ -1,0 +1,61 @@
+.VideoTamplateContainer{
+    display:flex;
+    background-color:white;
+    width:1fr;
+    height:15vh;
+}
+
+.Infobar{
+    display:flex;
+    background-color: rgba(66, 66, 66, 0.349);
+    width:100%;
+    height:5vh;
+    margin-top: auto;
+    pointer-events: none;
+
+    flex-direction: row;
+}
+
+.VideoTitle{
+    color: #E40000;
+    font-size: 1.2em;
+    align-self: center;
+    margin-left: 1em;
+    font-family: "Exo 2 bold";
+}
+
+.Fireicon{
+    width: 1em;
+    align-self: center;
+    margin-left: auto;
+    margin-right: 1em;
+}
+
+.FiresNumber{
+    color: #E40000;
+    font-size: 1.2em;
+    align-self: center;
+    font-family: "Exo 2 bold";
+    margin-right: 1em;
+}
+
+@media (max-width: 800px) {
+    .VideoTamplateContainer{
+        display:flex;
+        margin-top: 1em;
+        background-color:white;
+        width:100%;
+        height:15vh;
+    }
+
+    .Infobar{
+        display:none;
+        background-color: rgba(66, 66, 66, 0.349);
+        width:100%;
+        height:5vh;
+        margin-top: auto;
+        pointer-events: none;
+    
+        flex-direction: row;
+    }
+}
