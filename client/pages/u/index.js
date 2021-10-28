@@ -5,7 +5,7 @@ import axios from "axios"
 import * as cookie from 'cookie'
 import Link from "next/Link"
 
-import CustomizeAccountPopUp from "../../Components/userAccount/CustomizeUserAccountPopup"
+import AccountSettingsPopUp from "../../Components/userAccount/UserSettingsAccountPopup"
 import VideoTamplate from "../../Components/userAccount/VideoTamplate"
 
 export default function OwnerAccountPage(props) {
@@ -13,7 +13,8 @@ export default function OwnerAccountPage(props) {
   const [AccountPublicToken, setAccountPublicToken] = useState("");
 
   const [AccountEMail, setAccountEMail] = useState("");
-  const [ToggledCustomizePopUp, setToggledCustomizePopUp] = useState(false);
+  const [ToggledsettingsPopUp, setToggledsettingsPopUp] = useState(false);
+
 
 
   useEffect(() => {
@@ -32,7 +33,17 @@ export default function OwnerAccountPage(props) {
               <hr color="#676767" className={style.ChanelStatsBar} />
               <h2 className={style.AccountFolowersText}>Folowers: {props.AccountFolowers}</h2>
             </div>
+            <button className={style.AccountSettingsButton} onClick={() => { setToggledsettingsPopUp(!ToggledsettingsPopUp) }}>
+              <img className={style.AccountSettingsIcon} src="assets/ChanelIcons/settings.svg" alt="settingsIcon" />
+            </button>
           </div>
+
+          {ToggledsettingsPopUp ? (
+            <AccountSettingsPopUp closePopup={() => { setToggledsettingsPopUp(!ToggledsettingsPopUp) }}
+              UserName={props.AccountName}
+              AccountEmail={props.AccountEmail}
+            />
+          ) : null}
 
           <div className={style.Content}>
             <div className={style.Videos}>
