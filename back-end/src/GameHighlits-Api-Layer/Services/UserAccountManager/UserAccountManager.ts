@@ -4,7 +4,7 @@ import { Connect, Query } from "../../config/mysql";
 import hat from 'hat';
 import bcrypt from 'bcrypt';
 import fs from "fs"
-import {validationResult } from 'express-validator'
+import { validationResult } from 'express-validator'
 
 import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
@@ -32,7 +32,7 @@ const GetOwnerUserAccountData = (req: Request, res: Response) => {
     });
   };
 
-  const GetAccountQueryString = `SELECT UserName, UserEmail, ChanelFolowers, ChanelDescription FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
+  const GetAccountQueryString = `SELECT UserName, UserEmail, ChanelFolowers, ChanelDescription, Visibility FROM users WHERE PrivateToken="${req.params.AccountToken}";`;
   Connect()
     .then(connection => {
 
@@ -55,6 +55,7 @@ const GetOwnerUserAccountData = (req: Request, res: Response) => {
           AccountEmail: data[0].UserEmail,
           AccountFolowers: data[0].ChanelFolowers,
           ChanelDescription: data[0].ChanelDescription,
+          AccountVisibility: data[0].Visibility,
         });
 
       }).catch(error => {
@@ -167,7 +168,7 @@ const LoginUserAccount = (req: any, res: any) => {
 
   const errors = myValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(200).json({ error:true, errors: errors.array() });
+    return res.status(200).json({ error: true, errors: errors.array() });
   }
 
 
@@ -226,7 +227,7 @@ const RegisterUserAccount = (req: Request, res: Response) => {
   //* Finds the validation errors in this request and wraps them in an object with handy functions
   const errors = myValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(200).json({ error:true, errors: errors.array() });
+    return res.status(200).json({ error: true, errors: errors.array() });
   }
 
   AccountChecks.UserNameAndEmailCheck(req.body.UserName, req.body.UserEmail, (err: boolean, exist: boolean) => {
@@ -323,13 +324,13 @@ const CheckPassword = (InputedPassword: string, Token: string, callback: any) =>
     });
 }
 
-//* Change AccountSettings to one send by user
-const ChangeAccountName = (req: Request, res: Response, next: NextFunction) => {
+//* Change ChangeAccountName to one send by user
+const ChangeAccountName = (req: Request, res: Response) => {
 
-  if (req.body.AccountToken === undefined || req.body.AccountToken === null || req.body.newAccountName === undefined || req.body.newAccountName === null) {
-    return res.status(200).json({
-      error: true
-    });
+  //* Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
   }
 
   const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserName="${req.body.newAccountName}" WHERE PrivateToken="${req.body.AccountToken}"`;
@@ -338,7 +339,44 @@ const ChangeAccountName = (req: Request, res: Response, next: NextFunction) => {
       Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
+          })
+        }
 
+        res.status(200).json({
+          error: false
+        })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, `${error.message}+1`, error);
+        return res.status(505);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
+}
+
+//* Change ChangeAccountEmail to one send by user
+const ChangeAccountEmail = (req: Request, res: Response) => {
+
+  //* Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+  const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserEmail="${req.body.newEmail}" WHERE PrivateToken="${req.body.AccountToken}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
         if (data.affectedRows === 0) {
           return res.status(200).json({
             error: true,
@@ -363,45 +401,41 @@ const ChangeAccountName = (req: Request, res: Response, next: NextFunction) => {
 }
 
 //*Make profile public/private
-const ChangeProfileVisibility = (req: Request, res: Response) => {
+const ChangeAccountvisibility = (req: Request, res: Response) => {
   logging.info(NAMESPACE, "Change User Name Service called");
-  if (req.body.AccountToken === undefined || req.body.AccountToken === null) {
-    return res.status(200).json({
-      error: true
-    });
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
   }
 
-  // const ChangeAccountSettingsSqlQuery = `UPDATE users SET public="${req.body.newAccountName}" WHERE PrivateToken="${req.body.AccountToken}"`;
-  // Connect()
-  //   .then(connection => {
-  //     Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
+  const ChangeAccountSettingsSqlQuery = `UPDATE users SET Visibility="${req.body.newVisibility  }" WHERE PrivateToken="${req.body.AccountToken}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
 
-  //       let data = JSON.parse(JSON.stringify(results));
+        let data = JSON.parse(JSON.stringify(results));
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
+          })
+        }
 
-  //       if (data.affectedRows === 0) {
-  //         return res.status(200).json({
-  //           error: true,
-  //         })
-  //       }
+        res.status(200).json({
+          error: false
+        })
 
-  //       res.status(200).json({
-  //         error: false
-  //       })
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(505);
+      }).finally(() => {
+        connection.end();
+      });
 
-  //     }).catch(error => {
-  //       logging.error(NAMESPACE, error.message, error);
-  //       return res.status(505);
-  //     }).finally(() => {
-  //       connection.end();
-  //     });
-
-  //   }).catch(error => {
-  //     logging.error(NAMESPACE, error.message, error);
-  //     return res.status(505);
-  //   });
-
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
 }
-
 
 //* Get User Account public data by publick token
 const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
@@ -542,6 +576,8 @@ export default {
   LoginUserAccount,
   RegisterUserAccount,
   ChangeAccountName,
+  ChangeAccountEmail,
+  ChangeAccountvisibility,
   GetUserFolowedChanels,
   GetAccountImage
 };

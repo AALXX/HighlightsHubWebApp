@@ -25,6 +25,15 @@
     background: #464646;
     border: 2px solid #656565;
     z-index: 1;
+    overflow-y: scroll;
+}
+
+.popup_inner::-webkit-scrollbar {
+    width: 7px;
+}
+
+.popup_inner::-webkit-scrollbar-thumb {
+    background: #2e2e2e;
 }
 
 .PupUpbackground {
@@ -156,6 +165,7 @@
     display: flex;
     align-self: center;
     width: 65%;
+    flex-direction: column;
 }
 
 .VisibilityText{
@@ -174,6 +184,28 @@
     border: none;
     margin-left:1rem;
     align-self: center;
+}
+
+
+.TopContainer{
+    display: flex;
+    width:100%;
+}
+
+.ChangeVisibilityButton{
+    background-color: #3b3b3b;
+    border: none;
+    color: #E40000;
+    height: 1.5rem;
+}
+
+.ChangeVisibilityButton:hover{
+    background-color: #303030;
+
+}
+
+.ChangeVisibilityButton:active {
+    background-color: #2b2b2b;
 }
 
 .LogOutText{

@@ -12,14 +12,10 @@ export default function OwnerAccountPage(props) {
 
   const [AccountPublicToken, setAccountPublicToken] = useState("");
 
-  const [AccountEMail, setAccountEMail] = useState("");
   const [ToggledsettingsPopUp, setToggledsettingsPopUp] = useState(false);
-
-
 
   useEffect(() => {
     setAccountPublicToken(Cookies.get("PublicUserToken"));
-    console.log(props.VideoList)
   }, [])
 
   return (
@@ -42,6 +38,8 @@ export default function OwnerAccountPage(props) {
             <AccountSettingsPopUp closePopup={() => { setToggledsettingsPopUp(!ToggledsettingsPopUp) }}
               UserName={props.AccountName}
               AccountEmail={props.AccountEmail}
+              AccountToken={Cookies.get("UserToken")}
+              AccountVisibility={props.AccountVisibility}
             />
           ) : null}
 
@@ -102,6 +100,7 @@ export async function getServerSideProps(context) {
       props: {
         AccountExist: false,
         AccountName: "",
+        AccountVisibility: null,
         AccountEmail: null,
         AccountFolowers: 0,
         ChanelDescription: "",
@@ -120,6 +119,7 @@ export async function getServerSideProps(context) {
     return {
       props: {
         AccountExist: AccountData.data.AccountExist,
+        AccountVisibility: null,
         AccountName: "",
         AccountEmail: null,
         AccountFolowers: 0,
@@ -135,6 +135,7 @@ export async function getServerSideProps(context) {
       AccountExist: AccountData.data.AccountExist,
       AccountName: AccountData.data.AccountName,
       AccountEmail: AccountData.data.AccountEmail,
+      AccountVisibility: AccountData.data.AccountVisibility,
       AccountFolowers: AccountData.data.AccountFolowers,
       ChanelDescription: AccountData.data.ChanelDescription,
       UserToken: parsedCookies.UserToken,

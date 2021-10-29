@@ -14,19 +14,18 @@
         display: flex;
         flex-direction: row;
         margin-top: 2vh;
-        height: 7.5rem;
+        height: 8rem;
         background-color: #3f3f3f;
         width: 97%;
-        margin-left: 1.5vw;
+        align-self: center;
     }
 
     .AccountProfileImage {
         border: solid 1px black;
         border-radius: 50%;
-        height: 5.2rem;
-        width: 5.2rem;
-        margin-top: .8rem;
-        margin-left: 2rem;
+        height: 5rem;
+        align-self: center;
+        margin-left: 2.5rem;
     }
 
     .ChanelStats {
