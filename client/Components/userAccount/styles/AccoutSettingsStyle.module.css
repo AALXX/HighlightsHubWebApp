@@ -66,9 +66,9 @@
     width: 85%;
 }
 
-.SecondLine{
+.SecondLine {
     width: 85%;
-    margin-top:2em;
+    margin-top: 2em;
 }
 
 /**Credential Part  */
@@ -161,45 +161,46 @@
 
 /** Part 2 */
 
-.VisibilityContainer{
+.VisibilityContainer {
     display: flex;
     align-self: center;
     width: 65%;
     flex-direction: column;
 }
 
-.VisibilityText{
+.VisibilityText {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1.2em;
     margin-top: 1.5rem;
 }
 
-.AccountVisibilitySelect{
+.AccountVisibilitySelect {
     align-self: center;
     width: 100%;
     margin-top: 2vh;
     background-color: #363636;
     color: white;
     border: none;
-    margin-left:1rem;
+    margin-left: 1rem;
     align-self: center;
 }
 
 
-.TopContainer{
+.TopContainer {
     display: flex;
-    width:100%;
+    width: 100%;
+    border: none;
 }
 
-.ChangeVisibilityButton{
+.ChangeVisibilityButton {
     background-color: #3b3b3b;
     border: none;
     color: #E40000;
     height: 1.5rem;
 }
 
-.ChangeVisibilityButton:hover{
+.ChangeVisibilityButton:hover {
     background-color: #303030;
 
 }
@@ -208,19 +209,19 @@
     background-color: #2b2b2b;
 }
 
-.LogOutText{
+.LogOutText {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1em;
     margin-top: auto;
     border: none;
-    background-color:#3b3b3b;
+    background-color: #3b3b3b;
     height: 1.5rem;
     width: 65%;
     align-self: center;
 }
 
-.LogOutText:hover{
+.LogOutText:hover {
     background-color: #303030;
 
 }
@@ -230,7 +231,7 @@
 }
 
 
-.DeleteAccText{
+.DeleteAccText {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1em;
@@ -238,16 +239,101 @@
     margin-bottom: 1rem;
     height: 1.5rem;
     border: none;
-    background-color:#3b3b3b;
+    background-color: #3b3b3b;
     width: 65%;
     align-self: center;
 }
 
-.DeleteAccText:hover{
+.DeleteAccText:hover {
     background-color: #303030;
 
 }
 
 .DeleteAccText:active {
     background-color: #2b2b2b;
+}
+
+@media (min-width: 800px) and (max-width: 1300px) {
+
+    .popup_inner {
+        left: 10%;
+        width: 80vw;
+    }
+}
+
+@media (max-width: 800px) {
+    .popup_inner {
+        left: 10%;
+        width: 80vw;
+    }
+
+    /** Settings */
+    .SettingsText {
+        color: #E40000;
+        align-self: center;
+        font-size: .8em;
+        font-family: "Exo 2";
+    }
+
+    .CredentialContent {
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        width: 75%;
+    }
+    
+    .CredentialInputContent {
+        height: 1.5rem;
+        margin-top: .5rem;
+    }
+
+    .UsernameText {
+        font-size: .8em;
+    }
+    
+    .UsernameInput {
+        font-size: .5em;
+        width: 85%
+    }
+    
+    .EmailText {
+        font-size: .8em;
+    }
+    
+    .EmailInput {
+        font-size: .5em;
+        width: 85%
+    }
+
+    .ChangePasswordButton {
+        margin-top: 2rem;
+        height: 2rem;
+    }
+
+    /** Part 2 */
+    .VisibilityContainer {
+        width: 80%;
+    }
+
+    .VisibilityText {
+        font-size: .8em;
+        margin-top: 1rem;
+    }
+
+    .LogOutText {
+        font-size: .5em;
+        height: 1.5rem;
+        width: 80%;
+    }
+    
+    
+    
+    .DeleteAccText {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        font-size: .5em;
+        height: 1.5rem;
+        width: 80%;
+    }
+    
 }

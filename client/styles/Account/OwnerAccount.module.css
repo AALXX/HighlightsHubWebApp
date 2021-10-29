@@ -245,6 +245,19 @@
         align-self: center;
     }
 
+    .AccountSettingsButton{
+        margin-left: auto;
+        width:5rem;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+
+    .AccountSettingsIcon{
+        width:2rem;
+    }
+
+
     .AccountNameText {
         color: #E40000;
         font-family: "exo 2";
@@ -329,7 +342,7 @@
 
 }
 
-@media (min-width: 700px) and (max-width: 1300px) {
+@media (min-width: 800px) and (max-width: 1300px) {
 
     .PageContainer {
         display: flex;
@@ -436,6 +449,20 @@
         margin-top: 2vh;
         background-color: #3f3f3f;
     }
+
+    .AccountSettingsButton{
+        margin-left: auto;
+        margin-right: 5rem;
+        width:5rem;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+
+    .AccountSettingsIcon{
+        width:3.5rem;
+    }
+
 
     .AboutChanelPart {
         display: flex;
