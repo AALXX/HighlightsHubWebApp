@@ -230,6 +230,11 @@
     background-color: #2b2b2b;
 }
 
+.DeleteAccContainer{
+    display: flex;   
+    width: 65%;
+    align-self: center;
+}
 
 .DeleteAccText {
     color: #E40000;
@@ -240,7 +245,19 @@
     height: 1.5rem;
     border: none;
     background-color: #3b3b3b;
-    width: 65%;
+    align-self: center;
+    width:85%
+}
+
+.DeletedeleteAccSureText{
+    color: #E40000;
+    font-family: "Exo 2";
+    font-size: 1.2em;
+    align-self: center;
+    margin-left: auto;
+}
+
+.DeletedeleteAccSure{
     align-self: center;
 }
 
@@ -252,6 +269,8 @@
 .DeleteAccText:active {
     background-color: #2b2b2b;
 }
+
+
 
 @media (min-width: 800px) and (max-width: 1300px) {
 
@@ -326,14 +345,27 @@
         width: 80%;
     }
     
-    
-    
     .DeleteAccText {
         margin-top: 1rem;
         margin-bottom: 1rem;
         font-size: .5em;
         height: 1.5rem;
         width: 80%;
+    }
+
+    .DeleteAccContainer{
+        width: 80%;
+
+    }
+
+    .DeletedeleteAccSureText{
+        font-size: .5em;
+        align-self: center;
+        margin-left: auto;
+    }
+    
+    .DeletedeleteAccSure{
+        align-self: center;
     }
     
 }

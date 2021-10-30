@@ -11,6 +11,9 @@ export default function AccoutSettingsStyle(props) {
     const [Email, setEmail] = useState("");
     const [AccountVisibility, setAccountVisibility] = useState("public");
 
+    const [Sure, setSure] = useState(false);
+
+
     useEffect(() => {
         setUserName(props.UserName);
         setEmail(props.AccountEmail);
@@ -60,6 +63,19 @@ export default function AccoutSettingsStyle(props) {
         Router.reload(window.location.pathname);
     }
 
+    const DeleteAccount = () => {
+        if(!Sure){
+            return window.alert("CheckBox Not Checked");
+        }
+
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/delete-user-account/`, { AccountToken: props.AccountToken, PublicAccountToken: props.PublicAccountToken}).then((res) => {
+            if (res.data.error) {
+                window.alert("error");
+            }
+            Router.reload(window.location.pathname);
+        })
+    }
+
     return (
         <div className={styles.popup}>
             <div className={styles.popup_inner}>
@@ -97,7 +113,7 @@ export default function AccoutSettingsStyle(props) {
                 </div>
                 <hr color="#656565" className={styles.SecondLine} />
                 <div className={styles.VisibilityContainer}>
-                    <div  className={styles.TopContainer}>
+                    <div className={styles.TopContainer}>
                         <h1 className={styles.VisibilityText}>Profile:</h1>
                         <select name="videoVisibility" className={styles.AccountVisibilitySelect} onChange={(e) => setAccountVisibility(e.target.value)} value={AccountVisibility}>
                             <option value="public">Public</option>
@@ -107,7 +123,11 @@ export default function AccoutSettingsStyle(props) {
                     <button className={styles.ChangeVisibilityButton} onClick={() => { ChangeVisibility(); }}>Change!</button>
                 </div>
                 <button className={styles.LogOutText} onClick={() => { LogOut(); }}>Log Out</button>
-                <button className={styles.DeleteAccText}>Delete Account</button>
+                <div className={styles.DeleteAccContainer}>
+                    <button className={styles.DeleteAccText} onClick={() => { DeleteAccount(); }}>Delete Account</button>
+                    <h1 className={styles.DeletedeleteAccSureText}>Sure</h1>
+                    <input className={styles.DeletedeleteAccSure} type="checkbox" name="Sure" defaultChecked={false}  onChange={(e) => { setSure(e.target.checked); }} />
+                </div>
             </div>
         </div>
     )

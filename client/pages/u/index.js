@@ -40,6 +40,7 @@ export default function OwnerAccountPage(props) {
               AccountEmail={props.AccountEmail}
               AccountToken={Cookies.get("UserToken")}
               AccountVisibility={props.AccountVisibility}
+              PublicAccountToken={AccountPublicToken}
             />
           ) : null}
 

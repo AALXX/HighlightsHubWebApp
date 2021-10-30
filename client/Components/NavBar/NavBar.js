@@ -9,15 +9,18 @@ import { useRouter } from 'next/router'
 import ChanelLinkTamplate from "./NavBarChanelLinksModel"
 
 export default function NavBar() {
+    const router = useRouter()
     const [sidebar, setsidebar] = useState(false)
     const [Input, setInput] = useState([]);
-    const router = useRouter()
+
+    const [AccountPublicToken, setAccountPublicToken] = useState("");
     const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
 
     useEffect(() => {
 
         if (Cookies.get("PublicUserToken") === undefined) {
-            return setFolowedChanelsList("");
+
+            return setFolowedChanelsList([]);
         }
 
         axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-user-folowed-chanels/${Cookies.get("PublicUserToken")}`).then((res) => {
@@ -26,8 +29,12 @@ export default function NavBar() {
             for (let i = 0; i < res.data.length; i++) {
                 FolowedChanelsListArr.push(res.data[i])
             }
+
             setFolowedChanelsList(FolowedChanelsListArr);
         });
+
+        console.log(FolowedChanelsList);
+
     }, [])
 
     return (
@@ -78,14 +85,14 @@ export default function NavBar() {
                     </Link>
                     <hr color="#4D4D4D" className={style.HorizontalLine} />
                     <div className={style.FolowedChanelsContainer}>
-                        {/* {FolowedChanelsList.map((Chanel, index) => (
+                        {FolowedChanelsList.map((Chanel, index) => (
                             <div key={index}>
                                 <ChanelLinkTamplate
                                     ChanelName={Chanel.ChanelName}
                                     ChanelId={Chanel.ChanelsId}
                                 />
                             </div>
-                        ))} */}
+                        ))}
                     </div>
 
                 </nav>

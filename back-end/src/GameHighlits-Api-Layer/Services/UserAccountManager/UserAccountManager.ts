@@ -8,7 +8,10 @@ import { validationResult } from 'express-validator'
 
 import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
+import GetUserPublicToken from '../../CommonFunctions/GetUserTokenTools/GetUserPublicToken';
 const NAMESPACE = 'AccountManagerService';
+
+
 
 const myValidationResult = validationResult.withDefaults({
   formatter: error => {
@@ -20,8 +23,139 @@ const myValidationResult = validationResult.withDefaults({
 
 //*Interfarces
 interface ChanelsTokens {
-  ChanelToken: string;
+  FolowedToken: string;
 };
+
+//*------------------------------------------------- Create accountp Part ------------------------------------------------------
+
+
+//*Login user account into Database
+const LoginUserAccount = (req: any, res: any) => {
+
+  logging.info(NAMESPACE, "LogIn User Account Service called");
+
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+
+  const loginAccountQuerryString = `SELECT PrivateToken, UserPwd, PublicToken FROM users WHERE UserEmail="${req.body.UserEmail}"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, loginAccountQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        if (Object.keys(data).length === 0) {
+          return res.status(200).json({
+            UserFound: false
+          });
+        }
+
+        bcrypt.compare(req.body.Password, data[0].UserPwd, (err, isMatch) => {
+          if (err) {
+            return res.status(500).json({
+              error: true
+            });
+          } else if (!isMatch) {
+            return res.status(200).json({
+              UserFound: true,
+              pwdmathch: false,
+              error: false
+            })
+          } else {
+            return res.status(202).json({ UserToken: data[0].PrivateToken, PublicUserToken: data[0].PublicToken, pwdmathch: true, error: false, UserFound: true });
+          }
+        })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(500).json({
+          message: error.message,
+          error
+        });
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(500).json({
+        message: error.message,
+        error
+      });
+    });
+};
+
+//*Register Account To dataBase
+const RegisterUserAccount = (req: Request, res: Response) => {
+  logging.info(NAMESPACE, "Register User Account Service called");
+
+  //* Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+  AccountChecks.UserNameAndEmailCheck(req.body.UserName, req.body.UserEmail, (err: boolean, exist: boolean) => {
+
+    if (err) {
+      return res.status(200).json({
+        error: false,
+      })
+    }
+
+    if (exist) {
+      return res.status(200).json({
+        error: false,
+        UserNameExistsorEmailExists: true,
+      })
+    }
+
+    const saltRounds = 10;
+    bcrypt.hash(req.body.Password, saltRounds, (err, hash) => {
+      if (err) {
+        return res.status(500);
+      }
+
+      let PublicUserToken = hat();
+      let PrivateUserToken = hat();
+
+      let UserCredentials = {
+        UserName: req.body.UserName,
+        PrivateUserToken: PrivateUserToken,
+        PublicUserToken: PublicUserToken,
+        UserEmail: req.body.UserEmail,
+        HashedPasWord: hash
+      }
+
+      Connect()
+        .then(connection => {
+
+          const RegisterqueryString = `INSERT INTO users (UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken}","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
+
+          Query(connection, RegisterqueryString).then(() => {
+            return res.status(200).json({ UserToken: PrivateUserToken, PublicUserToken: PublicUserToken });
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(500);
+          }).finally(() => {
+            connection.end();
+          });
+
+        }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(500);
+        });
+    });
+
+  });
+
+}
+
+//*------------------------------------------------- Get account infos part -----------------------------------------------------
 
 //*Get user Account by provided user token
 const GetOwnerUserAccountData = (req: Request, res: Response) => {
@@ -161,155 +295,32 @@ const GetAccountVideos = (req: Request, res: Response) => {
     });
 }
 
-//*Login user account into Database
-const LoginUserAccount = (req: any, res: any) => {
+//* Get User Account public data by public token
+const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
+  logging.info(NAMESPACE, "Get User Account Service called");
 
-  logging.info(NAMESPACE, "LogIn User Account Service called");
+  //* if /:AccountToken param is null or empty send 404
+  if (PublickToken === "" || PublickToken === null) {
+    return callback(true, null);
+  };
 
-  const errors = myValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(200).json({ error: true, errors: errors.array() });
-  }
-
-
-  const loginAccountQuerryString = `SELECT PrivateToken, UserPwd, PublicToken FROM users WHERE UserEmail="${req.body.UserEmail}"`;
+  const GetAccountQueryString = `SELECT * FROM users WHERE PublicToken="${PublickToken}";`;
   Connect()
     .then(connection => {
 
-      Query(connection, loginAccountQuerryString).then(results => {
-
-        let data = JSON.parse(JSON.stringify(results));
-        if (Object.keys(data).length === 0) {
-          return res.status(200).json({
-            UserFound: false
-          });
-        }
-
-        bcrypt.compare(req.body.Password, data[0].UserPwd, (err, isMatch) => {
-          if (err) {
-            return res.status(500).json({
-              error: true
-            });
-          } else if (!isMatch) {
-            return res.status(200).json({
-              UserFound: true,
-              pwdmathch: false,
-              error: false
-            })
-          } else {
-            return res.status(202).json({ UserToken: data[0].PrivateToken, PublicUserToken: data[0].PublicToken, pwdmathch: true, error: false, UserFound: true });
-          }
-        })
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(500).json({
-          message: error.message,
-          error
-        });
-      }).finally(() => {
-        connection.end();
-      });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(500).json({
-        message: error.message,
-        error
-      });
-    });
-};
-
-//*Register Account To dataBase
-const RegisterUserAccount = (req: Request, res: Response) => {
-  logging.info(NAMESPACE, "Register User Account Service called");
-
-  //* Finds the validation errors in this request and wraps them in an object with handy functions
-  const errors = myValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(200).json({ error: true, errors: errors.array() });
-  }
-
-  AccountChecks.UserNameAndEmailCheck(req.body.UserName, req.body.UserEmail, (err: boolean, exist: boolean) => {
-
-    if (err) {
-      return res.status(200).json({
-        error: false,
-      })
-    }
-
-    if (exist) {
-      return res.status(200).json({
-        error: false,
-        UserNameExistsorEmailExists: true,
-      })
-    }
-
-    const saltRounds = 10;
-    bcrypt.hash(req.body.Password, saltRounds, (err, hash) => {
-      if (err) {
-        return res.status(500);
-      }
-
-      let PublicUserToken = hat();
-      let PrivateUserToken = hat();
-
-      let UserCredentials = {
-        UserName: req.body.UserName,
-        PrivateUserToken: PrivateUserToken,
-        PublicUserToken: PublicUserToken,
-        UserEmail: req.body.UserEmail,
-        HashedPasWord: hash
-      }
-
-      Connect()
-        .then(connection => {
-
-          const RegisterqueryString = `INSERT INTO users (UserName, PrivateToken, PublicToken, UserEmail, UserPwd) VALUES ("${UserCredentials.UserName}","${UserCredentials.PrivateUserToken}","${UserCredentials.PublicUserToken}","${UserCredentials.UserEmail}","${UserCredentials.HashedPasWord}")`;
-
-          Query(connection, RegisterqueryString).then(() => {
-            return res.status(200).json({ UserToken: PrivateUserToken, PublicUserToken: PublicUserToken });
-
-          }).catch(error => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(500);
-          }).finally(() => {
-            connection.end();
-          });
-
-        }).catch(error => {
-          logging.error(NAMESPACE, error.message, error);
-          return res.status(500);
-        });
-    });
-
-  });
-
-}
-
-const CheckPassword = (InputedPassword: string, Token: string, callback: any) => {
-  const GetUserPasswordFromDb = `SELECT pwdUsers FROM users WHERE Token="${Token}"`;
-
-  Connect()
-    .then(connection => {
-
-      Query(connection, GetUserPasswordFromDb).then(results => {
+      Query(connection, GetAccountQueryString).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
 
         if (Object.keys(data).length === 0) {
-          return callback(false, false);
+          return callback(true, null);
         }
 
-        bcrypt.compare(InputedPassword, data[0].pwdUsers, (err, isMatch) => {
-          if (err) {
-            return callback(true, null);
-          } else if (!isMatch) {
-            return callback(false, false);
-          } else {
-            return callback(false, true);
-          }
-        })
+        const UserAccountData = {
+          AcountName: data[0].uidUsers,
+        }
+
+        callback(false, UserAccountData);
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
@@ -323,6 +334,103 @@ const CheckPassword = (InputedPassword: string, Token: string, callback: any) =>
       return callback(true, null);
     });
 }
+
+const GetUserFolowedChanels = (req: Request, res: Response) => {
+
+  if (req.params.AccountToken === "" || req.params.AccountToken === undefined) {
+    return res.status(200).json({
+      error: true
+    })
+  }
+
+
+  //*it defines a type for chanel tokens object
+  GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
+    if (err) {
+      return res.status(200).json({
+        error: true
+      })
+    }
+
+    let Chanels: any = [];
+
+    //*get all chanels data because it makes multiple requests to db
+    for (let i = 0; i < ChanelsTokens.length; i++) {
+      let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].FolowedToken).catch((err) => {
+        return res.status(200).json({
+          error: true
+        });
+      });;
+
+      let ChanelData_Obj = {
+        ChanelsId: ChanelsTokens[i].FolowedToken,
+        ChanelName: ChanelsName,
+      };
+
+      Chanels.push(ChanelData_Obj);
+    }
+
+
+    return res.status(200).json(
+      Chanels,
+
+    )
+  });
+}
+
+const GetFolowedChanelsTokens = (AcountToken: string, callBack: any) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT FolowedToken FROM folow_class WHERE FolowerToken="${AcountToken}"`;
+
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        callBack(false, data);
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return callBack(true, null);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return callBack(true, null);
+    });
+}
+
+const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resolve, reject) => {
+  const GetFolowedChanelsTokensQuerryString = `SELECT UserName FROM users WHERE PublicToken="${AccountToken}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        resolve(data[0].UserName);
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        reject(error);
+
+      })
+        .finally(() => {
+          connection.end();
+        });
+
+    }).catch(error => {
+      logging.error(NAMESPACE,"CUM2");
+
+      // logging.error(NAMESPACE, error.message, error);
+      reject(error);
+    });
+});
+
+
+//*------------------------------------------------- Change account infos part ---------------------------------------------------
+
 
 //* Change ChangeAccountName to one send by user
 const ChangeAccountName = (req: Request, res: Response) => {
@@ -437,135 +545,44 @@ const ChangeAccountvisibility = (req: Request, res: Response) => {
     });
 }
 
-//* Get User Account public data by publick token
-const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
-  logging.info(NAMESPACE, "Get User Account Service called");
+//*------------------------------------------------- Delete account infos part ---------------------------------------------------
 
-  //* if /:AccountToken param is null or empty send 404
-  if (PublickToken === "" || PublickToken === null) {
-    return callback(true, null);
-  };
 
-  const GetAccountQueryString = `SELECT * FROM users WHERE PublicToken="${PublickToken}";`;
+const DeleteAccount = (req: Request, res: Response) =>{
+  const errors = myValidationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+  console.log(req.body)
+
+  const ChangeAccountSettingsSqlQuery = `DELETE FROM users WHERE PrivateToken="${req.body.AccountToken}"; DELETE FROM folow_class WHERE FolowerToken="${req.body.PublicAccountToken}";`;
   Connect()
     .then(connection => {
-
-      Query(connection, GetAccountQueryString).then(results => {
+      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
 
         let data = JSON.parse(JSON.stringify(results));
-
-        if (Object.keys(data).length === 0) {
-          return callback(true, null);
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
+          })
         }
 
-        const UserAccountData = {
-          AcountName: data[0].uidUsers,
-        }
-
-        callback(false, UserAccountData);
+        res.status(200).json({
+          error: false
+        })
 
       }).catch(error => {
         logging.error(NAMESPACE, error.message, error);
-        return callback(true, null);
+        return res.status(505);
       }).finally(() => {
         connection.end();
       });
 
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
-      return callback(true, null);
-    });
-}
-
-const GetUserFolowedChanels = (req: Request, res: Response, next: NextFunction) => {
-
-  //* if AccountToken param is null or empty send 404
-  if (req.params.AccountToken === "" || req.params.AccountToken === null) {
-    return res.status(200).json({
-      error: true,
-    });
-  };
-
-
-  //*it defines a type for chanel tokens object
-  GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
-    if (err) {
-      return res.status(200).json({
-        error: true
-      })
-    }
-
-    let Chanels: any = [];
-
-    //*get all chanels data because it makes multiple requests to db
-    for (let i = 0; i < ChanelsTokens.length; i++) {
-      let ChanelsName = await GetFolowedChanelNames(ChanelsTokens[i].ChanelToken).catch((err) => {
-        return res.status(200).json({
-          error: true
-        });
-      });;
-
-      let ChanelData_Obj = {
-        ChanelsId: ChanelsTokens[i].ChanelToken,
-        ChanelName: ChanelsName,
-      };
-
-      Chanels.push(ChanelData_Obj);
-    }
-
-
-    return res.status(200).json(
-      Chanels,
-
-    )
-  });
-}
-
-const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resolve, reject) => {
-  const GetFolowedChanelsTokensQuerryString = `SELECT UserName FROM users WHERE PublicToken="${AccountToken}"`;
-  Connect()
-    .then(connection => {
-      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
-
-        let data = JSON.parse(JSON.stringify(results));
-        resolve(data[0].UserName);
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        reject(error);
-
-      })
-        .finally(() => {
-          connection.end();
-        });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      reject(error);
-    });
-});
-
-const GetFolowedChanelsTokens = (AcountToken: string, callBack: any) => {
-  const GetFolowedChanelsTokensQuerryString = `SELECT ChanelToken FROM folow_class WHERE UserToken="${AcountToken}"`;
-
-  Connect()
-    .then(connection => {
-
-      Query(connection, GetFolowedChanelsTokensQuerryString).then(results => {
-
-        let data = JSON.parse(JSON.stringify(results));
-        callBack(false, data);
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return callBack(true, null);
-      }).finally(() => {
-        connection.end();
-      });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return callBack(true, null);
+      return res.status(505);
     });
 }
 
@@ -579,5 +596,6 @@ export default {
   ChangeAccountEmail,
   ChangeAccountvisibility,
   GetUserFolowedChanels,
-  GetAccountImage
+  GetAccountImage,
+  DeleteAccount
 };

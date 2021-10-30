@@ -33,7 +33,7 @@ export default function Login() {
                     return window.alert("account with this email or username already exists");
                 }
 
-                const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 1000);
+                const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 99999);
 
                 Cookies.set("UserToken", res.data.UserToken, {
                     expires: inFifteenMinutes

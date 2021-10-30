@@ -28,7 +28,7 @@ export default function Login(props) {
                     return window.alert("Incrorrect password");
                 }
 
-                const inFifteenMinutes = new Date(new Date().getTime() + 15 * 60 * 999999);
+                const inFifteenMinutes = new Date(new Date().getTime() + 99999 * 60 * 999999);
 
                 Cookies.set("UserToken", res.data.UserToken, {
                     expires: inFifteenMinutes
