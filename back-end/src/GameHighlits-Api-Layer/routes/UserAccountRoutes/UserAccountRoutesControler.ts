@@ -11,12 +11,14 @@ router.get("/get-owner-user-account-videos/:AccountToken", UserAccountService.Ge
 
 router.get("/get-user-folowed-chanels/:AccountToken", UserAccountService.GetUserFolowedChanels);
 
-router.post("/login-user-account", body('UserEmail').isEmail(), body('Password').isLength({ min: 4 }).not().isEmpty().trim(), UserAccountService.LoginUserAccount);
+router.post("/login-user-account", body('UserEmail').isEmail(), body('Password').isLength({ min: 5 }).not().isEmpty().trim(), UserAccountService.LoginUserAccount);
 router.post("/register-user-account", body('UserName').isLength({ max: 10 }).not().isEmpty().trim().escape(), body('UserEmail').isEmail(), body('Password').isLength({ min: 5 }).not().isEmpty().trim(), UserAccountService.RegisterUserAccount);
 
 router.post("/change-user-account-name", body('newAccountName').isLength({ max: 10 }).not().isEmpty().trim().escape(), body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountName);
 router.post("/change-user-account-email", body('newEmail').not().isEmpty().isEmail(), body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountEmail);
 router.post("/change-user-account-visibility", body('newVisibility').not().isEmpty(), body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountvisibility);
+
+router.post("/change-user-account-password/", body('NewPassword').isLength({ min: 4 }).not().isEmpty().trim(), body('UserToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountPassword);
 
 router.post("/delete-user-account", body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.DeleteAccount);
 

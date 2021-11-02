@@ -5,6 +5,8 @@ import hat from 'hat';
 import bcrypt from 'bcrypt';
 import fs from "fs"
 import { validationResult } from 'express-validator'
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname+'/.env' });
 
 import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
@@ -421,7 +423,7 @@ const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resol
         });
 
     }).catch(error => {
-      logging.error(NAMESPACE,"CUM2");
+      logging.error(NAMESPACE, "CUM2");
 
       // logging.error(NAMESPACE, error.message, error);
       reject(error);
@@ -516,7 +518,7 @@ const ChangeAccountvisibility = (req: Request, res: Response) => {
     return res.status(200).json({ error: true, errors: errors.array() });
   }
 
-  const ChangeAccountSettingsSqlQuery = `UPDATE users SET Visibility="${req.body.newVisibility  }" WHERE PrivateToken="${req.body.AccountToken}"`;
+  const ChangeAccountSettingsSqlQuery = `UPDATE users SET Visibility="${req.body.newVisibility}" WHERE PrivateToken="${req.body.AccountToken}"`;
   Connect()
     .then(connection => {
       Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
@@ -545,10 +547,49 @@ const ChangeAccountvisibility = (req: Request, res: Response) => {
     });
 }
 
+const ChangeAccountPassword = (req: Request, res: Response) => {
+
+  const saltRounds = 10;
+  bcrypt.hash(req.body.NewPassword, saltRounds, (err, hashedPwd) => {
+    if (err) {
+      return res.status(500);
+    }
+
+    const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserPwd="${hashedPwd}" WHERE PrivateToken="${req.body.UserToken}"`;
+    Connect()
+      .then(connection => {
+        Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
+
+          let data = JSON.parse(JSON.stringify(results));
+          if (data.affectedRows === 0) {
+            return res.status(200).json({
+              error: true,
+              msg:"same password used"
+            })
+          }
+
+          res.status(200).json({
+            error: false
+          })
+
+        }).catch(error => {
+          logging.error(NAMESPACE, `${error.message}`, error);
+          return res.status(505);
+        }).finally(() => {
+          connection.end();
+        });
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(505);
+      });
+  });
+}
+
 //*------------------------------------------------- Delete account infos part ---------------------------------------------------
 
 
-const DeleteAccount = (req: Request, res: Response) =>{
+const DeleteAccount = (req: Request, res: Response) => {
   const errors = myValidationResult(req);
 
   if (!errors.isEmpty()) {
@@ -594,6 +635,7 @@ export default {
   RegisterUserAccount,
   ChangeAccountName,
   ChangeAccountEmail,
+  ChangeAccountPassword,
   ChangeAccountvisibility,
   GetUserFolowedChanels,
   GetAccountImage,

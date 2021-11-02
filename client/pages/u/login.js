@@ -63,7 +63,7 @@ export default function Login(props) {
                         <h1 className={styles.PasswordText}>Password:</h1>
                         <input className={styles.PasswordTextInput}
                             type="password"
-                            placeholder="User Name..."
+                            placeholder="Password"
                             name="Password"
                             minLength="5"
                         />

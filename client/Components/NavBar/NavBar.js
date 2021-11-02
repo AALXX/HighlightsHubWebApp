@@ -33,8 +33,6 @@ export default function NavBar() {
             setFolowedChanelsList(FolowedChanelsListArr);
         });
 
-        console.log(FolowedChanelsList);
-
     }, [])
 
     return (

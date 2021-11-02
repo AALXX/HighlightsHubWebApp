@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Router from "next/router";
 import styles from "./styles/AccoutSettingsStyle.module.css";
 import Cookies from 'js-cookie'
+import emailjs from 'emailjs-com';
+import jwt from 'jsonwebtoken';
 
 
 export default function AccoutSettingsStyle(props) {
@@ -64,16 +66,31 @@ export default function AccoutSettingsStyle(props) {
     }
 
     const DeleteAccount = () => {
-        if(!Sure){
+        if (!Sure) {
             return window.alert("CheckBox Not Checked");
         }
 
-        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/delete-user-account/`, { AccountToken: props.AccountToken, PublicAccountToken: props.PublicAccountToken}).then((res) => {
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/delete-user-account/`, { AccountToken: props.AccountToken, PublicAccountToken: props.PublicAccountToken }).then((res) => {
             if (res.data.error) {
                 window.alert("error");
             }
             Router.reload(window.location.pathname);
         })
+    }
+
+    const ChangePassword = () => {
+        const Secret = process.env.SECRET_TOKEN + props.AccountToken
+
+        const payload = { PrivateToken: props.AccountToken };
+        const token = jwt.sign(payload, Secret, {expiresIn: '15min'});
+        const link = `http://localhost:3000/u/reset-password/${token}`;
+
+        emailjs.send(`${process.env.service_id}`, `${process.env.tamplate_id}`, { UserEmail: Email, Link: link }, `${process.env.user_id}`)
+            .then(function (response) {
+                window.alert("link send");
+            }, function (error) {
+                window.alert('FAILED...', error);
+            });
     }
 
     return (
@@ -109,7 +126,7 @@ export default function AccoutSettingsStyle(props) {
                         />
                         <button className={styles.ChangeUsernameButton} onClick={() => { ChangeUserEmail(); }}>Change!</button>
                     </div>
-                    <button className={styles.ChangePasswordButton}>Change Password</button>
+                    <button className={styles.ChangePasswordButton} onClick={() => { ChangePassword(); }}>Change Password</button>
                 </div>
                 <hr color="#656565" className={styles.SecondLine} />
                 <div className={styles.VisibilityContainer}>
@@ -126,7 +143,7 @@ export default function AccoutSettingsStyle(props) {
                 <div className={styles.DeleteAccContainer}>
                     <button className={styles.DeleteAccText} onClick={() => { DeleteAccount(); }}>Delete Account</button>
                     <h1 className={styles.DeletedeleteAccSureText}>Sure</h1>
-                    <input className={styles.DeletedeleteAccSure} type="checkbox" name="Sure" defaultChecked={false}  onChange={(e) => { setSure(e.target.checked); }} />
+                    <input className={styles.DeletedeleteAccSure} type="checkbox" name="Sure" defaultChecked={false} onChange={(e) => { setSure(e.target.checked); }} />
                 </div>
             </div>
         </div>
