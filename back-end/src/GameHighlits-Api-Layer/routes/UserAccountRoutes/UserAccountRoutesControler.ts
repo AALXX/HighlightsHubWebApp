@@ -7,7 +7,11 @@ const router = express.Router();
 
 router.get("/get-user-account-image/:PublicAccountToken", UserAccountService.GetAccountImage);
 router.get("/get-owner-user-account-data/:AccountToken", UserAccountService.GetOwnerUserAccountData);
-router.get("/get-owner-user-account-videos/:AccountToken", UserAccountService.GetAccountVideos);
+router.get("/get-owner-user-account-videos/:AccountToken", UserAccountService.GetOwnerAccountVideos);
+
+router.get("/get-other-user-account-data/:PublicAccountToken", UserAccountService.GetUserAccountData);
+router.get("/get-other-user-account-videos/:PublicAccountToken", UserAccountService.GetOtherAccountVideos);
+
 
 router.get("/get-user-folowed-chanels/:AccountToken", UserAccountService.GetUserFolowedChanels);
 

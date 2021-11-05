@@ -3,17 +3,12 @@ import Cookies from 'js-cookie'
 import { useEffect, useState } from "react";
 import axios from "axios"
 import * as cookie from 'cookie'
-import Link from "next/Link"
 
 import VideoTamplate from "../../Components/userAccount/VideoTamplate"
-
-
 
 export default function ExternAccountPage(props) {
 
   const [AccountPublicToken, setAccountPublicToken] = useState("");
-
-  const [ToggledsettingsPopUp, setToggledsettingsPopUp] = useState(false);
 
   useEffect(() => {
     setAccountPublicToken(Cookies.get("PublicUserToken"));
@@ -30,9 +25,6 @@ export default function ExternAccountPage(props) {
               <hr color="#676767" className={style.ChanelStatsBar} />
               <h2 className={style.AccountFolowersText}>Folowers: {props.AccountFolowers}</h2>
             </div>
-            <button className={style.AccountSettingsButton} onClick={() => { setToggledsettingsPopUp(!ToggledsettingsPopUp) }}>
-              <img className={style.AccountSettingsIcon} src="assets/ChanelIcons/settings.svg" alt="settingsIcon" />
-            </button>
           </div>
 
           <div className={style.Content}>
@@ -75,12 +67,42 @@ export default function ExternAccountPage(props) {
 
         <div className={style.AccountNotFoundcontainer}>
           <h1 className={style.AccountNotFoundtext}>Account Not Found</h1>
-          <Link href="/u/auth/login" >
-            <a className={style.ToLoginLink}>Already Have an account</a>
-          </Link>
         </div>
       )}
 
     </>
   )
+}
+
+
+export async function getServerSideProps(context) {
+
+
+  const AccountData = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-other-user-account-data/${context.query.AccToken}`);
+  const AccountVideos = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-other-user-account-videos/${context.query.AccToken}`);
+  console.log(AccountVideos.data)
+
+  if (AccountData.data.AccountExist === false) {
+    return {
+      props: {
+        AccountExist: AccountData.data.AccountExist,
+        AccountVisibility: null,
+        AccountName: "",
+        AccountFolowers: 0,
+        ChanelDescription: "",
+        VideoList: null,
+      }
+    }
+  }
+
+  return {
+    props: {
+      AccountExist: AccountData.data.AccountExist,
+      AccountName: AccountData.data.AccountName,
+      AccountVisibility: AccountData.data.AccountVisibility,
+      AccountFolowers: AccountData.data.AccountFolowers,
+      ChanelDescription: AccountData.data.ChanelDescription,
+      VideoList: AccountVideos.data.Videos,
+    },
+  }
 }

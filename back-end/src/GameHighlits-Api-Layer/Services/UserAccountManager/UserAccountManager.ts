@@ -157,7 +157,7 @@ const RegisterUserAccount = (req: Request, res: Response) => {
 
 }
 
-//*------------------------------------------------- Get account infos part -----------------------------------------------------
+//*------------------------------------------------- Get Owner account infos part -----------------------------------------------------
 
 //*Get user Account by provided user token
 const GetOwnerUserAccountData = (req: Request, res: Response) => {
@@ -268,7 +268,7 @@ const GetAccountImage = (req: Request, res: Response) => {
 }
 
 //*Get Account Videos
-const GetAccountVideos = (req: Request, res: Response) => {
+const GetOwnerAccountVideos = (req: Request, res: Response) => {
   if (req.params.AccountToken === "" || req.params.AccountToken === undefined) {
     return res.status(200).json({
       error: true
@@ -294,46 +294,6 @@ const GetAccountVideos = (req: Request, res: Response) => {
     }).catch(error => {
       logging.error(NAMESPACE, error.message, error);
       return res.status(505);
-    });
-}
-
-//* Get User Account public data by public token
-const GetUserAccountDataByPublicToken = (PublickToken: string, callback: any) => {
-  logging.info(NAMESPACE, "Get User Account Service called");
-
-  //* if /:AccountToken param is null or empty send 404
-  if (PublickToken === "" || PublickToken === null) {
-    return callback(true, null);
-  };
-
-  const GetAccountQueryString = `SELECT * FROM users WHERE PublicToken="${PublickToken}";`;
-  Connect()
-    .then(connection => {
-
-      Query(connection, GetAccountQueryString).then(results => {
-
-        let data = JSON.parse(JSON.stringify(results));
-
-        if (Object.keys(data).length === 0) {
-          return callback(true, null);
-        }
-
-        const UserAccountData = {
-          AcountName: data[0].uidUsers,
-        }
-
-        callback(false, UserAccountData);
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return callback(true, null);
-      }).finally(() => {
-        connection.end();
-      });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return callback(true, null);
     });
 }
 
@@ -429,6 +389,90 @@ const GetFolowedChanelNames = async (AccountToken: string) => new Promise((resol
       reject(error);
     });
 });
+
+//*------------------------------------------------- Get Other account infos part ---------------------------------------------------
+//*Get user Account by provided user token
+const GetUserAccountData = (req: Request, res: Response) => {
+  //* if /:AccountToken param is null or empty send 404
+  if (req.params.AccountToken === "" || req.params.AccountToken === null) {
+    return res.status(200).json({
+      error: true,
+    });
+  };
+
+  const GetAccountQueryString = `SELECT UserName, ChanelFolowers, ChanelDescription, Visibility FROM users WHERE PublicToken="${req.params.PublicAccountToken}";`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetAccountQueryString).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+
+        //*it checks if data object has values if not it sends back account ecist false
+        if (Object.keys(data).length === 0) {
+          return res.status(200).json({
+            error: true,
+            AccountExist: false
+          })
+        }
+
+        res.status(200).json({
+          AccountExist: true,
+          error: false,
+          AccountName: data[0].UserName,
+          AccountFolowers: data[0].ChanelFolowers,
+          ChanelDescription: data[0].ChanelDescription,
+          AccountVisibility: data[0].Visibility,
+        });
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(500).json({
+          error: true
+        });
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(500).json({
+        error: true
+      });
+    });
+};
+
+//*Get Account Videos
+const GetOtherAccountVideos = (req: Request, res: Response) => {
+
+  if (req.params.PublicAccountToken === "" || req.params.PublicAccountToken === undefined) {
+    return res.status(200).json({
+      error: true
+    })
+  }
+
+  const GetChanelVideos = `SELECT VideoTitle, VideoToken, Fires FROM videos WHERE OwnerToken="${req.params.PublicAccountToken}" AND Visibility="public"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetChanelVideos).then(results => {
+
+        let Videos = JSON.parse(JSON.stringify(results));
+        
+        res.status(200).json({ Videos: Videos })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(505);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
+}
 
 
 //*------------------------------------------------- Change account infos part ---------------------------------------------------
@@ -629,15 +673,20 @@ const DeleteAccount = (req: Request, res: Response) => {
 
 export default {
   GetOwnerUserAccountData,
-  GetUserAccountDataByPublicToken,
-  GetAccountVideos,
+  GetOwnerAccountVideos,
   LoginUserAccount,
+  GetAccountImage,
+  GetUserFolowedChanels,
+
   RegisterUserAccount,
+ 
   ChangeAccountName,
   ChangeAccountEmail,
   ChangeAccountPassword,
   ChangeAccountvisibility,
-  GetUserFolowedChanels,
-  GetAccountImage,
-  DeleteAccount
+ 
+  DeleteAccount,
+
+  GetUserAccountData,
+  GetOtherAccountVideos
 };

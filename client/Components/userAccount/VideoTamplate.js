@@ -13,7 +13,7 @@ export default function VideoTamplate(props) {
             {isHovered ? (
                 <div className={styles.Infobar}>
                     <h1 className={styles.VideoTitle}>{props.VideoTitle}</h1>
-                    <img src="assets/Chanelicons/ActiveFireIcon.svg" alt="FireIcon" className={styles.Fireicon} />
+                    <img src="/assets/Chanelicons/ActiveFireIcon.svg" alt="FireIcon" className={styles.Fireicon} />
                     <h1 className={styles.FiresNumber}>{abbreviateNumber(props.VideoFires)}</h1>
                 </div>
             ) : (null)}
