@@ -79,11 +79,11 @@ export default function AccoutSettingsStyle(props) {
     }
 
     const ChangePassword = () => {
-        const Secret = process.env.SECRET_TOKEN + props.AccountToken
+        const Secret = process.env.SECRET_TOKEN + Email
 
-        const payload = { PrivateToken: props.AccountToken };
+        const payload = { AccountEmail: Email };
         const token = jwt.sign(payload, Secret, {expiresIn: '15min'});
-        const link = `http://localhost:3000/u/reset-password/${token}`;
+        const link = `http://localhost:3000/u/auth/reset-password/${token}/?email=${Email}`;
 
         emailjs.send(`${process.env.service_id}`, `${process.env.tamplate_id}`, { UserEmail: Email, Link: link }, `${process.env.user_id}`)
             .then(function (response) {

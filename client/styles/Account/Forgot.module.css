@@ -4,6 +4,7 @@
     align-items: center;
     flex-direction: column;
     margin-top: 1.5rem;
+
 }
 
 .ChangePwdCard{
@@ -36,24 +37,24 @@
 
 /* PasswordPart */
 
-.PasswordPart{
+.EmailPart{
     display: flex;
     align-self: center;
-    width: 75%;
+    flex-direction: column;
+    width: 80%;
     margin-top: 1.5rem;
 
 }
 
-.PasswordText{
+.EmailText{
     color: #E40000;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-family: "Exo 2";
 }
 
-.PasswordTextInput{
+
+.EmailTextInput{
     height: 1.5rem;
-    margin-left: auto;
-    margin-top: .5rem;
     background-color: #555555;
     border: none;
     color: #FFFFFF;

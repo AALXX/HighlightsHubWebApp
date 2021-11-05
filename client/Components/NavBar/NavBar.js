@@ -13,7 +13,6 @@ export default function NavBar() {
     const [sidebar, setsidebar] = useState(false)
     const [Input, setInput] = useState([]);
 
-    const [AccountPublicToken, setAccountPublicToken] = useState("");
     const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
 
     useEffect(() => {

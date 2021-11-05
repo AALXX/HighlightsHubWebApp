@@ -84,7 +84,7 @@ export default function OwnerAccountPage(props) {
 
         <div className={style.AccountNotFoundcontainer}>
           <h1 className={style.AccountNotFoundtext}>Account Not Found</h1>
-          <Link href="/u/login" >
+          <Link href="/u/auth/login" >
             <a className={style.ToLoginLink}>Already Have an account</a>
           </Link>
         </div>

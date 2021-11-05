@@ -1,5 +1,5 @@
 
-import styles from "../../styles/Account/Signup.module.css"
+import styles from "../../../styles/Account/Signup.module.css"
 import Link from "next/Link"
 import { useEffect, useState } from "react"
 import axios from "axios"
@@ -102,7 +102,7 @@ export default function Login() {
                     <div className={styles.FooterCardContainer}>
                         <input className={styles.SignUpButton} type="submit" value="Sign Up" />
 
-                        <Link href="/u/login" >
+                        <Link href="/u/auth/login" >
                             <a className={styles.ToLoginLink}>Already Have an account</a>
                         </Link>
 

@@ -18,7 +18,7 @@ router.post("/change-user-account-name", body('newAccountName').isLength({ max: 
 router.post("/change-user-account-email", body('newEmail').not().isEmpty().isEmail(), body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountEmail);
 router.post("/change-user-account-visibility", body('newVisibility').not().isEmpty(), body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountvisibility);
 
-router.post("/change-user-account-password/", body('NewPassword').isLength({ min: 4 }).not().isEmpty().trim(), body('UserToken').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountPassword);
+router.post("/change-user-account-password/", body('NewPassword').isLength({ min: 4 }).not().isEmpty().trim(), body('AccountEmail').not().isEmpty().trim().escape(), UserAccountService.ChangeAccountPassword);
 
 router.post("/delete-user-account", body('AccountToken').not().isEmpty().trim().escape(), UserAccountService.DeleteAccount);
 

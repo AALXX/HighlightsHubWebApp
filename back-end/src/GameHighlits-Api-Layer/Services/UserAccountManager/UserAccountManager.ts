@@ -555,7 +555,7 @@ const ChangeAccountPassword = (req: Request, res: Response) => {
       return res.status(500);
     }
 
-    const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserPwd="${hashedPwd}" WHERE PrivateToken="${req.body.UserToken}"`;
+    const ChangeAccountSettingsSqlQuery = `UPDATE users SET UserPwd="${hashedPwd}" WHERE UserEmail="${req.body.AccountEmail}"`;
     Connect()
       .then(connection => {
         Query(connection, ChangeAccountSettingsSqlQuery).then(results => {

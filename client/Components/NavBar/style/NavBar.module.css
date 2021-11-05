@@ -142,30 +142,7 @@
     flex-direction: column;
     z-index: 1;
     left: 0;
-    transition: 300ms ease;
-    animation-name: tranlate-right;
 }
-
-/** KeyFrames to translate sidebar*/
-@keyframes translate-right{
-    to{
-        transform: translateX(100%);
-    }
-}
-
-@keyframes translate-left{
-    to{
-        transform: translateX(-100%);
-    }
-}
-
-/** KeyFrames to translate black background*/
-@keyframes translate-BlackBackground{
-    0% {opacity: 0;}
-    100% {opacity: 1;}
-
-}
-
 
 .XButton{
     margin-top: 1em;

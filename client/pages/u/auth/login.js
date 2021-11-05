@@ -1,5 +1,5 @@
 
-import styles from "../../styles/Account/Login.module.css"
+import styles from "../../../styles/Account/Login.module.css"
 import Link from "next/Link"
 import { useEffect, useState } from "react"
 import axios from "axios";
@@ -13,7 +13,7 @@ export default function Login(props) {
     const SubmitLogin = e => {
         e.preventDefault();
 
-        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/login-user-account`, { UserEmail: e.target.Email.value, Password: e.target.Password.value})
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/login-user-account`, { UserEmail: e.target.Email.value, Password: e.target.Password.value })
             .then((res) => {
                 if (res.data.error) {
                     return window.alert("an error has ocured");
@@ -68,11 +68,17 @@ export default function Login(props) {
                             minLength="5"
                         />
                     </div>
+
+
+                    <Link href="/u/auth/forgotpwd" >
+                        <a className={styles.ForgotPassword}>Forgot Password</a>
+                    </Link>
+
                     <hr color="#676767" className={styles.BottomBar} />
                     <div className={styles.FooterCardContainer}>
                         <input className={styles.LogInButton} type="submit" value="Log In" />
 
-                        <Link href="/u/signup" >
+                        <Link href="/u/auth/signup" >
                             <a className={styles.ToLoginLink}>Don't Have an account</a>
                         </Link>
                     </div>

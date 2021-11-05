@@ -13,6 +13,16 @@
     background-color: #3f3f3f;
     width: 35rem;
     height: 70vh;
+    overflow-y: scroll;
+}
+
+.LoginCard::-webkit-scrollbar {
+    width: 7px;
+}
+
+/* Handle */
+.LoginCard::-webkit-scrollbar-thumb {
+    background: #2e2e2e;
 }
 
 .SignUpText{
@@ -77,7 +87,12 @@
     color: #FFFFFF;
 }
 
-
+.ForgotPassword{
+    font-family: "Exo 2";
+    color: #E40000;
+    margin-top: 30vh;
+    margin-left: 4.5rem;
+}
 /* card footer */
 
 .BottomBar{
@@ -85,10 +100,10 @@
     margin-top: auto;
 }
 
+
 .FooterCardContainer{
     display: flex;
     flex-direction: column;
-
 }
 
 .LogInButton{

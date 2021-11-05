@@ -1,4 +1,4 @@
-import styles from "../../../styles/Account/ResetPassword.module.css"
+import styles from "../../../../styles/Account/ResetPassword.module.css"
 import jwt from 'jsonwebtoken';
 import { useEffect, useState } from 'react';
 import * as cookie from 'cookie'
@@ -10,19 +10,20 @@ export default function token(props) {
     const [Linkvalid, setLinkValid] = useState(false);
 
     useEffect(() => {
+
         if (!props.error) {
             return setLinkValid(true);
         }
     }, [])
 
-    const SubmitLogin = e => {
+    const SubmitResetPwd = e => {
         e.preventDefault();
 
         if (e.target.password.value !== e.target.RepeatPassword.value) {
             return window.alert("passwords don't match");
         }
 
-        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/change-user-account-password/`, { NewPassword: e.target.password.value, UserToken: props.payload.PrivateToken })
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/change-user-account-password/`, { NewPassword: e.target.password.value, AccountEmail: props.payload.AccountEmail })
             .then((res) => {
                 if (res.data.error) {
                     return window.alert(`an error has ocured: ${res.data.msg}`);
@@ -40,7 +41,7 @@ export default function token(props) {
     return (
         <div className={styles.container}>
             {Linkvalid ? (
-                <form onSubmit={SubmitLogin}>
+                <form onSubmit={SubmitResetPwd}>
                     <div className={styles.ChangePwdCard}>
                         <h1 className={styles.ChangePwdText}>Change account password</h1>
                         <hr color="#676767" className={styles.Bar} />
@@ -79,13 +80,11 @@ export default function token(props) {
 
 
 export async function getServerSideProps(context) {
-
-    const parsedCookies = cookie.parse(context.req.headers.cookie);
-    const secret = process.env.SECRET_TOKEN + parsedCookies.UserToken
-
     try {
+        const secret = process.env.SECRET_TOKEN + context.query.email
+        
         const payload = jwt.verify(context.query.token, secret)
-
+        console.log(payload)
         return {
             props: {
                 error: false,
@@ -98,7 +97,6 @@ export async function getServerSideProps(context) {
             props: {
                 error: true,
                 payload: null,
-
             },
         }
     }
