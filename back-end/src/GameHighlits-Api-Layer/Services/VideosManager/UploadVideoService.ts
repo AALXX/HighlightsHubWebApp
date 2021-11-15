@@ -7,7 +7,7 @@ import FFmpeg from "fluent-ffmpeg"
 
 import logging from "../../config/logging";
 import { Connect, Query } from "../../config/mysql";
-import CommonFunctions from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
+import {CreatePublicToken} from "../../CommonFunctions/TokenCreation/TokenCreation"
 
 const NAMESPACE = "UploadManagerService";
 
@@ -102,7 +102,7 @@ const UploadVideoFileToServer = async (req: Request, res: Response) => {
 };
 
 const SendVideoDataToDb = (publicToken: string, filepath: string, VideoTitle: string,  VideoVisibility:string ,callback: any) => {
-  const VideoToken = hat();
+  const VideoToken = CreatePublicToken();
   let today = new Date().toISOString().slice(0, 10)
 
   const SendVidsDatasSqlQuery = `INSERT INTO videos (VideoTitle, Fires, DatePublished, VideoToken, OwnerToken, VideoPath, Visibility) 

@@ -8,9 +8,8 @@ import { validationResult } from 'express-validator'
 import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + '/.env' });
 
-import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
-import GetUserPublicToken from '../../CommonFunctions/GetUserTokenTools/GetUserPublicToken';
+import {CreatePublicToken} from "../../CommonFunctions/TokenCreation/TokenCreation"
 const NAMESPACE = 'AccountManagerService';
 
 
@@ -121,7 +120,7 @@ const RegisterUserAccount = (req: Request, res: Response) => {
         return res.status(500);
       }
 
-      let PublicUserToken = hat();
+      let PublicUserToken = CreatePublicToken();
       let PrivateUserToken = hat();
 
       let UserCredentials = {

@@ -34,6 +34,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/u/[AccToken].js"
+    ],
+    "/u/upload": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/u/upload.js"
     ]
   },
   "ampFirstPages": []
