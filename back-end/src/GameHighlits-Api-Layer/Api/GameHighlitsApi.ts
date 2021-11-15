@@ -4,7 +4,6 @@ import express from 'express';
 //* imports from route folder
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
 import VideosRoutesControler from "../routes/VideosManagerRoutes/VideoPlayesRoutesControler"
-import ChanelRoutesControler from "../routes/ChanelRoutes/ChanelRoutesController"
 import SearchingRoutesControler from "../routes/SearchingRoutes/SearchRoutesControler"
 
 //*Configs

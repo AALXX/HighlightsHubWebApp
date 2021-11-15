@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import logging from "../../config/logging";
 import { Connect, Query } from "../../config/mysql";
-import ChanelManager from "../ChanelManager/ChanelManager";
+// import ChanelManager from "../ChanelManager/ChanelManager";
 import GetUserPublicTokenTool from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 
 const NAMESPACE = 'VideoPlayerManagerService';
@@ -91,65 +91,65 @@ const SendTheVideo = (req: Request, res: Response, next: NextFunction) => {
 }
 
 //* Send RandomVideo
-const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) => {
-  const getRandomVideosQuerySttring = `SELECT * FROM videos ORDER BY RAND() LIMIT 1`;
+// const GetRandomVideoToken = (req: Request, res: Response, next: NextFunction) => {
+//   const getRandomVideosQuerySttring = `SELECT * FROM videos ORDER BY RAND() LIMIT 1`;
 
-  Connect()
-    .then(connection => {
+//   Connect()
+//     .then(connection => {
 
-      Query(connection, getRandomVideosQuerySttring).then(results => {
+//       Query(connection, getRandomVideosQuerySttring).then(results => {
 
-        let data = JSON.parse(JSON.stringify(results));
+//         let data = JSON.parse(JSON.stringify(results));
 
-        if (Object.keys(data).length === 0) {
-          return res.status(202).json({
-            error: true,
-            message: "a error has occured"
-          })
-        }
+//         if (Object.keys(data).length === 0) {
+//           return res.status(202).json({
+//             error: true,
+//             message: "a error has occured"
+//           })
+//         }
 
-        ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
+//         ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
 
-          if (err) {
-            logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
-            return res.status(202).json({
-              error: true,
-              message: "a error has occured"
-            })
-          }
+//           if (err) {
+//             logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
+//             return res.status(202).json({
+//               error: true,
+//               message: "a error has occured"
+//             })
+//           }
 
-          const VideoDatas = {
-            error: false,
-            VideoToken: data[0].VideoToken,
-            VideoLikes: data[0].VideoLikes,
-            VideoTitle: data[0].VideoTitle,
-            ChanelNameFromVideo: ChanelData.ChanelName,
-            ChanelPublicToken: ChanelData.ChanelPublicToken,
+//           const VideoDatas = {
+//             error: false,
+//             VideoToken: data[0].VideoToken,
+//             VideoLikes: data[0].VideoLikes,
+//             VideoTitle: data[0].VideoTitle,
+//             ChanelNameFromVideo: ChanelData.ChanelName,
+//             ChanelPublicToken: ChanelData.ChanelPublicToken,
 
-          }
+//           }
 
-          return res.status(202).json(VideoDatas);
+//           return res.status(202).json(VideoDatas);
 
-        });
+//         });
 
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(500).json({
-          message: error.message,
-          error
-        });
-      }).finally(() => {
-        connection.end();
-      });
+//       }).catch(error => {
+//         logging.error(NAMESPACE, error.message, error);
+//         return res.status(500).json({
+//           message: error.message,
+//           error
+//         });
+//       }).finally(() => {
+//         connection.end();
+//       });
 
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(500).json({
-        message: error.message,
-        error
-      });
-    });
-}
+//     }).catch(error => {
+//       logging.error(NAMESPACE, error.message, error);
+//       return res.status(500).json({
+//         message: error.message,
+//         error
+//       });
+//     });
+// }
 
 
 
@@ -245,70 +245,70 @@ export const LikeTheVideoFunc = (req: any, res: any) => {
 }
 
 //* Get a specifc video data 
-const GetSpecificVideoData = (req: Request, res: Response, next: NextFunction) => {
+// const GetSpecificVideoData = (req: Request, res: Response, next: NextFunction) => {
 
-  logging.info(NAMESPACE, `Get - Specific video data`)
+//   logging.info(NAMESPACE, `Get - Specific video data`)
 
-  const GetVideoDataByTokenQueryString = `SELECT * FROM videos WHERE VideoToken="${req.params.PublicVideoToken}"`;
+//   const GetVideoDataByTokenQueryString = `SELECT * FROM videos WHERE VideoToken="${req.params.PublicVideoToken}"`;
 
-  Connect().then(connection => {
-    Query(connection, GetVideoDataByTokenQueryString).then(results => {
+//   Connect().then(connection => {
+//     Query(connection, GetVideoDataByTokenQueryString).then(results => {
 
-      //* Parse rows from database
-      let data = JSON.parse(JSON.stringify(results));
-
-
-      if (Object.keys(data).length === 0) {
-        return res.status(202).json({ error: true, message: "Video not found" });
-      }
-
-      ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
-
-        if (err) {
-          logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
-          res.status(202).json({
-            message: "a error has occured"
-          })
-        }
-
-        const VideoDatas = {
-          VideoToken: data[0].VideoToken,
-          VideoLikes: data[0].VideoLikes,
-          VideoTitle: data[0].VideoName,
-          ChanelNameFromVideo: ChanelData.ChanelName,
-          ChanelPublicToken: ChanelData.PublicChanelToken,
-          error: false
-        }
-
-        logging.info(NAMESPACE, `Get - ${VideoDatas.VideoTitle} video data`)
-        res.status(202).json(VideoDatas);
-
-      });
+//       //* Parse rows from database
+//       let data = JSON.parse(JSON.stringify(results));
 
 
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(500).json({
-        message: error.message,
-        error
-      });
-    }).finally(() => {
-      connection.end();
-    });
-  }).catch(error => {
-    logging.error(NAMESPACE, error.message, error);
-    return res.status(500).json({
-      message: error.message,
-      error
-    });
-  });
-}
+//       if (Object.keys(data).length === 0) {
+//         return res.status(202).json({ error: true, message: "Video not found" });
+//       }
+
+//       ChanelManager.GetChanelInformatios(data[0].PublicChanelToken, false, (err: boolean, ChanelData: any) => {
+
+//         if (err) {
+//           logging.error(NAMESPACE, "A ERROR HAS OCCURED AT VIDEO PLAYER MANAGER SERVICE ");
+//           res.status(202).json({
+//             message: "a error has occured"
+//           })
+//         }
+
+//         const VideoDatas = {
+//           VideoToken: data[0].VideoToken,
+//           VideoLikes: data[0].VideoLikes,
+//           VideoTitle: data[0].VideoName,
+//           ChanelNameFromVideo: ChanelData.ChanelName,
+//           ChanelPublicToken: ChanelData.PublicChanelToken,
+//           error: false
+//         }
+
+//         logging.info(NAMESPACE, `Get - ${VideoDatas.VideoTitle} video data`)
+//         res.status(202).json(VideoDatas);
+
+//       });
+
+
+//     }).catch(error => {
+//       logging.error(NAMESPACE, error.message, error);
+//       return res.status(500).json({
+//         message: error.message,
+//         error
+//       });
+//     }).finally(() => {
+//       connection.end();
+//     });
+//   }).catch(error => {
+//     logging.error(NAMESPACE, error.message, error);
+//     return res.status(500).json({
+//       message: error.message,
+//       error
+//     });
+//   });
+// }
 
 
 export default {
   SendTheVideo,
-  GetRandomVideoToken,
+  // GetRandomVideoToken,
   UserLikedTheVideoCheck,
   LikeTheVideoFunc,
-  GetSpecificVideoData
+  // GetSpecificVideoData
 };

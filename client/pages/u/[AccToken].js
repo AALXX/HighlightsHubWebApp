@@ -1,18 +1,39 @@
-import style from "../../styles/Account/OwnerAccount.module.css"
+import style from "../../styles/Account/NonOwnerAccount.module.css"
 import Cookies from 'js-cookie'
 import { useEffect, useState } from "react";
 import axios from "axios"
 import * as cookie from 'cookie'
+import { useRouter } from 'next/router'
 
 import VideoTamplate from "../../Components/userAccount/VideoTamplate"
 
 export default function ExternAccountPage(props) {
+  const router = useRouter()
 
   const [AccountPublicToken, setAccountPublicToken] = useState("");
+  const [Folows, setFolows] = useState(false);
+  const [Folowers, setFolowers] = useState(0);
 
   useEffect(() => {
     setAccountPublicToken(Cookies.get("PublicUserToken"));
+    setFolows(props.UserFolowStatus)
+    setFolowers(Number(props.AccountFolowers))
+    if (props.onwerAccount) {
+      router.push("/u");
+    }
   }, [])
+
+  const FollowChanel = () => {
+    axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/user-folow-acc/`, { UserPublicToken: Cookies.get("PublicUserToken"), ChanelToken: props.AccountToken }).then((res) => {
+      setFolows(res.data.itfolows)
+
+      if (res.data.itfolows) {
+        return setFolowers(Folowers + 1);
+      } else {
+        return setFolowers(Folowers - 1);
+      }
+    })
+  }
 
   return (
     <>
@@ -23,8 +44,13 @@ export default function ExternAccountPage(props) {
             <div className={style.ChanelStats}>
               <h2 className={style.AccountNameText}>{props.AccountName}</h2>
               <hr color="#676767" className={style.ChanelStatsBar} />
-              <h2 className={style.AccountFolowersText}>Folowers: {props.AccountFolowers}</h2>
+              <h2 className={style.AccountFolowersText}>Folowers: {Folowers}</h2>
             </div>
+            {Folows ? (
+              <button onClick={() => { FollowChanel(); }} className={style.UnFollowButton}>UnFollow</button>
+            ) : (
+              <button onClick={() => { FollowChanel(); }} className={style.FollowButton}>Follow</button>
+            )}
           </div>
 
           <div className={style.Content}>
@@ -77,15 +103,30 @@ export default function ExternAccountPage(props) {
 
 export async function getServerSideProps(context) {
 
+  let IsUserFolowingChanel = { data: { error: false, itfolows: false } };
+  //* Checks if the user is the owner of this chanel
+  if (context.req.headers.cookie !== undefined) {
+    const parsedCookies = cookie.parse(context.req.headers.cookie);
+    if (parsedCookies.PublicUserToken === context.query.AccToken) {
+      return {
+        props: {
+          onwerAccount: true,
+        }
+      }
+    }
+    IsUserFolowingChanel = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/user-folow-acc-check/${context.query.AccToken}/${parsedCookies.PublicUserToken}`);
+  }
 
   const AccountData = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-other-user-account-data/${context.query.AccToken}`);
   const AccountVideos = await axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-other-user-account-videos/${context.query.AccToken}`);
-  console.log(AccountVideos.data)
+
 
   if (AccountData.data.AccountExist === false) {
     return {
       props: {
         AccountExist: AccountData.data.AccountExist,
+        onwerAccount: false,
+        AccountToken: context.query.AccToken,
         AccountVisibility: null,
         AccountName: "",
         AccountFolowers: 0,
@@ -98,11 +139,14 @@ export async function getServerSideProps(context) {
   return {
     props: {
       AccountExist: AccountData.data.AccountExist,
+      onwerAccount: false,
       AccountName: AccountData.data.AccountName,
+      AccountToken: context.query.AccToken,
       AccountVisibility: AccountData.data.AccountVisibility,
       AccountFolowers: AccountData.data.AccountFolowers,
       ChanelDescription: AccountData.data.ChanelDescription,
       VideoList: AccountVideos.data.Videos,
+      UserFolowStatus: IsUserFolowingChanel.data.itfolows
     },
   }
 }

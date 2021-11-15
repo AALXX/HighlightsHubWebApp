@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 import fs from "fs"
 import { validationResult } from 'express-validator'
 import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname+'/.env' });
+dotenv.config({ path: __dirname + '/.env' });
 
 import InternalTools from "../../CommonFunctions/GetUserTokenTools/GetUserPublicToken"
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
@@ -156,6 +156,7 @@ const RegisterUserAccount = (req: Request, res: Response) => {
   });
 
 }
+
 
 //*------------------------------------------------- Get Owner account infos part -----------------------------------------------------
 
@@ -458,7 +459,7 @@ const GetOtherAccountVideos = (req: Request, res: Response) => {
       Query(connection, GetChanelVideos).then(results => {
 
         let Videos = JSON.parse(JSON.stringify(results));
-        
+
         res.status(200).json({ Videos: Videos })
 
       }).catch(error => {
@@ -472,6 +473,141 @@ const GetOtherAccountVideos = (req: Request, res: Response) => {
       logging.error(NAMESPACE, error.message, error);
       return res.status(505);
     });
+}
+
+const UserFolowAccCheck = (req: Request, res: Response) => {
+
+  if (req.params.PublicAccountToken === "" || req.params.PublicAccountToken === undefined || req.params.PublicUserToken === "" || req.params.PublicUserToken === undefined) {
+    return res.status(200).json({
+      error: true
+    })
+  }
+  // const GetChanelVideos = `SELECT * FROM folow_class WHERE FolowedToken="${req.params.PublicAccountToken}" AND FolowerToken="${req.params.PublicUserToken}"`;
+
+  UserFolowAccCheckFunc(req.params.PublicAccountToken, req.params.PublicUserToken, (err: boolean, iffolows: boolean) => {
+
+    if (err) {
+      return res.status(200).json({
+        error: true,
+        itfolows: false
+      })
+    }
+
+    res.status(200).json({ error: false, itfolows: iffolows })
+  });
+
+}
+
+/**
+ ** Ckeck if User folows chanel 
+ * @param FolowedToken 
+ * @param FolowerToken 
+ * @param callBack 
+ */
+const UserFolowAccCheckFunc = (FolowedToken: string, FolowerToken: string, callBack: any) => {
+  const GetChanelVideos = `SELECT * FROM folow_class WHERE FolowedToken="${FolowedToken}" AND FolowerToken="${FolowerToken}"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, GetChanelVideos).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        if (Object.keys(data).length === 0) {
+          return callBack(false, false);
+        }
+        return callBack(false, true);
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return callBack(true, null);
+
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return callBack(true, null);
+    });
+}
+
+const FolowAcc = (req: Request, res: Response) => {
+
+  UserFolowAccCheckFunc(req.body.ChanelToken, req.body.UserPublicToken, (err: boolean, iffolows: boolean) => {
+
+    //* if user already folows if it folows it removes form flow_class if not user is added
+    if (iffolows) {
+      const GetChanelVideos = `DELETE FROM folow_class WHERE FolowedToken="${req.body.ChanelToken}" AND FolowerToken="${req.body.UserPublicToken}"; UPDATE users SET ChanelFolowers=ChanelFolowers-${1} WHERE PublicToken="${req.body.ChanelToken}"`;
+      Connect()
+        .then(connection => {
+
+          Query(connection, GetChanelVideos).then(results => {
+
+            let data = JSON.parse(JSON.stringify(results));
+            if (data.affectedRows === 0) {
+              return res.status(200).json({
+                error: true,
+              })
+            }
+
+            return res.status(200).json({
+              error: false,
+              itfolows: false
+            })
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(200).json({
+              error: true,
+            })
+
+          }).finally(() => {
+            connection.end();
+          });
+
+        }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(200).json({
+            error: true,
+          })
+        });
+    } else {
+      const GetChanelVideos = `INSERT INTO folow_class (FolowerToken, FolowedToken) VALUES ('${req.body.UserPublicToken}','${req.body.ChanelToken}'); UPDATE users SET ChanelFolowers=ChanelFolowers+${1} WHERE PublicToken="${req.body.ChanelToken}" `;
+      Connect()
+        .then(connection => {
+
+          Query(connection, GetChanelVideos).then(results => {
+
+            let data = JSON.parse(JSON.stringify(results));
+            if (data.affectedRows === 0) {
+              return res.status(200).json({
+                error: true,
+              })
+            }
+
+            return res.status(200).json({
+              error: false,
+              itfolows: true
+            })
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(200).json({
+              error: true,
+            })
+
+          }).finally(() => {
+            connection.end();
+          });
+
+        }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(200).json({
+            error: true,
+          })
+        });
+    }
+
+  });
 }
 
 
@@ -608,7 +744,7 @@ const ChangeAccountPassword = (req: Request, res: Response) => {
           if (data.affectedRows === 0) {
             return res.status(200).json({
               error: true,
-              msg:"same password used"
+              msg: "same password used"
             })
           }
 
@@ -679,14 +815,16 @@ export default {
   GetUserFolowedChanels,
 
   RegisterUserAccount,
- 
+
   ChangeAccountName,
   ChangeAccountEmail,
   ChangeAccountPassword,
   ChangeAccountvisibility,
- 
+
   DeleteAccount,
 
   GetUserAccountData,
-  GetOtherAccountVideos
+  GetOtherAccountVideos,
+  UserFolowAccCheck,
+  FolowAcc
 };

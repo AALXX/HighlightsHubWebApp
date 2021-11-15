@@ -7,7 +7,7 @@ export default function ChanelLinkTamplate(props) {
 
     return (
         <>
-            <Link href={`/c/${props.ChanelId}`}>
+            <Link href={`/u/${props.ChanelId}`}>
                 <a>
                     <div className={style.container}>
                         <h1 className={style.ChnelNameText}>{props.ChanelName}</h1>

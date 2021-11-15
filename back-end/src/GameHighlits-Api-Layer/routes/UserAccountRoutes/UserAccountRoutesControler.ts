@@ -11,6 +11,8 @@ router.get("/get-owner-user-account-videos/:AccountToken", UserAccountService.Ge
 
 router.get("/get-other-user-account-data/:PublicAccountToken", UserAccountService.GetUserAccountData);
 router.get("/get-other-user-account-videos/:PublicAccountToken", UserAccountService.GetOtherAccountVideos);
+router.get("/user-folow-acc-check/:PublicAccountToken/:PublicUserToken", UserAccountService.UserFolowAccCheck);
+router.post("/user-folow-acc/", body('UserPublicToken').not().isEmpty().trim(), body('ChanelToken').not().isEmpty().trim(), UserAccountService.FolowAcc);
 
 
 router.get("/get-user-folowed-chanels/:AccountToken", UserAccountService.GetUserFolowedChanels);
