@@ -530,12 +530,44 @@ const UserFolowAccCheckFunc = (FolowedToken: string, FolowerToken: string, callB
 }
 
 const FolowAcc = (req: Request, res: Response) => {
-
   UserFolowAccCheckFunc(req.body.ChanelToken, req.body.UserPublicToken, (err: boolean, iffolows: boolean) => {
 
     //* if user already folows if it folows it removes form flow_class if not user is added
     if (iffolows) {
+      const GetChanelVideos = `DELETE FROM folow_class WHERE FolowedToken="${req.body.ChanelToken}" AND FolowerToken="${req.body.UserPublicToken}"; UPDATE users SET ChanelFolowers=ChanelFolowers-${1} WHERE PublicToken="${req.body.ChanelToken}"`;
+      Connect()
+        .then(connection => {
 
+          Query(connection, GetChanelVideos).then(results => {
+
+            let data = JSON.parse(JSON.stringify(results));
+            if (data.affectedRows === 0) {
+              return res.status(200).json({
+                error: true,
+              })
+            }
+
+            return res.status(200).json({
+              error: false,
+              itfolows: false
+            })
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(200).json({
+              error: true,
+            })
+
+          }).finally(() => {
+            connection.end();
+          });
+
+        }).catch(error => {
+          logging.error(NAMESPACE, error.message, error);
+          return res.status(200).json({
+            error: true,
+          })
+        });
     } else {
       const GetChanelVideos = `INSERT INTO folow_class (FolowerToken, FolowedToken) VALUES ('${req.body.UserPublicToken}','${req.body.ChanelToken}'); UPDATE users SET ChanelFolowers=ChanelFolowers+${1} WHERE PublicToken="${req.body.ChanelToken}" `;
       Connect()

@@ -97,7 +97,7 @@ export async function getServerSideProps(context) {
         AccountVisibility: null,
         AccountEmail: null,
         AccountFolowers: 0,
-        ChanelDescription: "",
+        ChanelDescription: null,
         UserToken: null
       }
     }
@@ -116,8 +116,8 @@ export async function getServerSideProps(context) {
         AccountVisibility: null,
         AccountName: "",
         AccountEmail: null,
+        ChanelDescription: null,
         AccountFolowers: 0,
-        ChanelDescription: AccountData.data.ChanelDescription,
         UserToken: null,
         VideoList: null,
       }

@@ -3,7 +3,7 @@
     background-color: #424242;
     height: 6em;
     flex-direction: row;
-    justify-content: center;    
+    justify-content: center;
 }
 
 .logo {
@@ -23,7 +23,7 @@
 
 /** SearchBar */
 
-.SearchBarContainer{
+.SearchBarContainer {
     display: flex;
     justify-content: center;
     width: 100%;
@@ -95,7 +95,6 @@
     height: 5em;
     width: 5em;
     margin-right: 3rem;
-    /* border: solid; */
 }
 
 .AccountImage {
@@ -104,7 +103,7 @@
 }
 
 /** SideBar */
-.SideBarActive{
+.SideBarActive {
     position: fixed;
     width: 100%;
     height: 100%;
@@ -117,7 +116,7 @@
     background-color: rgba(0, 0, 0, 0.5);
 
     transition: 300ms ease;
-    animation-name:translate-BlackBackground;
+    animation-name: translate-BlackBackground;
 }
 
 .NavMenu {
@@ -132,7 +131,7 @@
     left: -100%;
 }
 
-.NavMenuActive{
+.NavMenuActive {
     width: 12em;
     height: 100%;
     top: 0;
@@ -144,22 +143,22 @@
     left: 0;
 }
 
-.XButton{
+.XButton {
     margin-top: 1em;
-    color:#E40000;
-    height:3em;
+    color: #E40000;
+    height: 3em;
     background-color: transparent;
     border: transparent;
     outline: none;
     cursor: pointer;
 }
 
-.HorizontalLine{
-    width: 10em; 
+.HorizontalLine {
+    width: 10em;
     margin-top: 1em;
 }
 
-.SideBarButton{
+.SideBarButton {
     border: transparent;
     outline: none;
     cursor: pointer;
@@ -168,18 +167,45 @@
     height: 2.5em;
     align-self: center;
     margin-top: .5em;
-    color:#E40000;
+    color: #E40000;
     font-size: 1em;
     font-family: "Exo 2";
 }
 
-.SideBarButton:hover{
+.SideBarButton:hover {
     background-color: #464646;
 }
 
-.FolowedChanelsContainer{
+.FolowedChanelsContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+@media (max-width: 800px) {
+    .LogoButton {
+        margin-left: .5rem;
+    }
+
+    .AccountImageButton {
+        margin-right: .5rem;
+    }
+
+    /** SearchBar */
+
+    .SearchBarBorder {
+        display: flex;
+        align-self: center;
+        width: 55vw;
+        margin: auto;
+    }
+
+
+    .SideBarButton {
+        width: 12em;
+        height: 2.5em;
+        margin-top: .5em;
+        font-size: .8em;
+    }
+
+}
