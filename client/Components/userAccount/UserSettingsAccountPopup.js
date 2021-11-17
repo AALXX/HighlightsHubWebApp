@@ -12,6 +12,7 @@ export default function AccoutSettingsStyle(props) {
     const [UserName, setUserName] = useState("");
     const [Email, setEmail] = useState("");
     const [AccountVisibility, setAccountVisibility] = useState("public");
+    const [AccountDescription, setAccountDescription] = useState("public");
 
     const [Sure, setSure] = useState(false);
 
@@ -20,6 +21,7 @@ export default function AccoutSettingsStyle(props) {
         setUserName(props.UserName);
         setEmail(props.AccountEmail);
         setAccountVisibility(props.AccountVisibility);
+        setAccountDescription(props.ChanelDescription);
     }, []);
 
     const ChangeUserName = () => {
@@ -78,11 +80,20 @@ export default function AccoutSettingsStyle(props) {
         })
     }
 
+    const UpdateChanelDescription = () =>{
+        axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/change-user-account-description/`, { AccountToken: props.AccountToken, ChanelDescription: AccountDescription }).then((res) => {
+            if (res.data.error) {
+                window.alert("error");
+            }
+            Router.reload(window.location.pathname);
+        })
+    }
+
     const ChangePassword = () => {
         const Secret = process.env.SECRET_TOKEN + Email
 
         const payload = { AccountEmail: Email };
-        const token = jwt.sign(payload, Secret, {expiresIn: '15min'});
+        const token = jwt.sign(payload, Secret, { expiresIn: '15min' });
         const link = `http://localhost:3000/u/auth/reset-password/${token}/?email=${Email}`;
 
         emailjs.send(`${process.env.service_id}`, `${process.env.tamplate_id}`, { UserEmail: Email, Link: link }, `${process.env.user_id}`)
@@ -139,9 +150,20 @@ export default function AccoutSettingsStyle(props) {
                     </div>
                     <button className={styles.ChangeVisibilityButton} onClick={() => { ChangeVisibility(); }}>Change!</button>
                 </div>
-                <button className={styles.LogOutText} onClick={() => { LogOut(); }}>Log Out</button>
+                <div className={styles.ChanelDescription}>
+                    <h1 className={styles.VisibilityText}>About Chanel:</h1>
+                    <textarea className={styles.AboutChanelTextInput} cols="10" rows="7" placeholder="your message" name="message" minLength="10" maxLength="100"
+                        onChange={(e) => {
+                            setAccountDescription(e.target.value)
+                        }}
+                        value={AccountDescription}
+                    />
+                    <button className={styles.AboutChanelButton} onClick={() => {UpdateChanelDescription()}}>Update</button>
+                </div>
+
+                <button className={styles.LogOutButton} onClick={() => { LogOut(); }}>Log Out</button>
                 <div className={styles.DeleteAccContainer}>
-                    <button className={styles.DeleteAccText} onClick={() => { DeleteAccount(); }}>Delete Account</button>
+                    <button className={styles.DeleteAccButton} onClick={() => { DeleteAccount(); }}>Delete Account</button>
                     <h1 className={styles.DeletedeleteAccSureText}>Sure</h1>
                     <input className={styles.DeletedeleteAccSure} type="checkbox" name="Sure" defaultChecked={false} onChange={(e) => { setSure(e.target.checked); }} />
                 </div>

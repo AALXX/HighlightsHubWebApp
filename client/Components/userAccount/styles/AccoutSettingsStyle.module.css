@@ -112,6 +112,8 @@
     border: none;
     color: #E40000;
     margin-left: auto;
+    cursor: pointer;
+
 }
 
 .ChangeUsernameButton:hover {
@@ -149,6 +151,8 @@
     color: #E40000;
     margin-top: 2.5rem;
     height: 2.5rem;
+    cursor: pointer;
+
 }
 
 .ChangePasswordButton:hover {
@@ -198,6 +202,7 @@
     border: none;
     color: #E40000;
     height: 1.5rem;
+    cursor: pointer;
 }
 
 .ChangeVisibilityButton:hover {
@@ -209,34 +214,73 @@
     background-color: #2b2b2b;
 }
 
-.LogOutText {
+/** About Chanel Part */
+
+.ChanelDescription {
+    display: flex;
+    align-self: center;
+    width: 65%;
+    flex-direction: column;
+}
+
+.AboutChanelTextInput {
+    background-color: #3b3b3b;
+    border: none;
+    color: white;
+    resize: none;
+    font-size: 1.2em;
+}
+
+.AboutChanelButton {
+    margin-top: .8rem;
+    background-color: #3b3b3b;
+    border: none;
+    color: #E40000;
+    height: 1.5rem;
+    cursor: pointer;
+}
+
+
+.AboutChanelButton:hover {
+    background-color: #303030;
+
+}
+
+.AboutChanelButton:active {
+    background-color: #2b2b2b;
+}
+
+/** Logout/delete chanel part */
+.LogOutButton {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1em;
-    margin-top: auto;
+    margin-top: 2.5rem;
     border: none;
     background-color: #3b3b3b;
     height: 1.5rem;
     width: 65%;
     align-self: center;
+    cursor: pointer;
 }
 
-.LogOutText:hover {
+
+.LogOutButton:hover {
     background-color: #303030;
 
 }
 
-.LogOutText:active {
+.LogOutButton:active {
     background-color: #2b2b2b;
 }
 
-.DeleteAccContainer{
-    display: flex;   
+.DeleteAccContainer {
+    display: flex;
     width: 65%;
     align-self: center;
 }
 
-.DeleteAccText {
+.DeleteAccButton {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1em;
@@ -246,10 +290,11 @@
     border: none;
     background-color: #3b3b3b;
     align-self: center;
-    width:85%
+    width: 85%;
+    cursor: pointer;
 }
 
-.DeletedeleteAccSureText{
+.DeletedeleteAccSureText {
     color: #E40000;
     font-family: "Exo 2";
     font-size: 1.2em;
@@ -257,16 +302,16 @@
     margin-left: auto;
 }
 
-.DeletedeleteAccSure{
+.DeletedeleteAccSure {
     align-self: center;
 }
 
-.DeleteAccText:hover {
+.DeleteAccButton:hover {
     background-color: #303030;
 
 }
 
-.DeleteAccText:active {
+.DeleteAccButton:active {
     background-color: #2b2b2b;
 }
 
@@ -300,7 +345,7 @@
         align-self: center;
         width: 75%;
     }
-    
+
     .CredentialInputContent {
         height: 1.5rem;
         margin-top: .5rem;
@@ -309,16 +354,16 @@
     .UsernameText {
         font-size: .8em;
     }
-    
+
     .UsernameInput {
         font-size: .5em;
         width: 85%
     }
-    
+
     .EmailText {
         font-size: .8em;
     }
-    
+
     .EmailInput {
         font-size: .5em;
         width: 85%
@@ -327,6 +372,7 @@
     .ChangePasswordButton {
         margin-top: 2rem;
         height: 2rem;
+
     }
 
     /** Part 2 */
@@ -339,13 +385,13 @@
         margin-top: 1rem;
     }
 
-    .LogOutText {
+    .LogOutButton {
         font-size: .5em;
         height: 1.5rem;
         width: 80%;
     }
-    
-    .DeleteAccText {
+
+    .DeleteAccButton {
         margin-top: 1rem;
         margin-bottom: 1rem;
         font-size: .5em;
@@ -353,19 +399,19 @@
         width: 80%;
     }
 
-    .DeleteAccContainer{
+    .DeleteAccContainer {
         width: 80%;
 
     }
 
-    .DeletedeleteAccSureText{
+    .DeletedeleteAccSureText {
         font-size: .5em;
         align-self: center;
         margin-left: auto;
     }
-    
-    .DeletedeleteAccSure{
+
+    .DeletedeleteAccSure {
         align-self: center;
     }
-    
+
 }

@@ -9,7 +9,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + '/.env' });
 
 import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
-import {CreatePublicToken} from "../../CommonFunctions/TokenCreation/TokenCreation"
+import { CreatePublicToken } from "../../CommonFunctions/TokenCreation/TokenCreation"
 const NAMESPACE = 'AccountManagerService';
 
 
@@ -535,40 +535,7 @@ const FolowAcc = (req: Request, res: Response) => {
 
     //* if user already folows if it folows it removes form flow_class if not user is added
     if (iffolows) {
-      const GetChanelVideos = `DELETE FROM folow_class WHERE FolowedToken="${req.body.ChanelToken}" AND FolowerToken="${req.body.UserPublicToken}"; UPDATE users SET ChanelFolowers=ChanelFolowers-${1} WHERE PublicToken="${req.body.ChanelToken}"`;
-      Connect()
-        .then(connection => {
 
-          Query(connection, GetChanelVideos).then(results => {
-
-            let data = JSON.parse(JSON.stringify(results));
-            if (data.affectedRows === 0) {
-              return res.status(200).json({
-                error: true,
-              })
-            }
-
-            return res.status(200).json({
-              error: false,
-              itfolows: false
-            })
-
-          }).catch(error => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(200).json({
-              error: true,
-            })
-
-          }).finally(() => {
-            connection.end();
-          });
-
-        }).catch(error => {
-          logging.error(NAMESPACE, error.message, error);
-          return res.status(200).json({
-            error: true,
-          })
-        });
     } else {
       const GetChanelVideos = `INSERT INTO folow_class (FolowerToken, FolowedToken) VALUES ('${req.body.UserPublicToken}','${req.body.ChanelToken}'); UPDATE users SET ChanelFolowers=ChanelFolowers+${1} WHERE PublicToken="${req.body.ChanelToken}" `;
       Connect()
@@ -689,43 +656,6 @@ const ChangeAccountEmail = (req: Request, res: Response) => {
     });
 }
 
-//*Make profile public/private
-const ChangeAccountvisibility = (req: Request, res: Response) => {
-  logging.info(NAMESPACE, "Change User Name Service called");
-  const errors = myValidationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(200).json({ error: true, errors: errors.array() });
-  }
-
-  const ChangeAccountSettingsSqlQuery = `UPDATE users SET Visibility="${req.body.newVisibility}" WHERE PrivateToken="${req.body.AccountToken}"`;
-  Connect()
-    .then(connection => {
-      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
-
-        let data = JSON.parse(JSON.stringify(results));
-        if (data.affectedRows === 0) {
-          return res.status(200).json({
-            error: true,
-          })
-        }
-
-        res.status(200).json({
-          error: false
-        })
-
-      }).catch(error => {
-        logging.error(NAMESPACE, error.message, error);
-        return res.status(505);
-      }).finally(() => {
-        connection.end();
-      });
-
-    }).catch(error => {
-      logging.error(NAMESPACE, error.message, error);
-      return res.status(505);
-    });
-}
-
 const ChangeAccountPassword = (req: Request, res: Response) => {
 
   const saltRounds = 10;
@@ -763,6 +693,90 @@ const ChangeAccountPassword = (req: Request, res: Response) => {
         return res.status(505);
       });
   });
+}
+
+
+//*Make profile public/private
+const ChangeAccountvisibility = (req: Request, res: Response) => {
+  logging.info(NAMESPACE, "Change User Name Service called");
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+  const ChangeAccountSettingsSqlQuery = `UPDATE users SET Visibility="${req.body.newVisibility}" WHERE PrivateToken="${req.body.AccountToken}"`;
+  Connect()
+    .then(connection => {
+      Query(connection, ChangeAccountSettingsSqlQuery).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
+          })
+        }
+
+        res.status(200).json({
+          error: false
+        })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(505);
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(505);
+    });
+}
+
+const UpdateChanelDescription = (req: Request, res: Response) => {
+  logging.info(NAMESPACE, "Register User Account Service called");
+
+  //* Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
+
+  const UodateChanelDescriptionSqlQuerry = `UPDATE users SET ChanelDescription='${req.body.ChanelDescription}' WHERE PrivateToken="${req.body.AccountToken}"`;
+  Connect()
+    .then(connection => {
+
+      Query(connection, UodateChanelDescriptionSqlQuerry).then(results => {
+
+        let data = JSON.parse(JSON.stringify(results));
+        if (data.affectedRows === 0) {
+          return res.status(200).json({
+            error: true,
+          })
+        }
+
+        return res.status(200).json({
+          error: false,
+        })
+
+      }).catch(error => {
+        logging.error(NAMESPACE, error.message, error);
+        return res.status(200).json({
+          error: true,
+        })
+
+      }).finally(() => {
+        connection.end();
+      });
+
+    }).catch(error => {
+      logging.error(NAMESPACE, error.message, error);
+      return res.status(200).json({
+        error: true,
+      })
+    });
+
+
 }
 
 //*------------------------------------------------- Delete account infos part ---------------------------------------------------
@@ -819,6 +833,7 @@ export default {
   ChangeAccountEmail,
   ChangeAccountPassword,
   ChangeAccountvisibility,
+  UpdateChanelDescription,
 
   DeleteAccount,
 

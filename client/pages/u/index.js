@@ -41,6 +41,7 @@ export default function OwnerAccountPage(props) {
               AccountToken={Cookies.get("UserToken")}
               AccountVisibility={props.AccountVisibility}
               PublicAccountToken={AccountPublicToken}
+              ChanelDescription={props.ChanelDescription}
             />
           ) : null}
 
@@ -61,16 +62,8 @@ export default function OwnerAccountPage(props) {
               <div className={style.AboutChanelPart}>
                 <h2 className={style.AboutChanelText}>About Chanel</h2>
                 <hr color="#676767" className={style.AboutChanelLine} />
-                <h4 className={style.AboutChanelPargraphText}>{props.ChanelDescription}</h4>
+                <textarea className={style.AboutChanelPargraphText} value={props.ChanelDescription} readOnly />
               </div>
-
-              <div className={style.ChanelWallPart}>
-                <h2 className={style.AboutChanelText}>Chanel Wall</h2>
-                <hr color="#676767" className={style.AboutChanelLine} />
-                <br />
-                <div className={style.EmptySign}><h1 className={style.EmptyText}>EMPTY</h1></div>
-              </div>
-
 
               <div className={style.MostHighlithedGamesPart}>
                 <h2 className={style.MostHighlithedGamesText}>Highlithed Games</h2>
@@ -124,7 +117,7 @@ export async function getServerSideProps(context) {
         AccountName: "",
         AccountEmail: null,
         AccountFolowers: 0,
-        ChanelDescription: "",
+        ChanelDescription: AccountData.data.ChanelDescription,
         UserToken: null,
         VideoList: null,
       }

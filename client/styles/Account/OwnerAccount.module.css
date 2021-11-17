@@ -139,17 +139,16 @@
     }
 
     .AboutChanelPargraphText {
-        color: #E40000;
-        font-family: "exo 2";
-        font-size: .8rem;
-        margin: auto;
-    }
-
-    .ChanelWallPart {
-        display: flex;
-        flex-direction: column;
-        margin-top: 10%;
-        font-size: 1.2rem;
+        background-color: #313131;
+        border: none;
+        color: white;
+        resize: none;
+        font-size: 1.2em;
+        width:85%;
+        align-self: center;
+        height: 15rem;
+        outline: none;
+        cursor: default;
     }
 
     .MostHighlithedGamesPart {
@@ -483,18 +482,18 @@
     }
 
     .AboutChanelPargraphText {
-        color: #E40000;
-        font-family: "exo 2";
-        font-size: .8rem;
-        margin: auto;
+        background-color: #313131;
+        border: none;
+        color: white;
+        resize: none;
+        font-size: 1.2em;
+        width:85%;
+        align-self: center;
+        height: 15rem;
+        outline: none;
+        cursor: default;
     }
 
-    .ChanelWallPart {
-        display: flex;
-        flex-direction: column;
-        margin-top: 10%;
-        font-size: 1.2rem;
-    }
 
     .MostHighlithedGamesPart {
         display: flex;
