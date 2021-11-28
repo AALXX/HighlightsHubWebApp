@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 
 import multer from "multer";
-import hat from "hat";
 import fs from "fs";
 import FFmpeg from "fluent-ffmpeg"
 
 import logging from "../../config/logging";
 import { Connect, Query } from "../../config/mysql";
-import {CreatePublicToken} from "../../CommonFunctions/TokenCreation/TokenCreation"
+import { CreatePublicToken } from "../../CommonFunctions/TokenCreation/TokenCreation"
 
 const NAMESPACE = "UploadManagerService";
 
@@ -28,80 +27,64 @@ let upload = multer({
 const UploadVideoFileToServer = async (req: Request, res: Response) => {
   logging.info(NAMESPACE, "Posting Video service called");
 
+  
   upload(req, res, async (err: any) => {
     if (err) {
       return res.status(200).json({
         error: true,
       });
     }
-    //*check if the video exists
-    fs.stat(`../videos/${req.body.VideoTitle}`, (err) => {
-      if (err === null) {
 
-        //* check if the file exists in tmp folder
-        fs.stat(`../videos/tmp/${req.file?.originalname}`, (err) => {
+    const VideoToken = CreatePublicToken();
 
-          if (err === null) {
-            //*if exists delete the video from tmp folder
-            fs.unlink(`../videos/tmp/${req.file?.originalname}`, (err) => {
-              if (err) return console.log(err);
-              return res.status(200).json({
-                error: true,
-                mesage:"video exists"
-              })
-            });
+    //* file does not exist
+    fs.mkdir(`../videos/${VideoToken}`, (err) => {
+      if (err) {
+        return res.status(200).json({
+          error: true,
+        })
+      }
+      //* Directory Created Succesfully
+      fs.rename(`../videos/tmp/${req.file?.originalname}`, `../videos/${VideoToken}/${req.body.VideoTitle}_Source.mp4`, (err) => {
+        if (err) {
+          return res.status(200).json({
+            error: true,
+          })
+        }
 
-          }else if (err.code === 'ENOENT') {
-            //* The file does not exists
-            return res.status(200).json({
-              error: true,
-            })
-          }
-        });
+        //*File Moved succesfully
+        SendVideoDataToDb(req.body.UserPublicToken, `${VideoToken}/${req.body.VideoTitle}_Source.mp4`, req.body.VideoTitle, req.body.VideoVisibility, async (err: boolean) => {
 
-      } else if (err.code === 'ENOENT') {
-        //* file does not exist
-        fs.mkdir(`../videos/${req.body.VideoTitle}`, (err) => {
           if (err) {
             return res.status(200).json({
               error: true,
             })
           }
-          //* Directory Created Succesfully
-          fs.rename(`../videos/tmp/${req.file?.originalname}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, (err) => {
-            if (err) {
-              return res.status(200).json({
-                error: true,
-              })
-            }
+          //* Creates a 720p and 480p variant of the video
+          // await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${VideoToken}/${req.body.VideoTitle}_Source.mp4`, "1280x720").then(async () => {
+          //   await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${VideoToken}/${req.body.VideoTitle}_Source.mp4`, "480x360").then(() => {
+          //   })
+          // });
 
-            //*File Moved succesfully
-            SendVideoDataToDb(req.body.UserPublicToken, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, req.body.VideoTitle,  req.body.VideoVisibility, async (err: boolean) => {
-
-              if (err) {
-                return res.status(200).json({
-                  error: true,
-                })
-              }
-              //* Creates a 720p and 480p variant of the video
-              // await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "1280x720").then(async () => {
-              //   await VideoProceesor(`${req.body.VideoTitle}`, `../videos/${req.body.VideoTitle}/${req.body.VideoTitle}_Source.mp4`, "480x360").then(() => {
-              //   })
-              // });
-
-              return res.status(200).json({
-                error: false
-              })
-            });
-
-          });
+          return res.status(200).json({
+            error: false
+          })
         });
-      }
+
+      });
     });
   });
 };
 
-const SendVideoDataToDb = (publicToken: string, filepath: string, VideoTitle: string,  VideoVisibility:string ,callback: any) => {
+/**
+ * Sends Video Data to Database
+ * @param publicToken 
+ * @param filepath 
+ * @param VideoTitle 
+ * @param VideoVisibility 
+ * @param callback 
+ */
+const SendVideoDataToDb = (publicToken: string, filepath: string, VideoTitle: string, VideoVisibility: string, callback: any) => {
   const VideoToken = CreatePublicToken();
   let today = new Date().toISOString().slice(0, 10)
 

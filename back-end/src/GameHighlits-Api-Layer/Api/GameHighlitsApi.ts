@@ -1,5 +1,5 @@
 import http from 'http';
-import express from 'express';
+import express, { NextFunction } from 'express';
 
 //* imports from route folder
 import UserAccountRoutesControler from "../routes/UserAccountRoutes/UserAccountRoutesControler";
@@ -12,18 +12,6 @@ import logging from '../config/logging';
 const NAMESPACE = "GameHighlitsApi";
 const router = express();
 
-//* Loging the request
-router.use((req, res, next) => {
-
-  // logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}]`);
-
-  //   res.on("finish", () => {
-  //    logging.info(NAMESPACE, `METHOD- [${req.method}], URL -[${req.url}], IP - [${req.socket.remoteAddress}], STATUS- [${res.statusCode}]`);
-  // })
-  next();
-});
-
-//* Parse the Request
 router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 
@@ -48,7 +36,7 @@ router.use("/api/search-manager/", SearchingRoutesControler);
 
 
 //* Error Handleling
-router.use((req, res, next) => {
+router.use((req:any, res:any, next:NextFunction) => {
 
   const error = new Error('not found');
 

@@ -9,7 +9,7 @@ router.post("/upload-video", UploadVideoService.UploadVideoFileToServer);
 
 
 router.post("/like-the-video/", VideoPlayerManager.LikeTheVideoFunc);
-// router.get("/get-specific-video-data/:PublicVideoToken", VideoPlayerManager.GetSpecificVideoData);
+router.get("/get-video-data/:VideoToken", VideoPlayerManager.GetVideoData);
 router.post("/get-video-comments", VideoCommentsManager.GetVideoComments);
 router.post("/post-comment-to-video", VideoCommentsManager.PostRecivedCommentToDataBase);
 

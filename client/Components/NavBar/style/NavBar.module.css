@@ -29,9 +29,13 @@
     width: 100%;
 }
 
+.SearchForm{
+    align-self: center;
+
+}
+
 .SearchBarBorder {
     display: flex;
-    align-self: center;
     width: 30vw;
     margin: auto;
 }

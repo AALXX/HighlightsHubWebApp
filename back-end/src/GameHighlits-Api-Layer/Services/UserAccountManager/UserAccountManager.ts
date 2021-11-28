@@ -8,7 +8,7 @@ import { validationResult } from 'express-validator'
 import * as dotenv from "dotenv";
 dotenv.config({ path: __dirname + '/.env' });
 
-import AccountChecks from "../../CommonFunctions/AccountChecks/AccountExistCheck"
+import AccountChecks from "../../CommonFunctions/AccountChecks/AccountChecks"
 import { CreatePublicToken } from "../../CommonFunctions/TokenCreation/TokenCreation"
 const NAMESPACE = 'AccountManagerService';
 
@@ -103,7 +103,7 @@ const RegisterUserAccount = (req: Request, res: Response) => {
 
     if (err) {
       return res.status(200).json({
-        error: false,
+        error: true,
       })
     }
 
@@ -529,83 +529,106 @@ const UserFolowAccCheckFunc = (FolowedToken: string, FolowerToken: string, callB
     });
 }
 
+//* Follow acount
 const FolowAcc = (req: Request, res: Response) => {
-  UserFolowAccCheckFunc(req.body.ChanelToken, req.body.UserPublicToken, (err: boolean, iffolows: boolean) => {
 
-    //* if user already folows if it folows it removes form flow_class if not user is added
-    if (iffolows) {
-      const GetChanelVideos = `DELETE FROM folow_class WHERE FolowedToken="${req.body.ChanelToken}" AND FolowerToken="${req.body.UserPublicToken}"; UPDATE users SET ChanelFolowers=ChanelFolowers-${1} WHERE PublicToken="${req.body.ChanelToken}"`;
-      Connect()
-        .then(connection => {
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(200).json({ error: true, errors: errors.array() });
+  }
 
-          Query(connection, GetChanelVideos).then(results => {
+  AccountChecks.CheckIfAccountExist(req.body.UserPrivateToken, req.body.UserPublicToken, (err: boolean, exist: boolean) => {
 
-            let data = JSON.parse(JSON.stringify(results));
-            if (data.affectedRows === 0) {
-              return res.status(200).json({
-                error: true,
-              })
-            }
-
-            return res.status(200).json({
-              error: false,
-              itfolows: false
-            })
-
-          }).catch(error => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(200).json({
-              error: true,
-            })
-
-          }).finally(() => {
-            connection.end();
-          });
-
-        }).catch(error => {
-          logging.error(NAMESPACE, error.message, error);
-          return res.status(200).json({
-            error: true,
-          })
-        });
-    } else {
-      const GetChanelVideos = `INSERT INTO folow_class (FolowerToken, FolowedToken) VALUES ('${req.body.UserPublicToken}','${req.body.ChanelToken}'); UPDATE users SET ChanelFolowers=ChanelFolowers+${1} WHERE PublicToken="${req.body.ChanelToken}" `;
-      Connect()
-        .then(connection => {
-
-          Query(connection, GetChanelVideos).then(results => {
-
-            let data = JSON.parse(JSON.stringify(results));
-            if (data.affectedRows === 0) {
-              return res.status(200).json({
-                error: true,
-              })
-            }
-
-            return res.status(200).json({
-              error: false,
-              itfolows: true
-            })
-
-          }).catch(error => {
-            logging.error(NAMESPACE, error.message, error);
-            return res.status(200).json({
-              error: true,
-            })
-
-          }).finally(() => {
-            connection.end();
-          });
-
-        }).catch(error => {
-          logging.error(NAMESPACE, error.message, error);
-          return res.status(200).json({
-            error: true,
-          })
-        });
+    if (err) {
+      return res.status(200).json({
+        error: true,
+      })
     }
 
+    if(!exist){
+      return res.status(200).json({
+        error: true,
+      })
+    }
+
+    UserFolowAccCheckFunc(req.body.ChanelToken, req.body.UserPublicToken, (err: boolean, iffolows: boolean) => {
+
+      //* if user already folows if it folows it removes form flow_class if not user is added
+      if (iffolows) {
+        const GetChanelVideos = `DELETE FROM folow_class WHERE FolowedToken="${req.body.ChanelToken}" AND FolowerToken="${req.body.UserPublicToken}"; UPDATE users SET ChanelFolowers=ChanelFolowers-${1} WHERE PublicToken="${req.body.ChanelToken}"`;
+        Connect()
+          .then(connection => {
+
+            Query(connection, GetChanelVideos).then(results => {
+
+              let data = JSON.parse(JSON.stringify(results));
+              if (data.affectedRows === 0) {
+                return res.status(200).json({
+                  error: true,
+                })
+              }
+
+              return res.status(200).json({
+                error: false,
+                itfolows: false
+              })
+
+            }).catch(error => {
+              logging.error(NAMESPACE, error.message, error);
+              return res.status(200).json({
+                error: true,
+              })
+
+            }).finally(() => {
+              connection.end();
+            });
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(200).json({
+              error: true,
+            })
+          });
+      } else {
+        const GetChanelVideos = `INSERT INTO folow_class (FolowerToken, FolowedToken) VALUES ('${req.body.UserPublicToken}','${req.body.ChanelToken}'); UPDATE users SET ChanelFolowers=ChanelFolowers+${1} WHERE PublicToken="${req.body.ChanelToken}" `;
+        Connect()
+          .then(connection => {
+
+            Query(connection, GetChanelVideos).then(results => {
+
+              let data = JSON.parse(JSON.stringify(results));
+              if (data.affectedRows === 0) {
+                return res.status(200).json({
+                  error: true,
+                })
+              }
+
+              return res.status(200).json({
+                error: false,
+                itfolows: true
+              })
+
+            }).catch(error => {
+              logging.error(NAMESPACE, error.message, error);
+              return res.status(200).json({
+                error: true,
+              })
+
+            }).finally(() => {
+              connection.end();
+            });
+
+          }).catch(error => {
+            logging.error(NAMESPACE, error.message, error);
+            return res.status(200).json({
+              error: true,
+            })
+          });
+      }
+
+    });
   });
+
 }
 
 
@@ -812,7 +835,6 @@ const UpdateChanelDescription = (req: Request, res: Response) => {
 }
 
 //*------------------------------------------------- Delete account infos part ---------------------------------------------------
-
 
 const DeleteAccount = (req: Request, res: Response) => {
   const errors = myValidationResult(req);

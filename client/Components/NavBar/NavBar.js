@@ -16,7 +16,6 @@ export default function NavBar() {
     const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
 
     useEffect(() => {
-
         if (Cookies.get("PublicUserToken") === undefined) {
 
             return setFolowedChanelsList([]);
@@ -42,18 +41,20 @@ export default function NavBar() {
                 </button>
 
                 <div className={style.SearchBarContainer}>
-                    <div className={style.SearchBarBorder}>
-                        <div className={style.SearchBar}>
-                            <input type="test" className={style.SearchBarInput}
-                                placeholder="Search"
-                                onChange={event => setInput(event.currentTarget.value)}
-                            />
-                        </div>
+                    <form className={style.SearchForm}>
+                        <div className={style.SearchBarBorder}>
+                            <div className={style.SearchBar}>
+                                <input type="test" className={style.SearchBarInput}
+                                    placeholder="Search"
+                                    onChange={event => setInput(event.currentTarget.value)}
+                                />
+                            </div>
 
-                        <button className={style.SearchButton} >
-                            <img src='/assets/NavBarIcons/SearchBarIcon.svg' alt='next' className={style.SearchIcon} />
-                        </button>
-                    </div>
+                            <button className={style.SearchButton} >
+                                <img src='/assets/NavBarIcons/SearchBarIcon.svg' alt='next' className={style.SearchIcon} />
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <button className={style.AccountImageButton} onClick={() => router.push('/u')} >
                     <img src='/assets/NavBarIcons/RedAccountDefaultImage.svg' alt='AccountImageButton' className={style.AccountImage} />

@@ -92,7 +92,7 @@ export default function UploadPage(props) {
                 <div className={style.PageContainer}>
                     <div className={style.UploadFileSection}>
                         <label htmlFor="VideoFile" className={style.UploadBox}>
-                            <input className={style.UploadInput} type="file" id="VideoFile" onChange={(e) => { setvideoFile(e.target.files); PreviewVideo(e); }} accept=".mov,.mp4" />
+                            <input className={style.UploadInput} type="file" id="VideoFile" onChange={(e) => { setvideoFile(e.target.files); PreviewVideo(e); setProgress(0);}} accept=".mov,.mp4" />
                             <img src='/assets/UploadPageIcons/VideoUploadIcon.svg' alt='AccountImageButton' className={style.UploadIcon} />
                         </label>
                         <div className={style.ProgresAndAtributesContainer}>
