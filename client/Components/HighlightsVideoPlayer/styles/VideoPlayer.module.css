@@ -8,7 +8,6 @@
     flex-direction: column;
 }
 
-
 .VideoComponentContainer {
     display: flex;
     width: 100%;
@@ -16,6 +15,7 @@
     flex-direction: column;
     position: relative;
     overflow: hidden;
+    
 }
 
 .VideoComponent {
@@ -103,44 +103,44 @@
     -webkit-appearance: none;
 }
 
-.MuteButton{
+.MuteButton {
     cursor: pointer;
     width: 2rem;
     align-self: center;
     margin-right: 1rem;
 }
 
-.FullScreenButton{
+.FullScreenButton {
     cursor: pointer;
     width: 2rem;
     align-self: center;
     margin-right: 1rem;
 }
 
-.PlayerFooterCntainer{
+.PlayerFooterCntainer {
     display: flex;
-    background-color:#3d3d3d;
-    height:10%;
+    background-color: #3d3d3d;
+    height: 10%;
 }
 
-.ProfilePicture{
+.ProfilePicture {
+    width: 3em;
     align-self: center;
     background-color: transparent;
     border: transparent;
     outline: none;
     cursor: pointer;
-    width: 3em;
 }
 
-.ChanelStatsContainer{
+.ChanelStatsContainer {
     display: flex;
     margin-left: 2.5rem;
 }
 
-.ChanelStats{
+.ChanelStats {
     align-self: center;
     margin-left: 1.5em;
-    flex-direction:column;
+    flex-direction: column;
 }
 
 .AccountNameText {
@@ -148,7 +148,7 @@
     font-family: "exo 2";
     font-size: 1rem;
     margin: auto;
-    align-self:center;
+    align-self: center;
 }
 
 .ChanelStatsBar {
@@ -164,7 +164,7 @@
     margin: auto;
 }
 
-.VideoTitleText{
+.VideoTitleText {
     align-self: center;
     color: #E40000;
     font-family: "exo 2";
@@ -172,7 +172,7 @@
     margin-left: 13em;
 }
 
-.Fireicon{
+.Fireicon {
     width: 1.5em;
     align-self: center;
     margin-left: auto;
@@ -181,11 +181,134 @@
 
 }
 
-.VideoFiresText{
+.VideoFiresText {
     align-self: center;
     color: #E40000;
     font-family: "exo 2";
     font-size: 1.5rem;
     margin-right: 2em;
+
+}
+
+@media (min-width: 1100px) and (max-width: 1600px) {
+
+    .VideoPlayerBorder {
+        margin-left: 2%;
+        width: 65rem;
+        height: 40.77rem;
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 800px) and (max-width: 1100px) {
+    .VideoPlayerBorder {
+        margin-left: 0%;
+        width: 40rem;
+        height: 40.77rem;
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 830px) {
+    .VideoPlayerBorder {
+        margin-left: 0%;
+        width: 100%;
+        height: 18rem;
+        flex-direction: column;
+    }
+
+
+    .VideoComponentContainer {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        position: relative;
+    }
     
+    .VideoControlsContainer {
+        display: none;
+        bottom: 0;
+        width: 100%;
+        flex-wrap: wrap;
+        background: rgba(24, 24, 24, 0.575);
+        height: 5rem;
+        transform: translateY(100%) translateY(-2px);
+        transition: all 0.2s;
+    }
+
+    .PlayerFooterCntainer {
+        display: flex;
+        background-color: #3d3d3d;
+        height: 20%;
+        margin-top: auto;
+    }
+    
+    .ProfilePicture {
+        align-self: center;
+        background-color: transparent;
+        border: transparent;
+        outline: none;
+        cursor: pointer;
+        width: 1.5em;
+    }
+    
+    .ChanelStatsContainer {
+        display: flex;
+        margin-left: 1rem;
+    }
+    
+    .ChanelStats {
+        align-self: center;
+        margin-left: .5em;
+        flex-direction: column;
+    }
+    
+    .AccountNameText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .5rem;
+        margin: auto;
+        align-self: center;
+    }
+    
+    .ChanelStatsBar {
+        width: 3rem;
+        margin: auto;
+    
+    }
+    
+    .AccountFolowersText {
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: .5rem;
+        margin: auto;
+    }
+    
+    .VideoTitleText {
+        align-self: center;
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: 1rem;
+        margin-left: 3em;
+    }
+    
+    .Fireicon {
+        width: 1em;
+        align-self: center;
+        margin-left: auto;
+        margin-right: 1em;
+        cursor: pointer;
+    
+    }
+    
+    .VideoFiresText {
+        align-self: center;
+        color: #E40000;
+        font-family: "exo 2";
+        font-size: 1rem;
+        margin-right: 2em;
+    
+    }
 }

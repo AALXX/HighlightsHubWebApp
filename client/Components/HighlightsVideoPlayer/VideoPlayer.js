@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from 'next/router'
 import Link from "next/Link"
+import Image from "next/Image"
 
 export default function VideoPlayer(props) {
 
@@ -24,13 +25,24 @@ export default function VideoPlayer(props) {
     const [VideoExist, setVideoExist] = useState(false)
 
 
-    
+
     const mounted = useRef(false);
     const videoRef = useRef();
     const previousUrl = useRef(props.VideoToken);
 
     useEffect(() => {
         mounted.current = true;
+
+        setVolume(localStorage.getItem("Volume"));
+        setTimeout(() => {
+            videoRef?.current.volume = localStorage.getItem("Volume");
+            if (videoRef?.current.paused) {
+                setPlaying(true);
+            }
+            else {
+                setPlaying(false);
+            }
+        }, 100);
 
         setVideoTokenState(props.VideoToken)
         GetVideoData();
@@ -51,13 +63,13 @@ export default function VideoPlayer(props) {
                 setDurationMinutes(Math.floor(videoRef?.current?.duration / 60));
                 setDurationSeconds(Math.floor(videoRef?.current?.duration - DurationMinutes * 60));
 
-            }else{
+            } else {
                 return;
             }
 
         }, 1000);
 
-        return () => {mounted.current = false; clearInterval(VideoChecks);};
+        return () => { mounted.current = false; clearInterval(VideoChecks); };
 
     }, [props.VideoToken]);
 
@@ -93,7 +105,8 @@ export default function VideoPlayer(props) {
     //* volume
     const ChangeVolume = (e) => {
         videoRef.current.volume = e.target.value;
-        setVolume(e.target.value)
+        setVolume(e.target.value);
+        localStorage.setItem("Volume", e.target.value);
     }
 
     //* Play/Pause
@@ -112,15 +125,15 @@ export default function VideoPlayer(props) {
         <div className={styles.VideoPlayerBorder} >
             {VideoExist ? (
                 <div className={styles.VideoComponentContainer}>
-                    <video ref={videoRef} className={styles.VideoComponent} onClick={() => { PlayOrPauseVideo(); }}>
-                        <source src={`${process.env.LOCAL_VIDEO_STREAM_API_URL}/video-stream/${VideoTokenState}`} type="video/mp4" />
-                    </video>
+                    <div onClick={() => { PlayOrPauseVideo(); }} className={styles.VideoClickPlay}>
+
+                        <video ref={videoRef} className={styles.VideoComponent} autoPlay>
+                            <source src={`${process.env.LOCAL_VIDEO_STREAM_API_URL}/video-stream/${VideoTokenState}`} type="video/mp4" />
+                        </video>
+                    </div>
                     <div className={styles.VideoControlsContainer}>
                         <div className={styles.PlayBarProgress}>
-                            <div className={styles.PlayBarProgressFill} style={{ width: `${Progress}%` }} >
-
-                            </div>
-
+                            <div className={styles.PlayBarProgressFill} style={{ width: `${Progress}%` }} />
                         </div>
 
                         <div className={styles.VideoControls}>
@@ -132,20 +145,18 @@ export default function VideoPlayer(props) {
 
                             <div className={styles.Volume}>
                                 {Volume == 0 ? (
-                                    <img src='/assets/Player/volumeOff.svg' className={styles.MuteButton} alt="" onClick={() => { setVolume(0.5); videoRef.current.volume = 0.5 }} />
+                                    <img src='/assets/Player/volumeOff.svg' className={styles.MuteButton} alt="" onClick={() => { setVolume(0.5); videoRef.current.volume = 0.5; localStorage.setItem("Volume", 0.5) }} />
                                 ) : (
-                                    <img src='/assets/Player/volumeOn.svg' className={styles.MuteButton} alt="" onClick={() => { setVolume(0); videoRef.current.volume = 0 }} />
+                                    <img src='/assets/Player/volumeOn.svg' className={styles.MuteButton} alt="" onClick={() => { setVolume(0); videoRef.current.volume = 0; localStorage.setItem("Volume", 0) }} />
 
                                 )}
                                 <input type="range" className={styles.VolumeBar} min="0" max="1" step="0.01" onChange={(e) => { ChangeVolume(e); }} value={Volume} />
                             </div>
 
-
-
                             <div className={styles.VideoTime}>
                                 <span className={styles.CurrentTime}>{CurrentMinutes}:{CurrentSeconds < 10 ? "0" + CurrentSeconds : CurrentSeconds}</span> / <span className={styles.VideoTotalTime}>{DurationMinutes}:{durationSeconds}</span>
                             </div>
-                            <img src='/assets/Player/Fullscreen.svg' className={styles.FullScreenButton} alt="" onClick={() => { videoRef.current.requestFullscreen(); }} />
+                            <Image src='/assets/Player/Fullscreen.svg' className={styles.FullScreenButton} width={1} height={1} alt="" onClick={() => { videoRef.current.requestFullscreen(); }} />
                         </div>
 
                     </div>
@@ -157,7 +168,7 @@ export default function VideoPlayer(props) {
             <div className={styles.PlayerFooterCntainer}>
                 <div className={styles.ChanelStatsContainer}>
                     <Link href="/u" >
-                        <img className={styles.ProfilePicture} src='/assets/NavBarIcons/RedAccountDefaultImage.svg' />
+                        <Image className={styles.ProfilePicture} width={40} height={40} src='/assets/NavBarIcons/RedAccountDefaultImage.svg' />
                     </Link>
 
                     <div className={styles.ChanelStats}>

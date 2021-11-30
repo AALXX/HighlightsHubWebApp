@@ -5,6 +5,7 @@
 /client/node_modules
 /client/config
 /client/.next
+/client/next.config.js
 /.pnp
 .pnp.js
 
@@ -31,10 +32,10 @@ yarn-error.log*
 /client-old
 /AccProfileImages
 
-/client/src/VideoStream-Api-Layer/target/
-/client/src/VideoStream-Api-Layer/.mvn
-/client/src/VideoStream-Api-Layer/out
-/client/src/VideoStream-Api-Layer/.idea
+/back-end/src/VideoStream-Api-Layer/target/
+/back-end/src/VideoStream-Api-Layer/.mvn
+/back-end/src/VideoStream-Api-Layer/out
+/back-end/src/VideoStream-Api-Layer/.idea
 
 ### STS ###
 .apt_generated
