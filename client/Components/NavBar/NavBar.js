@@ -13,7 +13,7 @@ export default function NavBar() {
     const [sidebar, setsidebar] = useState(false)
     const [Input, setInput] = useState([]);
 
-    const [FolowedChanelsList, setFolowedChanelsList] = useState([{ ChanelsId: "", ChanelName: "" }]);
+    const [FolowedChanelsList, setFolowedChanelsList] = useState([]);
 
     useEffect(() => {
         if (Cookies.get("PublicUserToken") === undefined) {
@@ -23,11 +23,9 @@ export default function NavBar() {
 
         axios.get(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/get-user-folowed-chanels/${Cookies.get("PublicUserToken")}`).then((res) => {
             let FolowedChanelsListArr = [];
-
-            for (let i = 0; i < res.data.length; i++) {
-                FolowedChanelsListArr.push(res.data[i])
+            for (let i = 0; i < res.data.Chanels.length; i++) {
+                FolowedChanelsListArr.push(res.data.Chanels[i])
             }
-
             setFolowedChanelsList(FolowedChanelsListArr);
         });
 
@@ -87,7 +85,7 @@ export default function NavBar() {
                             <div key={index}>
                                 <ChanelLinkTamplate
                                     ChanelName={Chanel.ChanelName}
-                                    ChanelId={Chanel.ChanelsId}
+                                    ChanelId={Chanel.ChanelToken}
                                 />
                             </div>
                         ))}

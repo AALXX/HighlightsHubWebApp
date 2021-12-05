@@ -230,9 +230,6 @@ const GetAccountImage = (req: Request, res: Response) => {
           });
 
         }
-
-
-
         if (data[0].AccountAvatarIconPath === null) {
           return fs.readFile("./assets/AccountDefaulImage/RedAccountDefaultImage.png", (err, image) => {
             res.writeHead(200, {
@@ -305,7 +302,6 @@ const GetUserFolowedChanels = (req: Request, res: Response) => {
     })
   }
 
-
   //*it defines a type for chanel tokens object
   GetFolowedChanelsTokens(req.params.AccountToken, async (err: boolean, ChanelsTokens: ChanelsTokens[]) => {
     if (err) {
@@ -313,6 +309,7 @@ const GetUserFolowedChanels = (req: Request, res: Response) => {
         error: true
       })
     }
+
 
     let Chanels: any = [];
 
@@ -325,7 +322,7 @@ const GetUserFolowedChanels = (req: Request, res: Response) => {
       });;
 
       let ChanelData_Obj = {
-        ChanelsId: ChanelsTokens[i].FolowedToken,
+        ChanelToken: ChanelsTokens[i].FolowedToken,
         ChanelName: ChanelsName,
       };
 
@@ -333,10 +330,10 @@ const GetUserFolowedChanels = (req: Request, res: Response) => {
     }
 
 
-    return res.status(200).json(
-      Chanels,
 
-    )
+    return res.status(200).json({
+      Chanels: Chanels
+    })
   });
 }
 
@@ -545,7 +542,7 @@ const FolowAcc = (req: Request, res: Response) => {
       })
     }
 
-    if(!exist){
+    if (!exist) {
       return res.status(200).json({
         error: true,
       })

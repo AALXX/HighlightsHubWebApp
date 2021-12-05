@@ -24,18 +24,18 @@ export default function ExternAccountPage(props) {
   }, [])
 
   const FollowChanel = () => {
-    axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/user-folow-acc/`, { UserPublicToken: Cookies.get("PublicUserToken"), UserPrivateToken: Cookies.get("UserToken"),ChanelToken: props.AccountToken }).then((res) => {
+    axios.post(`${process.env.LOCAL_BACKEND_URL}/user-account-manager/user-folow-acc/`, { UserPublicToken: Cookies.get("PublicUserToken"), UserPrivateToken: Cookies.get("UserToken"), ChanelToken: props.AccountToken }).then((res) => {
       setFolows(res.data.itfolows)
 
-      if(res.data.error){
+      if (res.data.error) {
         return window.alert("Can't follow without account");
       }
 
       if (res.data.itfolows) {
         return setFolowers(Folowers + 1);
-      } else {
-        return setFolowers(Folowers - 1);
       }
+
+      return setFolowers(Folowers - 1);
     })
   }
 

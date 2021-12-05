@@ -19,34 +19,27 @@ import java.util.List;
 @RestController
 public class VideoStreamApiLayerApplication implements CommandLineRunner {
 
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private StreamService service;
 
-    //It Get Video Data from videos table
+    // It Get Video Data from videos table
     public List<VideoData> GetVideoData(String VideoToken) {
-        return jdbcTemplate.query("SELECT videoPath FROM videos WHERE VideoToken = ?", new BeanPropertyRowMapper(VideoData.class), VideoToken);
+        return jdbcTemplate.query("SELECT videoPath FROM videos WHERE VideoToken = ?",
+                new BeanPropertyRowMapper<VideoData>(VideoData.class), VideoToken);
     }
-
 
     @GetMapping(value = "api/video-stream/{VideoToken}", produces = "video/mp4")
     public Mono<Resource> GetVideo(@PathVariable String VideoToken, @RequestHeader("Range") String range) {
-        System.out.println("range in bytes() : " + range);
-
         List<VideoData> data = GetVideoData(VideoToken);
-        System.out.println(data.get(0).getVideoPath());
-
         return service.GetVideo(data.get(0).getVideoPath());
     }
-
 
     public static void main(String[] args) {
         SpringApplication.run(VideoStreamApiLayerApplication.class, args);
     }
-
 
     @Override
     public void run(String... args) throws Exception {
